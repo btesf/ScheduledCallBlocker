@@ -195,7 +195,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             contactNameTextView.setText(contact.getContactName());
             contactPhoneTextView.setText(contact.getPhoneNumber());
             outGoingCheckBox.setChecked(contact.isIsOutGoingBlocked());
-            inComingCheckBox.setChecked(contact.isIsOutGoingBlocked());
+            inComingCheckBox.setChecked(contact.isIsIncomingBlocked());
         }
     }
     /**

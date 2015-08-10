@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by bereket on 7/21/15.
@@ -17,13 +18,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     //blocked list table and columns
     private static String BLOCKED_LIST_TABLE = "BlockedList";
-    private static String ID = "_id";
-    private static String NAME = "name";
-    private static String PHONE_NUMBER = "PhoneNumber";
-    private static String OUTGOING_CALL_BLOCKED = "OutgoingCall";
-    private static String INCOMING_CALL_BLOCKED = "IncomingCall";
-    private static String NO_OF_TIMES_OUTGOING_BLOCKED = "BlockedOutgoingCalls";
-    private static String NO_OF_TIMES_INCOMING_BLOCKED = "BlockedIncomingCalls";
+    public static String ID = "_id";
+    public static String NAME = "name";
+    public static String PHONE_NUMBER = "PhoneNumber";
+    public static String OUTGOING_CALL_BLOCKED = "OutgoingCall";
+    public static String INCOMING_CALL_BLOCKED = "IncomingCall";
+    public static String NO_OF_TIMES_OUTGOING_BLOCKED = "BlockedOutgoingCalls";
+    public static String NO_OF_TIMES_INCOMING_BLOCKED = "BlockedIncomingCalls";
 
     private static String NO_NAME_CONTACT = "No name";
 
@@ -88,12 +89,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(NAME, contact.getContactName());
         cv.put(PHONE_NUMBER, contact.getPhoneNumber());
-        cv.put(OUTGOING_CALL_BLOCKED, contact.getOutgoingBlockedCount());
-        cv.put(INCOMING_CALL_BLOCKED, contact.getIncomingBlockedCount());
+        cv.put(OUTGOING_CALL_BLOCKED, contact.isIsOutGoingBlocked());
+        cv.put(INCOMING_CALL_BLOCKED, contact.isIsIncomingBlocked());
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());
 
-        getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{contact.getId()});
+        int rows = getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{contact.getId()});
     }
 
     public ContactCursor queryContacts(){

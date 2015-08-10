@@ -19,7 +19,7 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
 
     @Override
     public DataBaseHelper.ContactCursor loadInBackground(){
-        DataBaseHelper.ContactCursor cursor = loadData(); //TODO create data load here
+        DataBaseHelper.ContactCursor cursor = loadData();
         if(cursor !=  null){
             //Ensure that the content window is filled
             cursor.getCount();
