@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:id="@+id/single_contact_view_layout">
+   <!-- android:background="@drawable/highlight_list_menu_item"-->
+
+    <CheckBox
+        android:id="@+id/outgoing_call_blocked_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:focusable="false"
+        android:enabled="false"
+        android:layout_alignParentRight="true"
+        />
+
+    <CheckBox
+        android:id="@+id/incoming_call_blocked_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:focusable="false"
+        android:enabled="false"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/outgoing_call_blocked_checkbox"
+        />
+
+    <TextView
+        android:id="@+id/contact_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:layout_toLeftOf="@id/outgoing_call_blocked_checkbox"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/contact_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/outgoing_call_blocked_checkbox"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:layout_below="@id/contact_name"
+        />
+</RelativeLayout>

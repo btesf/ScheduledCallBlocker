@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">CallBlocker</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="add_from_contact">Add from contact</string>
+    <string name="add_manually">Add manually</string>
+    <string name="phoneNumberIsEmpty">Cannot add contact. Phone number is empty</string>
+    <string name="title_activity_single_contact">Manage contact</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="outgoing_call_blocked_string">Block outgoing call</string>
+    <string name="incoming_call_blocked_string">Block incoming call</string>
+</resources>
