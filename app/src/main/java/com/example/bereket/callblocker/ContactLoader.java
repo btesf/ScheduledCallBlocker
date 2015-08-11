@@ -22,7 +22,9 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
         DataBaseHelper.ContactCursor cursor = loadData();
         if(cursor !=  null){
             //Ensure that the content window is filled
-            cursor.getCount();  
+            cursor.getCount();
+
+            
         }
         return cursor;
     }
