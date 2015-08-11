@@ -24,29 +24,31 @@ public class CallBlockerReceiver extends BroadcastReceiver {
             phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
         }
 
-        DataBaseHelper helper = new DataBaseHelper(context);
+        ContactManager contactManager = ContactManager.getInstance(context);
 
-        DataBaseHelper.ContactCursor contactCursor = helper.queryContacts();
+        Contact blockedContact = contactManager.getContactByPhoneNumber(phoneNumber);
 
-        contactCursor.moveToFirst();
+        if(blockedContact == null){
 
-        do{
-            String str = contactCursor.getString(contactCursor.getColumnIndex(DataBaseHelper.PHONE_NUMBER));
+            return;
+        }
 
-            Log.d("bere.bere.bere", "Called No: " + phoneNumber + ", DB number: " + str);
-            //Determine the country code from current network (instead of system setting)
-            //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
-            TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);
+        //Determine the country code from current network (instead of system setting)
+        //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
+        TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);
+        String countryCodeValue = tm.getNetworkCountryIso();
 
-            String countryCodeValue = tm.getNetworkCountryIso();
+        if(countryCodeValue != null){
 
-            if(countryCodeValue != null){
+            Log.d("bere.bere.bere", countryCodeValue);
 
-                Log.d("bere.bere.bere", countryCodeValue);
+            if(phoneNumber.equals(blockedContact.getPhoneNumber())){
+                //if outgoing call is blocked proceed with blocking
+                if(blockedContact.isIsOutGoingBlocked()){
 
-                if(phoneNumber.equals(str)){//"0911510873")){
                     setResultData(null);
-                    abortBroadcast();
+                    //not recommended to abort broadcast
+                    //abortBroadcast();
                     Intent i  = new Intent(context, CallBlockerActivity.class);
                     PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
                     Notification notification = new NotificationCompat.Builder(context)
@@ -61,12 +63,9 @@ public class CallBlockerReceiver extends BroadcastReceiver {
                     NotificationManager notificationManager = (NotificationManager)
                             context.getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.notify(0, notification);
-
-                    break;
                 }
             }
-
         }
-        while(contactCursor.moveToNext());
+        //else { /*  if country code value is null, it means there is no network (no sim is inserted/phone is in airplane mode)*/}
     }
 }

@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.ListFragment;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,7 +50,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private DataBaseHelper dataBaseHelper;
+    private ContactManager mContactManager;
     private DataBaseHelper.ContactCursor mContactCursor;
 
     // TODO: Rename and change types of parameters
@@ -80,7 +79,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        dataBaseHelper = new DataBaseHelper(getActivity());
+        mContactManager = ContactManager.getInstance(getActivity());
         setHasOptionsMenu(true);
 
         getLoaderManager().initLoader(CONTACTS_LIST_LOADER, null, this);
@@ -193,7 +192,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             CheckBox inComingCheckBox = (CheckBox) view.findViewById(R.id.incoming_call_blocked_checkbox);
 
             contactNameTextView.setText(contact.getContactName());
-            contactPhoneTextView.setText(contact.getPhoneNumber());
+            contactPhoneTextView.setText(contact.getDisplayNumber());
             outGoingCheckBox.setChecked(contact.isIsOutGoingBlocked());
             inComingCheckBox.setChecked(contact.isIsIncomingBlocked());
         }
@@ -270,7 +269,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             }
             else{
 
-                dataBaseHelper.insertContact(id, phoneNumber, contactName);
+                mContactManager.insertContact(id, phoneNumber, contactName);
                 ((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
             }
         }

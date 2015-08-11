@@ -9,6 +9,7 @@ public class Contact implements Serializable {
 
     private String mId;
     private String mPhoneNumber;
+    private String mDisplayNumber;
     private String mContactName;
     private boolean mIsOutGoingBlocked;
     private boolean mIsIncomingBlocked;
@@ -37,6 +38,14 @@ public class Contact implements Serializable {
 
     public void setPhoneNumber(String mPhoneNumber) {
         this.mPhoneNumber = mPhoneNumber;
+    }
+
+    public String getDisplayNumber() {
+        return mDisplayNumber;
+    }
+
+    public void setDisplayNumber(String mDisplayNumber) {
+        this.mDisplayNumber = mDisplayNumber;
     }
 
     public boolean isIsOutGoingBlocked() {

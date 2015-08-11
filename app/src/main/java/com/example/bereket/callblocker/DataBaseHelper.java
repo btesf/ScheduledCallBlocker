@@ -21,6 +21,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static String ID = "_id";
     public static String NAME = "name";
     public static String PHONE_NUMBER = "PhoneNumber";
+    public static String DISPLAY_NUMBER = "DisplayNumber";
     public static String OUTGOING_CALL_BLOCKED = "OutgoingCall";
     public static String INCOMING_CALL_BLOCKED = "IncomingCall";
     public static String NO_OF_TIMES_OUTGOING_BLOCKED = "BlockedOutgoingCalls";
@@ -39,7 +40,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         String createBlockedListTable = " CREATE TABLE " +  BLOCKED_LIST_TABLE + " (" +
                 ID + " CHAR(10) PRIMARY KEY, " +
                 NAME + " varchar(100), " +
-                PHONE_NUMBER + " char(15), " +
+                PHONE_NUMBER + " char(20), " +
+                DISPLAY_NUMBER + " char(20), " +
                 OUTGOING_CALL_BLOCKED + " boolean default 0, " +
                 INCOMING_CALL_BLOCKED + " boolean default 0, " +
                 NO_OF_TIMES_OUTGOING_BLOCKED + " int default 0, " +
@@ -57,15 +59,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * <writable_database>.insert(..., <content_value>) is not used in favor of INSERT OR REPLACE statement
      * to avoid multiple queries to verify uniqueness of contact ID but updating some columns
      */
-    public void insertContact(String contactId, String phoneNumber, String contactName){
+    public void insertContact(String contactId, String phoneNumber,  String displayNumber, String contactName){
 
         if(phoneNumber == null || phoneNumber.isEmpty()) return;
 
         String query = "INSERT OR REPLACE INTO " + BLOCKED_LIST_TABLE  + " (" +
-                        ID + ", " + PHONE_NUMBER + ", " + NAME + ", " +
+                        ID + ", " + PHONE_NUMBER + ", " + DISPLAY_NUMBER + ", " + NAME + ", " +
                         OUTGOING_CALL_BLOCKED + ", " + INCOMING_CALL_BLOCKED + ", " +
                         NO_OF_TIMES_OUTGOING_BLOCKED + ", " + NO_OF_TIMES_INCOMING_BLOCKED + ") " +
-                        "VALUES ('" + contactId + "', '" + phoneNumber + "', '" +
+                        "VALUES ('" + contactId + "', '" + phoneNumber + "', '" + displayNumber + "', '" +
                         ((contactName == null || contactName.isEmpty()) ? NO_NAME_CONTACT : contactName) + "', " +
                         "COALESCE((SELECT " + OUTGOING_CALL_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default not blocked
                         "COALESCE((SELECT " + INCOMING_CALL_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default not blocked
@@ -79,9 +81,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, PHONE_NUMBER + " = ? ", new String[]{phoneNumber}, null, null, null);
 
-        if((cursor != null) && (cursor.getCount() > 0)) return null;
+        if((cursor != null) && (cursor.getCount() > 0))
+            return (new ContactCursor(cursor)).getContact();
 
-        return new ContactCursor(cursor).getContact();
+        return null;
     }
 
     public void updateContact(Contact contact){
@@ -89,6 +92,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(NAME, contact.getContactName());
         cv.put(PHONE_NUMBER, contact.getPhoneNumber());
+        cv.put(DISPLAY_NUMBER, contact.getDisplayNumber());
         cv.put(OUTGOING_CALL_BLOCKED, contact.isIsOutGoingBlocked());
         cv.put(INCOMING_CALL_BLOCKED, contact.isIsIncomingBlocked());
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());
@@ -116,6 +120,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             String contactId = getString(getColumnIndex(ID));
             String phoneNumber = getString(getColumnIndex(PHONE_NUMBER));
+            String displayNumber = getString(getColumnIndex(DISPLAY_NUMBER));
             String contactName = getString(getColumnIndex(NAME));
             boolean isOutgoingBlocked = getInt(getColumnIndex(OUTGOING_CALL_BLOCKED)) == 1 ? true : false;
             boolean isIncomingBlocked = getInt(getColumnIndex(INCOMING_CALL_BLOCKED)) == 1 ? true : false;
@@ -124,6 +129,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             contact.setId(contactId);
             contact.setPhoneNumber(phoneNumber);
+            contact.setDisplayNumber(displayNumber);
             contact.setContactName(contactName);
             contact.setIsIncomingBlocked(isIncomingBlocked);
             contact.setIsOutGoingBlocked(isOutgoingBlocked);

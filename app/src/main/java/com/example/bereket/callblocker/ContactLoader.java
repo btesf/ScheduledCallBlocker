@@ -10,11 +10,11 @@ import android.database.Cursor;
 public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor> {
 
     private DataBaseHelper.ContactCursor mCursor;
-    private DataBaseHelper dataHelper;
+    private ContactManager contactManager;
 
     public ContactLoader(Context context) {
         super(context);
-        dataHelper = new DataBaseHelper(context);
+        contactManager = ContactManager.getInstance(context);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
     }
 
     private DataBaseHelper.ContactCursor loadData(){
-        return dataHelper.queryContacts();
+        return contactManager.queryContacts();
     }
 
     @Override
