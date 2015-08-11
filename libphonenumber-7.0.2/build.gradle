@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('libphonenumber-7.0.2.jar'))

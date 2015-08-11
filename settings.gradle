@@ -1,1 +1,1 @@
-include ':app', ':libphonenumber-7.0.2'
+include ':app'
