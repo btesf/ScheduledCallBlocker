@@ -118,7 +118,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             // fragment is attached to one) that an item has been selected.
            // mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
-
+mContactManager.getContactByPhoneNumber("0911510873");
         Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
 
          Intent intent = new Intent(getActivity(), SingleContactActivity.class);

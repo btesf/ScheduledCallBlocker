@@ -81,10 +81,45 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, PHONE_NUMBER + " = ? ", new String[]{phoneNumber}, null, null, null);
 
-        if((cursor != null) && (cursor.getCount() > 0))
-            return (new ContactCursor(cursor)).getContact();
+        if(cursor != null && cursor.getCount() > 0) {
 
-        return null;
+
+            ContactCursor contactCursor = new ContactCursor(cursor);
+            contactCursor.moveToFirst();
+            Contact contact = contactCursor.getContact();
+            contactCursor.close();
+
+            return contact;
+
+
+//            cursor.moveToFirst();
+//            Contact contact = new Contact();
+//
+//            String contactId = cursor.getString(cursor.getColumnIndex(ID));
+//            String displayNumber = cursor.getString(cursor.getColumnIndex(DISPLAY_NUMBER));
+//            String contactName = cursor.getString(cursor.getColumnIndex(NAME));
+//            boolean isOutgoingBlocked = cursor.getInt(cursor.getColumnIndex(OUTGOING_CALL_BLOCKED)) == 1 ? true : false;
+//            boolean isIncomingBlocked = cursor.getInt(cursor.getColumnIndex(INCOMING_CALL_BLOCKED)) == 1 ? true : false;
+//            int incomingBlockedCount = cursor.getInt(cursor.getColumnIndex(NO_OF_TIMES_INCOMING_BLOCKED));
+//            int outgoingBlockedCount = cursor.getInt(cursor.getColumnIndex(NO_OF_TIMES_OUTGOING_BLOCKED));
+//
+//            contact.setId(contactId);
+//            contact.setPhoneNumber(phoneNumber);
+//            contact.setDisplayNumber(displayNumber);
+//            contact.setContactName(contactName);
+//            contact.setIsIncomingBlocked(isIncomingBlocked);
+//            contact.setIsOutGoingBlocked(isOutgoingBlocked);
+//            contact.setIncomingBlockedCount(incomingBlockedCount);
+//            contact.setOutgoingBlockedCount(outgoingBlockedCount);
+//            //close cursor
+//            cursor.close();
+//            return contact;
+
+        }
+        else {
+            return null;
+        }
+        //return null;
     }
 
     public void updateContact(Contact contact){
