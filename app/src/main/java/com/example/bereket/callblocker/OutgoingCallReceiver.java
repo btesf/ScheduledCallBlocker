@@ -14,7 +14,7 @@ import android.util.Log;
 /**
  * Created by bereket on 7/18/15.
  */
-public class CallBlockerReceiver extends BroadcastReceiver {
+public class OutgoingCallReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
