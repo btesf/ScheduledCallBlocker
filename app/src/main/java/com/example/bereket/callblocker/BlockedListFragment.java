@@ -13,12 +13,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.ListFragment;
 import android.provider.ContactsContract;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
@@ -32,7 +34,7 @@ import android.widget.Toast;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BlockedListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor>{
+public class BlockedListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor> {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -86,6 +88,60 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+
+        View v = super.onCreateView(inflater, parent, savedInstanceState);
+        ListView listView = (ListView) v.findViewById(android.R.id.list);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.contact_list_item_context, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.context_menu_delete_contact:
+                        ContactListAdaptor adapter = (ContactListAdaptor)getListAdapter();
+
+                        Contact contact = ((DataBaseHelper.ContactCursor)adapter.getCursor()).getContact();
+                        boolean contactDeleted = mContactManager.deleteContact(contact);
+                        mode.finish();
+                        if(contactDeleted){
+                            //adapter.notifyDataSetChanged();
+                            ((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+                        }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
+
+        return v;
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, null, this);
@@ -109,6 +165,11 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
     }
 
 
+/*    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        getActivity().getMenuInflater().inflate(R.menu.crime_list_item_context, menu);
+    }
+    */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -118,7 +179,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             // fragment is attached to one) that an item has been selected.
            // mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
-mContactManager.getContactByPhoneNumber("0911510873");
+        mContactManager.getContactByPhoneNumber("0911510873");
         Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
 
          Intent intent = new Intent(getActivity(), SingleContactActivity.class);

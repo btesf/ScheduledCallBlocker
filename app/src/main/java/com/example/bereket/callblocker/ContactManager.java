@@ -44,6 +44,11 @@ public class ContactManager {
         mDataHelper.insertContact(contactId, phoneNumber, displayNumber, contactName);
     }
 
+    public boolean deleteContact(Contact contact){
+
+        return mDataHelper.deleteContact(contact);
+    }
+
     public Contact getContactByPhoneNumber(String phoneNumber){
 
         return mDataHelper.getContactByPhoneNumber(phoneNumber);

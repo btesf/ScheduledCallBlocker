@@ -1,12 +1,19 @@
 package com.example.bereket.callblocker;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.android.internal.telephony.ITelephony;
 
 import java.lang.reflect.Method;
 
@@ -57,7 +64,6 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                         Method method = clazz.getDeclaredMethod("getITelephony");
                         method.setAccessible(true);
                         ITelephony telephonyService = (ITelephony) method.invoke(telephonyManager);
-
                         if(incomingNumber.equals(blockedContact.getPhoneNumber())) {
                             //if outgoing call is blocked proceed with blocking
                             if (blockedContact.isIsIncomingBlocked()) {
@@ -65,6 +71,22 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                                 telephonyService = (ITelephony) method.invoke(telephonyManager);
                                 telephonyService.silenceRinger();
                                 telephonyService.endCall();
+
+                                Intent i  = new Intent(context, CallBlockerActivity.class);
+                                PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
+                                Notification notification = new NotificationCompat.Builder(context)
+                                        .setTicker("New outgoing call")
+                                        .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                                        .setContentTitle("New call intercepted")
+                                        .setContentText(incomingNumber + " is intercepted")
+                                        .setContentIntent(pi)
+                                        .setAutoCancel(true)
+                                        .build();
+
+                                NotificationManager notificationManager = (NotificationManager)
+                                        context.getSystemService(Context.NOTIFICATION_SERVICE);
+                                notificationManager.notify(0, notification);
+
                             }
                         }
                     } catch (Exception e) {
@@ -73,19 +95,12 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                     //Turn OFF the mute
                     audioManager.setStreamMute(AudioManager.STREAM_RING, false);
                     break;
+
                 case PhoneStateListener.LISTEN_CALL_STATE:
+                    break;
 
             }
             super.onCallStateChanged(state, incomingNumber);
         }
-    }
-
-    private interface ITelephony {
-
-        boolean endCall();
-
-        void answerRingingCall();
-
-        void silenceRinger();
     }
 }

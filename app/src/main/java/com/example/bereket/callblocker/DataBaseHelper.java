@@ -97,6 +97,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         //return null;
     }
 
+    public boolean deleteContact(Contact contact){
+
+        int returnValue = getWritableDatabase().delete(BLOCKED_LIST_TABLE, ID + " = ? ", new String[]{contact.getId()});
+
+        return returnValue > 0 ? true : false;
+    }
+
     public void updateContact(Contact contact){
 
         ContentValues cv = new ContentValues();
