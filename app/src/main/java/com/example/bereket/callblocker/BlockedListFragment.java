@@ -124,7 +124,8 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                         mode.finish();
                         if(contactDeleted){
                             //adapter.notifyDataSetChanged();
-                            ((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+                            //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+                            getLoaderManager().restartLoader(0, null, BlockedListFragment.this);
                         }
                         return true;
                     default:

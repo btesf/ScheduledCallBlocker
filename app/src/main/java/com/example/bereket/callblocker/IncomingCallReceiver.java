@@ -10,7 +10,6 @@ import android.media.AudioManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
@@ -40,6 +39,13 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
+
+            //Determine the country code from current network (instead of system setting)
+            //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
+            TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);
+            String countryCodeValue = tm.getNetworkCountryIso();
+
+            incomingNumber = ContactManager.standardizePhoneNumber(incomingNumber, countryCodeValue);
 
             switch (state) {
 
@@ -75,9 +81,9 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                                 Intent i  = new Intent(context, CallBlockerActivity.class);
                                 PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
                                 Notification notification = new NotificationCompat.Builder(context)
-                                        .setTicker("New outgoing call")
+                                        .setTicker("Call blocker")
                                         .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                                        .setContentTitle("New call intercepted")
+                                        .setContentTitle("New incoming call intercepted")
                                         .setContentText(incomingNumber + " is intercepted")
                                         .setContentIntent(pi)
                                         .setAutoCancel(true)

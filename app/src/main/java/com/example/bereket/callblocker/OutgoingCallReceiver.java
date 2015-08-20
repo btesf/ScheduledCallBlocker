@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -18,29 +17,24 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        String phoneNumber = getResultData();
-
-        if(phoneNumber == null){
-            phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-        }
-
-        ContactManager contactManager = ContactManager.getInstance(context);
-
-        Contact blockedContact = contactManager.getContactByPhoneNumber(phoneNumber);
-
-        if(blockedContact == null){
-
-            return;
-        }
-
         //Determine the country code from current network (instead of system setting)
         //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
         TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);
         String countryCodeValue = tm.getNetworkCountryIso();
 
+        //if the phone has no network, (where we cannot determine countryCodeValue - will be null), we don't need to process any interception
         if(countryCodeValue != null){
 
-            Log.d("bere.bere.bere", countryCodeValue);
+            String phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+            phoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCodeValue);
+
+            ContactManager contactManager = ContactManager.getInstance(context);
+            Contact blockedContact = contactManager.getContactByPhoneNumber(phoneNumber);
+
+            if(blockedContact == null){
+
+                return;
+            }
 
             if(phoneNumber.equals(blockedContact.getPhoneNumber())){
                 //if outgoing call is blocked proceed with blocking
@@ -54,7 +48,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                     Notification notification = new NotificationCompat.Builder(context)
                             .setTicker("New outgoing call")
                             .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                            .setContentTitle("New call intercepted")
+                            .setContentTitle("New outgoing call intercepted")
                             .setContentText(phoneNumber + " is intercepted")
                             .setContentIntent(pi)
                             .setAutoCancel(true)

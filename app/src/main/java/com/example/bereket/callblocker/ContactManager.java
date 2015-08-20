@@ -2,7 +2,9 @@ package com.example.bereket.callblocker;
 
 import android.content.Context;
 
+import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 
 /**
@@ -39,7 +41,7 @@ public class ContactManager {
     public void insertContact(String contactId, String displayNumber, String contactName){
 
         //standardize phone number
-        String phoneNumber = standardizePhoneNumber(displayNumber);
+        String phoneNumber = standardizePhoneNumber(displayNumber, "ET");
 
         mDataHelper.insertContact(contactId, phoneNumber, displayNumber, contactName);
     }
@@ -54,8 +56,20 @@ public class ContactManager {
         return mDataHelper.getContactByPhoneNumber(phoneNumber);
     }
 
-    private String standardizePhoneNumber(String nonStandardPhone){
+    public static String standardizePhoneNumber(String nonStandardPhone, String countryCode){
 
-        return PhoneNumberUtil.normalizeDigitsOnly(nonStandardPhone);
+
+        String formattedPhoneNumber =  PhoneNumberUtil.normalizeDigitsOnly(nonStandardPhone);
+
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        try {
+            Phonenumber.PhoneNumber numberProto = phoneUtil.parse(formattedPhoneNumber, "ET");
+            //Since you know the country you can format it as follows:
+            formattedPhoneNumber = phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.E164 );
+        } catch (NumberParseException e) {
+            System.err.println("NumberParseException was thrown: " + e.toString());
+        }
+
+        return formattedPhoneNumber;
     }
 }
