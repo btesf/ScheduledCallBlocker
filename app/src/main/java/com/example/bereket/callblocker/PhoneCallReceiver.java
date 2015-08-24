@@ -51,7 +51,6 @@ public abstract class PhoneCallReceiver extends BroadcastReceiver {
                 state = TelephonyManager.CALL_STATE_RINGING;
             }
 
-
             onCallStateChanged(context, state, number);
         }
     }
