@@ -12,4 +12,18 @@
     <string name="outgoing_call_blocked_string">Block outgoing call</string>
     <string name="incoming_call_blocked_string">Block incoming call</string>
     <string name="delte_contact">delte</string>
+    <string name="dontBlockString">don\'t block</string>
+    <string name="alwaysBlockString">always</string>
+    <string name="scheduledBlockString">scheduled</string>
+    <string name="incoming_call_label_string">Incoming call</string>
+    <string name="outgoing_call_label_string">Outgoing call</string>
+    <string name="scheduledLabelMonday">Mon</string>
+    <string name="scheduledLabelTuesday">Tue</string>
+    <string name="scheduledLabelWednesday">Wed</string>
+    <string name="scheduledLabelThursday">Thu</string>
+    <string name="scheduledLabelFriday">Fri</string>
+    <string name="scheduledLabelSaturday">Sat</string>
+    <string name="scheduledLabelSunday">Sun</string>
+    <string name="scheduledNotSetButtonLabel">not set</string>
+    <string name="scheduledClearAllButtonLabel">Clear all</string>
 </resources>

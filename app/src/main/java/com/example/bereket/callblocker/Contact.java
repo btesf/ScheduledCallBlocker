@@ -11,8 +11,9 @@ public class Contact implements Serializable {
     private String mPhoneNumber;
     private String mDisplayNumber;
     private String mContactName;
-    private boolean mIsOutGoingBlocked;
-    private boolean mIsIncomingBlocked;
+    private boolean mIsNumberStandardized; //this decides if the number should be standardized before used in any telephone activity
+    private int mOutGoingBlockedState;
+    private int mIncomingBlockedState;
     private int mIncomingBlockedCount;
     private int mOutgoingBlockedCount;
 
@@ -48,20 +49,20 @@ public class Contact implements Serializable {
         this.mDisplayNumber = mDisplayNumber;
     }
 
-    public boolean isIsOutGoingBlocked() {
-        return mIsOutGoingBlocked;
+    public int getOutGoingBlockedState() {
+        return mOutGoingBlockedState;
     }
 
-    public void setIsOutGoingBlocked(boolean mIsOutGoingBlocked) {
-        this.mIsOutGoingBlocked = mIsOutGoingBlocked;
+    public void setOutGoingBlockedState(int mOutGoingBlockedState) {
+        this.mOutGoingBlockedState = mOutGoingBlockedState;
     }
 
-    public boolean isIsIncomingBlocked() {
-        return mIsIncomingBlocked;
+    public int getIncomingBlockedState() {
+        return mIncomingBlockedState;
     }
 
-    public void setIsIncomingBlocked(boolean mIsIncomingBlocked) {
-        this.mIsIncomingBlocked = mIsIncomingBlocked;
+    public void setIncomingBlockedState(int mIncomingBlockedState) {
+        this.mIncomingBlockedState = mIncomingBlockedState;
     }
 
     public int getIncomingBlockedCount() {
@@ -79,4 +80,13 @@ public class Contact implements Serializable {
     public void setOutgoingBlockedCount(int mOutgoingBlockedCount) {
         this.mOutgoingBlockedCount = mOutgoingBlockedCount;
     }
+
+    public boolean isIsNumberStandardized() {
+        return mIsNumberStandardized;
+    }
+
+    public void setIsNumberStandardized(boolean mIsNumberStandardized) {
+        this.mIsNumberStandardized = mIsNumberStandardized;
+    }
+
 }

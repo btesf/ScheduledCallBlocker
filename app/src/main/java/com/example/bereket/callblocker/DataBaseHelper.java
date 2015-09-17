@@ -8,6 +8,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Created by bereket on 7/21/15.
  */
@@ -26,6 +30,33 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static String INCOMING_CALL_BLOCKED = "IncomingCall";
     public static String NO_OF_TIMES_OUTGOING_BLOCKED = "BlockedOutgoingCalls";
     public static String NO_OF_TIMES_INCOMING_BLOCKED = "BlockedIncomingCalls";
+    public static String IS_NUMBER_STANDARDIZED = "IsNumberStandardized";
+
+    //block type table and columns constants
+    private static String BLOCK_STATE_TABLE = "BlockState";
+    private static String BLOCK_STATE_ID = "id";
+    private static String BLOCK_STATE_NAME = "name";
+
+    //block state table and column constants
+    private static String BLOCK_TYPE_TABLE = "BlockType";
+    private static String BLOCK_TYPE_NAME = "name";
+    private static String BLOCK_TYPE_ID = "id";
+
+    //scheduled block table
+    private static String BLOCK_SCHEDULE_TABLE = "BlockSchedule";
+    private static String BLOCK_SCHEDULE_ID = "_id";
+    private static String BLOCK_SCHEDULE_CONTACT_ID = "contactId";
+    private static String BLOCK_SCHEDULE_WEEK_DAY = "weekDay";
+    private static String BLOCK_SCHEDULE_FROM = "startTime";
+    private static String BLOCK_SCHEDULE_TO = "endTime";
+    private static String BLOCK_SCHEDULE_BLOCK_TYPE = "blockType";
+
+    //call log table
+    private static String CALL_LOG_TABLE = "CallLog";
+    private static String CALL_LOG_ID = "_id";
+    private static String CALL_LOG_CONTACT_ID = "contactId";
+    private static String CALL_LOG_BLOCK_TYPE = "blockType";
+    private static String CALL_LOG_TIME = "time";
 
     private static String NO_NAME_CONTACT = "No name";
 
@@ -37,17 +68,66 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
+        //holds blocked type reference table - 1-outgoing, 2-incoming
+        String createBlockTypeTable = " CREATE TABLE " + BLOCK_TYPE_TABLE + " (" +
+                BLOCK_TYPE_ID + " tinyint PRIMARY KEY, " +
+                BLOCK_TYPE_NAME + " varchar(20) )";
+
+        //holds blocked state reference table - 0-unblocked, 1-unscheduled, 2-scheduled
+        String createBlockStateTable = " CREATE TABLE " + BLOCK_STATE_TABLE + " (" +
+                BLOCK_STATE_ID + " tinyint PRIMARY KEY, " +
+                BLOCK_STATE_NAME + " varchar(20) )";
+
+        //holds blocked contacts records
         String createBlockedListTable = " CREATE TABLE " +  BLOCKED_LIST_TABLE + " (" +
-                ID + " CHAR(10) PRIMARY KEY, " +
+                ID + " char(10) primary key, " +
                 NAME + " varchar(100), " +
                 PHONE_NUMBER + " char(20), " +
                 DISPLAY_NUMBER + " char(20), " +
-                OUTGOING_CALL_BLOCKED + " boolean default 0, " +
-                INCOMING_CALL_BLOCKED + " boolean default 0, " +
+                OUTGOING_CALL_BLOCKED + " tinyint default 0, " +
+                INCOMING_CALL_BLOCKED + " tinyint default 0, " +
+                IS_NUMBER_STANDARDIZED + " boolean, " +
                 NO_OF_TIMES_OUTGOING_BLOCKED + " int default 0, " +
-                NO_OF_TIMES_INCOMING_BLOCKED + " int default 0)";
+                NO_OF_TIMES_INCOMING_BLOCKED + " int default 0," +
+                " FOREIGN KEY (" + OUTGOING_CALL_BLOCKED + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + "), "  +
+                " FOREIGN KEY (" + INCOMING_CALL_BLOCKED + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ")"  +
+                ")";
 
+        //scheduled block table
+        String createBlockScheduleTable = " CREATE TABLE " + BLOCK_SCHEDULE_TABLE + " (" +
+                BLOCK_SCHEDULE_ID + " integer primary key autoincrement, " +
+                BLOCK_SCHEDULE_CONTACT_ID + " char(10), " +
+                BLOCK_SCHEDULE_WEEK_DAY + " tinyint, " +
+                BLOCK_SCHEDULE_BLOCK_TYPE + " tinyint, " +
+                BLOCK_SCHEDULE_FROM + " datetime, " +
+                BLOCK_SCHEDULE_TO + " datetime, " +
+                " FOREIGN KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + "), "  +
+                " FOREIGN KEY (" + BLOCK_SCHEDULE_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") "  +
+                ")";
+
+        //call log table
+        String createCallLogTable = " CREATE TABLE " +  CALL_LOG_TABLE + " ( " +
+                CALL_LOG_ID + " integer primary key autoincrement, " +
+                CALL_LOG_CONTACT_ID + " char(10), " +
+                CALL_LOG_BLOCK_TYPE + " tinyint, " +
+                CALL_LOG_TIME + " datetime," +
+                " FOREIGN KEY (" + CALL_LOG_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + "), "  +
+                " FOREIGN KEY (" + CALL_LOG_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") "  +
+                " )";
+
+        //block type reference insert string
+        String insertBlockTypeReferences = " INSERT INTO " + BLOCK_TYPE_TABLE + " VALUES (1, 'outgoing'), (2, 'incoming') ";
+        String insertBlockStateReferences = " INSERT INTO " + BLOCK_STATE_TABLE + " VALUES (0, 'unblocked'), (1, 'unscheduled'), (2, 'scheduled') ";
+
+        //block state reference insert string
+        sqLiteDatabase.execSQL(createBlockTypeTable);
+        sqLiteDatabase.execSQL(createBlockStateTable);
         sqLiteDatabase.execSQL(createBlockedListTable);
+        sqLiteDatabase.execSQL(createBlockScheduleTable);
+        sqLiteDatabase.execSQL(createCallLogTable);
+        //run insert statements
+        sqLiteDatabase.execSQL(insertBlockTypeReferences);
+        sqLiteDatabase.execSQL(insertBlockStateReferences);
     }
 
     @Override
@@ -59,17 +139,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * <writable_database>.insert(..., <content_value>) is not used in favor of INSERT OR REPLACE statement
      * to avoid multiple queries to verify uniqueness of contact ID but updating some columns
      */
-    public void insertContact(String contactId, String phoneNumber,  String displayNumber, String contactName){
+    public void insertContact(String contactId, String phoneNumber,  String displayNumber, String contactName, Boolean isNumberStandardized){
 
         if(phoneNumber == null || phoneNumber.isEmpty()) return;
 
         String query = "INSERT OR REPLACE INTO " + BLOCKED_LIST_TABLE  + " (" +
                         ID + ", " + PHONE_NUMBER + ", " + DISPLAY_NUMBER + ", " + NAME + ", " +
-                        OUTGOING_CALL_BLOCKED + ", " + INCOMING_CALL_BLOCKED + ", " +
+                        OUTGOING_CALL_BLOCKED + ", " + INCOMING_CALL_BLOCKED + ", " + IS_NUMBER_STANDARDIZED + ", " +
                         NO_OF_TIMES_OUTGOING_BLOCKED + ", " + NO_OF_TIMES_INCOMING_BLOCKED + ") " +
                         "VALUES ('" + contactId + "', '" + phoneNumber + "', '" + displayNumber + "', '" +
-                        ((contactName == null || contactName.isEmpty()) ? NO_NAME_CONTACT : contactName) + "', " +
-                        "COALESCE((SELECT " + OUTGOING_CALL_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default not blocked
+                        ((contactName == null || contactName.isEmpty()) ? NO_NAME_CONTACT : contactName) + "', '" +
+                        isNumberStandardized + "', " +
+                        "COALESCE((SELECT " + INCOMING_CALL_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default not blocked
                         "COALESCE((SELECT " + INCOMING_CALL_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default not blocked
                         "COALESCE((SELECT " + NO_OF_TIMES_OUTGOING_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default to zero
                         "COALESCE((SELECT " + NO_OF_TIMES_INCOMING_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0))"; //default to zero
@@ -83,7 +164,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         if(cursor != null && cursor.getCount() > 0) {
 
-
             ContactCursor contactCursor = new ContactCursor(cursor);
             contactCursor.moveToFirst();
             Contact contact = contactCursor.getContact();
@@ -94,7 +174,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         else {
             return null;
         }
-        //return null;
+    }
+
+    public ContactCursor getNonStandardizedPhoneContacts(){
+
+        Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, IS_NUMBER_STANDARDIZED + " = ? ", new String[]{"0"}, null, null, null);
+
+        if(cursor != null && cursor.getCount() > 0) {
+
+            return new ContactCursor(cursor);
+        }
+
+        else return null;
     }
 
     public boolean deleteContact(Contact contact){
@@ -110,8 +201,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(NAME, contact.getContactName());
         cv.put(PHONE_NUMBER, contact.getPhoneNumber());
         cv.put(DISPLAY_NUMBER, contact.getDisplayNumber());
-        cv.put(OUTGOING_CALL_BLOCKED, contact.isIsOutGoingBlocked());
-        cv.put(INCOMING_CALL_BLOCKED, contact.isIsIncomingBlocked());
+        cv.put(IS_NUMBER_STANDARDIZED, contact.isIsNumberStandardized());
+        cv.put(OUTGOING_CALL_BLOCKED, contact.getOutGoingBlockedState());
+        cv.put(INCOMING_CALL_BLOCKED, contact.getIncomingBlockedState());
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());
 
@@ -139,8 +231,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String phoneNumber = getString(getColumnIndex(PHONE_NUMBER));
             String displayNumber = getString(getColumnIndex(DISPLAY_NUMBER));
             String contactName = getString(getColumnIndex(NAME));
-            boolean isOutgoingBlocked = getInt(getColumnIndex(OUTGOING_CALL_BLOCKED)) == 1 ? true : false;
-            boolean isIncomingBlocked = getInt(getColumnIndex(INCOMING_CALL_BLOCKED)) == 1 ? true : false;
+            boolean isNumberStandardized = getInt(getColumnIndex(IS_NUMBER_STANDARDIZED)) == 1 ? true : false;
+            int outgoingBlockedState = getInt(getColumnIndex(OUTGOING_CALL_BLOCKED));
+            int incomingBlockedState = getInt(getColumnIndex(INCOMING_CALL_BLOCKED));
             int incomingBlockedCount = getInt(getColumnIndex(NO_OF_TIMES_INCOMING_BLOCKED));
             int outgoingBlockedCount = getInt(getColumnIndex(NO_OF_TIMES_OUTGOING_BLOCKED));
 
@@ -148,12 +241,72 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             contact.setPhoneNumber(phoneNumber);
             contact.setDisplayNumber(displayNumber);
             contact.setContactName(contactName);
-            contact.setIsIncomingBlocked(isIncomingBlocked);
-            contact.setIsOutGoingBlocked(isOutgoingBlocked);
+            contact.setIsNumberStandardized(isNumberStandardized);
+            contact.setIncomingBlockedState(outgoingBlockedState);
+            contact.setOutGoingBlockedState(incomingBlockedState);
             contact.setIncomingBlockedCount(incomingBlockedCount);
             contact.setOutgoingBlockedCount(outgoingBlockedCount);
 
             return contact;
         }
+    }
+
+    //schedule
+    public boolean insertSchedule(String contactId, Date startTime, Date endTime, int blockType){
+
+        ContentValues cv = new ContentValues();
+        cv.put(BLOCK_SCHEDULE_CONTACT_ID, contactId);
+        cv.put(BLOCK_SCHEDULE_FROM, startTime.getTime());
+        cv.put(BLOCK_SCHEDULE_TO, endTime.getTime());
+        cv.put(BLOCK_SCHEDULE_BLOCK_TYPE, blockType);
+
+        return getWritableDatabase().insert(BLOCK_SCHEDULE_TABLE, null, cv) == -1 ? false : true;
+
+    }
+
+    public boolean deleteSchedule(Schedule schedule){
+
+       return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_ID + " = ? ", new String[]{String.valueOf(schedule.getId())}) != 0 ? true : false;
+    }
+
+    public List<Schedule> queryContactSchedule(String contactId, int blockType){
+
+        Cursor cursor = getReadableDatabase().query(BLOCK_SCHEDULE_TABLE, null, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{contactId, String.valueOf(blockType)}, null, null, BLOCK_SCHEDULE_WEEK_DAY  + " asc");
+
+        List<Schedule> scheduleList = new ArrayList<Schedule>();
+        Schedule schedule;
+
+        while(cursor.moveToNext()){
+
+            schedule = new Schedule();
+
+            schedule.setContactId(contactId);
+            schedule.setId(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_ID)));
+            schedule.setStartTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_FROM))));
+            schedule.setEndTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_TO))));
+            schedule.setWeekDay(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_WEEK_DAY)));
+            schedule.setBlockType(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_BLOCK_TYPE)));
+            scheduleList.add(schedule);
+        }
+
+        if(cursor != null){
+            cursor.close();
+        }
+        return scheduleList;
+    }
+
+    public boolean updateSchedule(Schedule schedule){
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(BLOCK_SCHEDULE_ID, schedule.getId());
+        cv.put(BLOCK_SCHEDULE_CONTACT_ID, schedule.getContactId());
+        cv.put(BLOCK_SCHEDULE_FROM, schedule.getStartTime().getTime());
+        cv.put(BLOCK_SCHEDULE_TO, schedule.getEndTime().getTime());
+        cv.put(BLOCK_SCHEDULE_WEEK_DAY, schedule.getWeekDay());
+        cv.put(BLOCK_SCHEDULE_BLOCK_TYPE, schedule.getBlockType());
+
+        getWritableDatabase().update(BLOCK_SCHEDULE_TABLE, cv, BLOCK_SCHEDULE_ID + " = ? ", new String[]{String.valueOf(schedule.getId())});
+        return true;
     }
 }

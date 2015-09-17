@@ -29,6 +29,12 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
             phoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCodeValue);
 
             ContactManager contactManager = ContactManager.getInstance(context);
+            //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
+            if(contactManager.nonStandardizedPreferenceEnabled()){
+
+                contactManager.standardizeNonStandardContactPhones(countryCodeValue);
+            }
+
             Contact blockedContact = contactManager.getContactByPhoneNumber(phoneNumber);
 
             if(blockedContact == null){
@@ -38,7 +44,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
 
             if(phoneNumber.equals(blockedContact.getPhoneNumber())){
                 //if outgoing call is blocked proceed with blocking
-                if(blockedContact.isIsOutGoingBlocked()){
+                if(blockedContact.getOutGoingBlockedState() == 1){
 
                     setResultData(null);
                     //not recommended to abort broadcast

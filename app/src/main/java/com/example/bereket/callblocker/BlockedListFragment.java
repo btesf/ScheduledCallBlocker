@@ -180,10 +180,9 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             // fragment is attached to one) that an item has been selected.
            // mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
-        mContactManager.getContactByPhoneNumber("0911510873");
-        Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
 
-         Intent intent = new Intent(getActivity(), SingleContactActivity.class);
+        Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
+        Intent intent = new Intent(getActivity(), SingleContactActivity.class);
         //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
         intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
         startActivityForResult(intent, SINGLE_CONTACT_ACTIVITY_RESULT);
@@ -255,8 +254,8 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
 
             contactNameTextView.setText(contact.getContactName());
             contactPhoneTextView.setText(contact.getDisplayNumber());
-            outGoingCheckBox.setChecked(contact.isIsOutGoingBlocked());
-            inComingCheckBox.setChecked(contact.isIsIncomingBlocked());
+            outGoingCheckBox.setChecked(contact.getOutGoingBlockedState() == 1 ? true : false);
+            inComingCheckBox.setChecked(contact.getIncomingBlockedState() == 1 ? true : false);
         }
     }
     /**

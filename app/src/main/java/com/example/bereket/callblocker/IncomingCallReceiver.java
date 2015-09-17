@@ -46,12 +46,16 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             String countryCodeValue = tm.getNetworkCountryIso();
 
             incomingNumber = ContactManager.standardizePhoneNumber(incomingNumber, countryCodeValue);
+            ContactManager contactManager = ContactManager.getInstance(context);
+            //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
+            if(contactManager.nonStandardizedPreferenceEnabled()){
+
+                contactManager.standardizeNonStandardContactPhones(countryCodeValue);
+            }
 
             switch (state) {
 
                 case TelephonyManager.CALL_STATE_RINGING:
-
-                    ContactManager contactManager = ContactManager.getInstance(context);
 
                     Contact blockedContact = contactManager.getContactByPhoneNumber(incomingNumber);
 
@@ -60,7 +64,11 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                         break;
                     }
 
-                    String block_number = blockedContact.getPhoneNumber();
+                    //check if current phone number is standardized; if not standardize
+                    String phoneNumber = blockedContact.getPhoneNumber();
+                    if(!blockedContact.isIsNumberStandardized()){
+                        phoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCodeValue);
+                    }
                     AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
                     //Turn ON the mute
                     audioManager.setStreamMute(AudioManager.STREAM_RING, true);
@@ -72,7 +80,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                         ITelephony telephonyService = (ITelephony) method.invoke(telephonyManager);
                         if(incomingNumber.equals(blockedContact.getPhoneNumber())) {
                             //if outgoing call is blocked proceed with blocking
-                            if (blockedContact.isIsIncomingBlocked()) {
+                            if (blockedContact.getIncomingBlockedState() == 1) {
                                 //telephonyService.silenceRinger();//Security exception problem
                                 telephonyService = (ITelephony) method.invoke(telephonyManager);
                                 telephonyService.silenceRinger();
@@ -106,6 +114,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                     break;
 
             }
+            //check if there are any non-standardized numbers and run standardizing service
             super.onCallStateChanged(state, incomingNumber);
         }
     }
