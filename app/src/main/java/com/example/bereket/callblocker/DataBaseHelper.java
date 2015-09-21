@@ -10,7 +10,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by bereket on 7/21/15.
@@ -89,8 +91,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 IS_NUMBER_STANDARDIZED + " boolean, " +
                 NO_OF_TIMES_OUTGOING_BLOCKED + " int default 0, " +
                 NO_OF_TIMES_INCOMING_BLOCKED + " int default 0," +
-                " FOREIGN KEY (" + OUTGOING_CALL_BLOCKED + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + "), "  +
-                " FOREIGN KEY (" + INCOMING_CALL_BLOCKED + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ")"  +
+                " FOREIGN KEY (" + OUTGOING_CALL_BLOCKED + ") REFERENCES " + BLOCK_STATE_TABLE + "(" + BLOCK_STATE_ID + "), "  +
+                " FOREIGN KEY (" + INCOMING_CALL_BLOCKED + ") REFERENCES " + BLOCK_STATE_TABLE + "(" + BLOCK_STATE_ID + ")"  +
                 ")";
 
         //scheduled block table
@@ -99,8 +101,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 BLOCK_SCHEDULE_CONTACT_ID + " char(10), " +
                 BLOCK_SCHEDULE_WEEK_DAY + " tinyint, " +
                 BLOCK_SCHEDULE_BLOCK_TYPE + " tinyint, " +
-                BLOCK_SCHEDULE_FROM + " datetime, " +
-                BLOCK_SCHEDULE_TO + " datetime, " +
+                BLOCK_SCHEDULE_FROM + " long, " +
+                BLOCK_SCHEDULE_TO + " long, " +
                 " FOREIGN KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + "), "  +
                 " FOREIGN KEY (" + BLOCK_SCHEDULE_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") "  +
                 ")";
@@ -117,7 +119,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         //block type reference insert string
         String insertBlockTypeReferences = " INSERT INTO " + BLOCK_TYPE_TABLE + " VALUES (1, 'outgoing'), (2, 'incoming') ";
-        String insertBlockStateReferences = " INSERT INTO " + BLOCK_STATE_TABLE + " VALUES (0, 'unblocked'), (1, 'unscheduled'), (2, 'scheduled') ";
+        String insertBlockStateReferences = " INSERT INTO " + BLOCK_STATE_TABLE + " VALUES (0, 'unblocked'), (1, 'always blocked'), (2, 'scheduled block') ";
 
         //block state reference insert string
         sqLiteDatabase.execSQL(createBlockTypeTable);
@@ -269,12 +271,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
        return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_ID + " = ? ", new String[]{String.valueOf(schedule.getId())}) != 0 ? true : false;
     }
 
-    public List<Schedule> queryContactSchedule(String contactId, int blockType){
+    public Map<Integer,Schedule> queryContactSchedule(String contactId, int blockType){
 
         Cursor cursor = getReadableDatabase().query(BLOCK_SCHEDULE_TABLE, null, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{contactId, String.valueOf(blockType)}, null, null, BLOCK_SCHEDULE_WEEK_DAY  + " asc");
 
-        List<Schedule> scheduleList = new ArrayList<Schedule>();
+        Map<Integer,Schedule> scheduleMap = new HashMap<>();
         Schedule schedule;
+        int weekDay;
 
         while(cursor.moveToNext()){
 
@@ -284,15 +287,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             schedule.setId(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_ID)));
             schedule.setStartTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_FROM))));
             schedule.setEndTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_TO))));
-            schedule.setWeekDay(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_WEEK_DAY)));
+            weekDay = cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_WEEK_DAY));
+            schedule.setWeekDay(weekDay);
             schedule.setBlockType(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_BLOCK_TYPE)));
-            scheduleList.add(schedule);
+
+            scheduleMap.put(weekDay, schedule);
         }
 
         if(cursor != null){
             cursor.close();
         }
-        return scheduleList;
+        return scheduleMap;
     }
 
     public boolean updateSchedule(Schedule schedule){

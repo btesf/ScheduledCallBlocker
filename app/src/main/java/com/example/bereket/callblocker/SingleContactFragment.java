@@ -1,9 +1,11 @@
 package com.example.bereket.callblocker;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +15,16 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -32,14 +39,15 @@ public class SingleContactFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_PARAM1 = "param1";
+    public static final int PICK_SCHEDULE_TIME_REQUEST_CODE = 0;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private Contact mContact;
-    private List<Schedule> mIncomingSchedule;
-    private List<Schedule> mOutgoingSchedule;
+    private Map<Integer,Schedule> mIncomingSchedule;
+    private Map<Integer,Schedule> mOutgoingSchedule;
     //UI Elements
     private CheckBox mOutgoingCheckBox;
     private CheckBox mIncomingCheckbox;
@@ -55,12 +63,18 @@ public class SingleContactFragment extends Fragment {
     //ugly and many controls
     private Button incomingCallMondayButton, incomingCallTuesdayButton, incomingCallWednesdayButton, incomingCallThursdayButton, incomingCallFridayButton, incomingCallSaturdayButton, incomingCallSundayButton;
     private Button outgoingCallMondayButton, outgoingCallTuesdayButton, outgoingCallWednesdayButton, outgoingCallThursdayButton, outgoingCallFridayButton, outgoingCallSaturdayButton, outgoingCallSundayButton;
-
+    private List<Button> incomingCallWeekDayButtons;
+    private List<Button> outgoingCallWeekDayButtons;
 
     //Database property
     private DataBaseHelper dataBaseHelper;
 
     private OnFragmentInteractionListener mListener;
+
+    {
+        incomingCallWeekDayButtons = new ArrayList<>();
+        outgoingCallWeekDayButtons = new ArrayList<>();
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -192,7 +206,7 @@ public class SingleContactFragment extends Fragment {
                 incomingScheduleTable.setVisibility(View.VISIBLE);
                 //read incoming block schedule for current contact
                 mIncomingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.INCOMING);
-
+                setButtonLabels(incomingCallWeekDayButtons, mIncomingSchedule);
                 break;
             default:
         }
@@ -226,9 +240,76 @@ public class SingleContactFragment extends Fragment {
                 dontBlockOutgoingRadio.setChecked(false);
                 scheduledOutgoingRadio.setChecked(true);
                 outgoingScheduleTable.setVisibility(View.VISIBLE);
+                setButtonLabels(outgoingCallWeekDayButtons, mOutgoingSchedule);
 
                 break;
             default:
+        }
+
+        incomingCallWeekDayButtons.add(incomingCallMondayButton);
+        incomingCallWeekDayButtons.add(incomingCallTuesdayButton);
+        incomingCallWeekDayButtons.add(incomingCallWednesdayButton);
+        incomingCallWeekDayButtons.add(incomingCallThursdayButton);
+        incomingCallWeekDayButtons.add(incomingCallFridayButton);
+        incomingCallWeekDayButtons.add(incomingCallSaturdayButton);
+        incomingCallWeekDayButtons.add(incomingCallSundayButton);
+
+        outgoingCallWeekDayButtons.add(outgoingCallMondayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallTuesdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallWednesdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallThursdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallFridayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallSaturdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallSundayButton);
+
+        //for(Button weekDayButton : incomingCallWeekDayButtons){
+        for(int i = 0; i < incomingCallWeekDayButtons.size(); i++){
+            Button weekDayButton = incomingCallWeekDayButtons.get(i);
+            final int index = i;
+            weekDayButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+
+                    Schedule schedule = mIncomingSchedule.get(index);
+
+                    if(schedule == null){
+
+                        schedule = new Schedule();
+                        schedule.setWeekDay(index);
+                        schedule.setContactId(mContact.getId());
+                        schedule.setBlockType(BlockType.INCOMING);
+                    }
+
+                    PickTimeFragment pickTimeFragment = PickTimeFragment.newInstance(schedule, BlockType.INCOMING);
+                    pickTimeFragment.setTargetFragment(SingleContactFragment.this,PICK_SCHEDULE_TIME_REQUEST_CODE);
+                    pickTimeFragment.show(getFragmentManager(), "bere.bere.bere");
+                }
+            });
+        }
+
+        for(int i = 0; i < outgoingCallWeekDayButtons.size(); i++){
+            Button weekDayButton = outgoingCallWeekDayButtons.get(i);
+            final int index = i + 1;
+            weekDayButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Schedule schedule = mOutgoingSchedule.get(index);
+
+                    if(schedule == null){
+
+                        schedule = new Schedule();
+                        schedule.setWeekDay(index);
+                        schedule.setContactId(mContact.getId());
+                        schedule.setBlockType(BlockType.OUTGOING);
+                    }
+
+                    PickTimeFragment pickTimeFragment = PickTimeFragment.newInstance(schedule, BlockType.OUTGOING);
+                    pickTimeFragment.setTargetFragment(SingleContactFragment.this,PICK_SCHEDULE_TIME_REQUEST_CODE);
+                    pickTimeFragment.show(getFragmentManager(), "bere.bere.bere");
+                }
+            });
         }
 
         return view;
@@ -300,51 +381,13 @@ public class SingleContactFragment extends Fragment {
                     }
                     break;
                 case R.id.scheduledOutgoingRadio:
+
                     if(checked){
                         mContact.setOutGoingBlockedState(BlockState.SCHEDULED_BLOCK);
                         outgoingScheduleTable.setVisibility(View.VISIBLE);
                         //read outgoing block schedule for current contact
                         mOutgoingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.OUTGOING);
-                        //set the button labels
-                        if(mOutgoingSchedule.size() > 0){
-                            for(Schedule schedule : mOutgoingSchedule){
-
-                                Calendar cal = Calendar.getInstance();
-                                cal.setTime(schedule.getStartTime());
-                                String startTime = "";
-                                startTime += cal.get(Calendar.HOUR);
-                                startTime += ": " + cal.get(Calendar.MINUTE);
-
-                                String endTime = "";
-                                cal.setTime(schedule.getEndTime());
-                                endTime+= cal.get(Calendar.HOUR);
-                                endTime+=": " + cal.get(Calendar.MINUTE);
-
-                                switch(schedule.getWeekDay()){
-                                    case 1:
-                                        outgoingCallMondayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 2:
-                                        outgoingCallTuesdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 3:
-                                        outgoingCallWednesdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 4:
-                                        outgoingCallThursdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 5:
-                                        outgoingCallFridayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 6:
-                                        outgoingCallSaturdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 7:
-                                        outgoingCallSundayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                }
-                            }
-                        }
+                        setButtonLabels(outgoingCallWeekDayButtons, mOutgoingSchedule);
                     }
                     break;
             }
@@ -373,53 +416,89 @@ public class SingleContactFragment extends Fragment {
                     break;
                 case R.id.scheduledIncomingRadio:
                     if(checked){
-                        mContact.setIncomingBlockedState(BlockState.SCHEDULED_BLOCK);
+
+                        mContact.setOutGoingBlockedState(BlockState.SCHEDULED_BLOCK);
                         incomingScheduleTable.setVisibility(View.VISIBLE);
                         //read outgoing block schedule for current contact
                         mIncomingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.INCOMING);
-                        //set the button labels
-                        if(mIncomingSchedule.size() > 0){
-                            for(Schedule schedule : mIncomingSchedule){
-
-                                Calendar cal = Calendar.getInstance();
-                                cal.setTime(schedule.getStartTime());
-                                String startTime = "";
-                                startTime += cal.get(Calendar.HOUR);
-                                startTime += ": " + cal.get(Calendar.MINUTE);
-
-                                String endTime = "";
-                                cal.setTime(schedule.getEndTime());
-                                endTime+= cal.get(Calendar.HOUR);
-                                endTime+=": " + cal.get(Calendar.MINUTE);
-
-                                switch(schedule.getWeekDay()){
-                                    case 1:
-                                        incomingCallMondayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 2:
-                                        incomingCallTuesdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 3:
-                                        incomingCallWednesdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 4:
-                                        incomingCallThursdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 5:
-                                        incomingCallFridayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 6:
-                                        incomingCallSaturdayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                    case 7:
-                                        incomingCallSundayButton.setText(startTime + " = " + endTime);
-                                        break;
-                                }
-                            }
-                        }
+                        setButtonLabels(incomingCallWeekDayButtons, mIncomingSchedule);
                     }
                     break;
             }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if(resultCode != Activity.RESULT_OK) return;
+
+        switch(requestCode){
+            case PICK_SCHEDULE_TIME_REQUEST_CODE:
+
+                if(data != null){
+
+                    Schedule schedule = (Schedule) data.getSerializableExtra(PickTimeFragment.SCHEDULE);
+                    //TODO: will schedule always be non-null?
+                    Map<Integer, Schedule> scheduleMap = null;
+                    List<Button> buttonList = null;
+
+                    if(schedule.getBlockType() == BlockType.INCOMING){
+
+                        scheduleMap = mIncomingSchedule;
+                        buttonList = incomingCallWeekDayButtons;
+                    }
+                    else if(schedule.getBlockType() == BlockType.OUTGOING){
+
+                        scheduleMap = mOutgoingSchedule;
+                        buttonList = outgoingCallWeekDayButtons;
+                    }
+                    //update the list
+                    int weekDay = schedule.getWeekDay();
+                    scheduleMap.put(weekDay, schedule);
+                    //update the button
+                    Button weekDayButton = buttonList.get(weekDay);
+                    setSingleButtonLabel(weekDayButton, schedule);
+                }
+                break;
+        }
+
+    }
+
+    private void setButtonLabels(List<Button> buttonsList, Map<Integer, Schedule> scheduleMap){
+
+        Button weekDayButton;
+        Schedule schedule;
+        //set the button labels
+        for(int i = 0; i < buttonsList.size(); i++){
+
+            weekDayButton = buttonsList.get(i);
+            schedule = scheduleMap.get(i+1);
+
+           setSingleButtonLabel(weekDayButton, schedule);
+        }
+    }
+
+    private void setSingleButtonLabel(Button button, Schedule schedule){
+
+        if(schedule == null){
+
+            button.setText(R.string.scheduledNotSetButtonLabel);
+        }
+        else{
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(schedule.getStartTime());
+            String startTime = "";
+            startTime += cal.get(Calendar.HOUR);
+            startTime += ": " + cal.get(Calendar.MINUTE);
+
+            String endTime = "";
+            cal.setTime(schedule.getEndTime());
+            endTime+= cal.get(Calendar.HOUR);
+            endTime+=": " + cal.get(Calendar.MINUTE);
+
+            button.setText(startTime + " - " + endTime);
         }
     }
 }

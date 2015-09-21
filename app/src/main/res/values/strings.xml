@@ -26,4 +26,10 @@
     <string name="scheduledLabelSunday">Sun</string>
     <string name="scheduledNotSetButtonLabel">not set</string>
     <string name="scheduledClearAllButtonLabel">Clear all</string>
+    <string name="pick_time">Pick time</string>
+    <string name="button_ok_text">Ok</string>
+    <string name="block_type_data_missing">Error! Some data is missing from dialog.</string>
+    <string name="week_day_data_missing">Error! Some data is missing from dialog.</string>
+    <string name="button_string_change">change</string>
+    <string name="button_cancel_button">Cancel</string>
 </resources>
