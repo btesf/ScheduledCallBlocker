@@ -240,6 +240,7 @@ public class SingleContactFragment extends Fragment {
                 dontBlockOutgoingRadio.setChecked(false);
                 scheduledOutgoingRadio.setChecked(true);
                 outgoingScheduleTable.setVisibility(View.VISIBLE);
+                mOutgoingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.OUTGOING);
                 setButtonLabels(outgoingCallWeekDayButtons, mOutgoingSchedule);
 
                 break;
@@ -326,6 +327,8 @@ public class SingleContactFragment extends Fragment {
     public void onPause(){
         super.onPause();
         dataBaseHelper.updateContact(mContact);
+        dataBaseHelper.updateSchedules(mIncomingSchedule);
+        dataBaseHelper.updateSchedules(mOutgoingSchedule);
     }
 
     @Override

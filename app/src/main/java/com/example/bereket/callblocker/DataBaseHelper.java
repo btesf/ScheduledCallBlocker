@@ -46,7 +46,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     //scheduled block table
     private static String BLOCK_SCHEDULE_TABLE = "BlockSchedule";
-    private static String BLOCK_SCHEDULE_ID = "_id";
     private static String BLOCK_SCHEDULE_CONTACT_ID = "contactId";
     private static String BLOCK_SCHEDULE_WEEK_DAY = "weekDay";
     private static String BLOCK_SCHEDULE_FROM = "startTime";
@@ -97,12 +96,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         //scheduled block table
         String createBlockScheduleTable = " CREATE TABLE " + BLOCK_SCHEDULE_TABLE + " (" +
-                BLOCK_SCHEDULE_ID + " integer primary key autoincrement, " +
                 BLOCK_SCHEDULE_CONTACT_ID + " char(10), " +
                 BLOCK_SCHEDULE_WEEK_DAY + " tinyint, " +
                 BLOCK_SCHEDULE_BLOCK_TYPE + " tinyint, " +
                 BLOCK_SCHEDULE_FROM + " long, " +
                 BLOCK_SCHEDULE_TO + " long, " +
+                " PRIMARY KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ", " + BLOCK_SCHEDULE_WEEK_DAY + ")" +
                 " FOREIGN KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + "), "  +
                 " FOREIGN KEY (" + BLOCK_SCHEDULE_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") "  +
                 ")";
@@ -268,7 +267,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteSchedule(Schedule schedule){
 
-       return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_ID + " = ? ", new String[]{String.valueOf(schedule.getId())}) != 0 ? true : false;
+       return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_WEEK_DAY + " = ?", new String[]{schedule.getContactId(), String.valueOf(schedule.getWeekDay())}) != 0 ? true : false;
     }
 
     public Map<Integer,Schedule> queryContactSchedule(String contactId, int blockType){
@@ -284,7 +283,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             schedule = new Schedule();
 
             schedule.setContactId(contactId);
-            schedule.setId(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_ID)));
             schedule.setStartTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_FROM))));
             schedule.setEndTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_TO))));
             weekDay = cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_WEEK_DAY));
@@ -304,14 +302,36 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         ContentValues cv = new ContentValues();
 
-        cv.put(BLOCK_SCHEDULE_ID, schedule.getId());
         cv.put(BLOCK_SCHEDULE_CONTACT_ID, schedule.getContactId());
         cv.put(BLOCK_SCHEDULE_FROM, schedule.getStartTime().getTime());
         cv.put(BLOCK_SCHEDULE_TO, schedule.getEndTime().getTime());
         cv.put(BLOCK_SCHEDULE_WEEK_DAY, schedule.getWeekDay());
         cv.put(BLOCK_SCHEDULE_BLOCK_TYPE, schedule.getBlockType());
 
-        getWritableDatabase().update(BLOCK_SCHEDULE_TABLE, cv, BLOCK_SCHEDULE_ID + " = ? ", new String[]{String.valueOf(schedule.getId())});
+        getWritableDatabase().update(BLOCK_SCHEDULE_TABLE, cv, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_WEEK_DAY + " = ?", new String[]{schedule.getContactId(), String.valueOf(schedule.getWeekDay())});
         return true;
+    }
+
+    public void updateSchedules(Map<Integer, Schedule> schedules){
+
+        if(schedules.keySet().size() < 1) return;
+
+        String query = "INSERT OR REPLACE INTO " + BLOCK_SCHEDULE_TABLE + " (" +
+                BLOCK_SCHEDULE_CONTACT_ID + ", " +
+                BLOCK_SCHEDULE_WEEK_DAY + ", " +
+                BLOCK_SCHEDULE_FROM + ", " +
+                BLOCK_SCHEDULE_TO + ", " +
+                BLOCK_SCHEDULE_BLOCK_TYPE + ") values ";
+
+        StringBuilder builder = new StringBuilder();
+
+        for(Schedule schedule : schedules.values()){
+
+            builder.append("( '" +  schedule.getContactId() + "', '" + schedule.getWeekDay() + "', '" + schedule.getStartTime() +"', '" + schedule.getEndTime() + "', '" + schedule.getBlockType() + "'),");
+        }
+        //remove the last comma
+        builder.deleteCharAt(builder.length() - 1);
+
+        getWritableDatabase().execSQL(query + builder.toString());
     }
 }
