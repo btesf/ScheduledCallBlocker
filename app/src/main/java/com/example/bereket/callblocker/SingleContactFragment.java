@@ -74,6 +74,22 @@ public class SingleContactFragment extends Fragment {
     {
         incomingCallWeekDayButtons = new ArrayList<>();
         outgoingCallWeekDayButtons = new ArrayList<>();
+
+        incomingCallWeekDayButtons.add(incomingCallMondayButton);
+        incomingCallWeekDayButtons.add(incomingCallTuesdayButton);
+        incomingCallWeekDayButtons.add(incomingCallWednesdayButton);
+        incomingCallWeekDayButtons.add(incomingCallThursdayButton);
+        incomingCallWeekDayButtons.add(incomingCallFridayButton);
+        incomingCallWeekDayButtons.add(incomingCallSaturdayButton);
+        incomingCallWeekDayButtons.add(incomingCallSundayButton);
+
+        outgoingCallWeekDayButtons.add(outgoingCallMondayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallTuesdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallWednesdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallThursdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallFridayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallSaturdayButton);
+        outgoingCallWeekDayButtons.add(outgoingCallSundayButton);
     }
 
     /**
@@ -327,8 +343,8 @@ public class SingleContactFragment extends Fragment {
     public void onPause(){
         super.onPause();
         dataBaseHelper.updateContact(mContact);
-        dataBaseHelper.updateSchedules(mIncomingSchedule);
-        dataBaseHelper.updateSchedules(mOutgoingSchedule);
+        if(mIncomingSchedule != null) dataBaseHelper.updateSchedules(mIncomingSchedule);
+        if(mOutgoingSchedule != null)  dataBaseHelper.updateSchedules(mOutgoingSchedule);
     }
 
     @Override
