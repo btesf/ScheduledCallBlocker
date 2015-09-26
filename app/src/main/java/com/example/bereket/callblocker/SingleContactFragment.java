@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,9 +49,9 @@ public class SingleContactFragment extends Fragment {
     private Contact mContact;
     private Map<Integer,Schedule> mIncomingSchedule;
     private Map<Integer,Schedule> mOutgoingSchedule;
+    private boolean mIsIncomingScheduleChanged = false;
+    private boolean mIsOutgoingScheduleChanged = false;
     //UI Elements
-    private CheckBox mOutgoingCheckBox;
-    private CheckBox mIncomingCheckbox;
     private TextView mPhoneNumberTextView;
     private TextView mContactNameTextView;
 
@@ -74,22 +75,6 @@ public class SingleContactFragment extends Fragment {
     {
         incomingCallWeekDayButtons = new ArrayList<>();
         outgoingCallWeekDayButtons = new ArrayList<>();
-
-        incomingCallWeekDayButtons.add(incomingCallMondayButton);
-        incomingCallWeekDayButtons.add(incomingCallTuesdayButton);
-        incomingCallWeekDayButtons.add(incomingCallWednesdayButton);
-        incomingCallWeekDayButtons.add(incomingCallThursdayButton);
-        incomingCallWeekDayButtons.add(incomingCallFridayButton);
-        incomingCallWeekDayButtons.add(incomingCallSaturdayButton);
-        incomingCallWeekDayButtons.add(incomingCallSundayButton);
-
-        outgoingCallWeekDayButtons.add(outgoingCallMondayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallTuesdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallWednesdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallThursdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallFridayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallSaturdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallSundayButton);
     }
 
     /**
@@ -131,31 +116,11 @@ public class SingleContactFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_single_contact, container, false);
 
-        mIncomingCheckbox = (CheckBox) view.findViewById(R.id.incoming_call_blocked_checkbox);
-        mOutgoingCheckBox = (CheckBox) view.findViewById(R.id.outgoing_call_blocked_checkbox);
-
-        mIncomingCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                   mContact.setIncomingBlockedState(isChecked ? 1 : 0);
-            }
-        });
-
-        mOutgoingCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                mContact.setOutGoingBlockedState(isChecked ? 1 : 0);
-            }
-        });
-
         mPhoneNumberTextView = (TextView) view.findViewById(R.id.contact_phone_number_id);
         mContactNameTextView = (TextView) view.findViewById(R.id.contact_name_id);
 
         mPhoneNumberTextView.setText(mContact.getPhoneNumber());
         mContactNameTextView.setText(mContact.getContactName());
-        mIncomingCheckbox.setChecked(mContact.getIncomingBlockedState() == 1 ? true : false);
-        mOutgoingCheckBox.setChecked(mContact.getOutGoingBlockedState() == 1 ? true : false);
-
 
         outgoingScheduleTable = (TableLayout)view.findViewById(R.id.outgoingScheduleTable);
         incomingScheduleTable = (TableLayout) view.findViewById(R.id.incomingScheduleTable);
@@ -189,79 +154,6 @@ public class SingleContactFragment extends Fragment {
         outgoingCallSaturdayButton = (Button) view.findViewById(R.id.outgoingCallSaturdayButton);
         outgoingCallSundayButton = (Button) view.findViewById(R.id.outgoingCallSundayButton);
 
-        //set the view according to the model data
-        switch(mContact.getIncomingBlockedState()){
-            case BlockState.ALWAYS_BLOCK:
-                //check the always block radio button
-                //uncheck other radio buttons
-                //hide the scheduled view
-                alwaysBlockIncomingRadio.setChecked(true);
-                dontBlockIncomingRadio.setChecked(false);
-                scheduledIncomingRadio.setChecked(false);
-                incomingScheduleTable.setVisibility(View.GONE);
-
-                break;
-            case BlockState.DONT_BLOCK:
-                //check the don't block radio button
-                //uncheck other radio buttons
-                //hide the scheduled view
-                alwaysBlockIncomingRadio.setChecked(false);
-                dontBlockIncomingRadio.setChecked(true);
-                scheduledIncomingRadio.setChecked(false);
-                incomingScheduleTable.setVisibility(View.GONE);
-
-                break;
-            case BlockState.SCHEDULED_BLOCK:
-                //check the scheduled radio button
-                //uncheck other radio buttons
-                //show the scheduled view
-                //iterate though the scheduled block list for this number and set the button labels accordingly
-                alwaysBlockIncomingRadio.setChecked(false);
-                dontBlockIncomingRadio.setChecked(false);
-                scheduledIncomingRadio.setChecked(true);
-                incomingScheduleTable.setVisibility(View.VISIBLE);
-                //read incoming block schedule for current contact
-                mIncomingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.INCOMING);
-                setButtonLabels(incomingCallWeekDayButtons, mIncomingSchedule);
-                break;
-            default:
-        }
-
-        switch(mContact.getOutGoingBlockedState()){
-            case BlockState.ALWAYS_BLOCK:
-                //check the always block radio button
-                //uncheck other radio buttons
-                //hide the scheduled view
-                alwaysBlockOutgoingRadio.setChecked(true);
-                dontBlockOutgoingRadio.setChecked(false);
-                scheduledOutgoingRadio.setChecked(false);
-                outgoingScheduleTable.setVisibility(View.GONE);
-
-                break;
-            case BlockState.DONT_BLOCK:
-                //check the don't block radio button
-                //uncheck other radio buttons
-                //hide the scheduled view
-                alwaysBlockOutgoingRadio.setChecked(false);
-                dontBlockOutgoingRadio.setChecked(true);
-                scheduledOutgoingRadio.setChecked(false);
-                outgoingScheduleTable.setVisibility(View.GONE);
-                break;
-            case BlockState.SCHEDULED_BLOCK:
-                //check the scheduled radio button
-                //uncheck other radio buttons
-                //show the scheduled view
-                //iterate though the scheduled block list for this number and set the button labels accordingly
-                alwaysBlockOutgoingRadio.setChecked(false);
-                dontBlockOutgoingRadio.setChecked(false);
-                scheduledOutgoingRadio.setChecked(true);
-                outgoingScheduleTable.setVisibility(View.VISIBLE);
-                mOutgoingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.OUTGOING);
-                setButtonLabels(outgoingCallWeekDayButtons, mOutgoingSchedule);
-
-                break;
-            default:
-        }
 
         incomingCallWeekDayButtons.add(incomingCallMondayButton);
         incomingCallWeekDayButtons.add(incomingCallTuesdayButton);
@@ -279,63 +171,242 @@ public class SingleContactFragment extends Fragment {
         outgoingCallWeekDayButtons.add(outgoingCallSaturdayButton);
         outgoingCallWeekDayButtons.add(outgoingCallSundayButton);
 
-        //for(Button weekDayButton : incomingCallWeekDayButtons){
-        for(int i = 0; i < incomingCallWeekDayButtons.size(); i++){
-            Button weekDayButton = incomingCallWeekDayButtons.get(i);
-            final int index = i;
-            weekDayButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-
-                    Schedule schedule = mIncomingSchedule.get(index);
-
-                    if(schedule == null){
-
-                        schedule = new Schedule();
-                        schedule.setWeekDay(index);
-                        schedule.setContactId(mContact.getId());
-                        schedule.setBlockType(BlockType.INCOMING);
-                    }
-
-                    PickTimeFragment pickTimeFragment = PickTimeFragment.newInstance(schedule, BlockType.INCOMING);
-                    pickTimeFragment.setTargetFragment(SingleContactFragment.this,PICK_SCHEDULE_TIME_REQUEST_CODE);
-                    pickTimeFragment.show(getFragmentManager(), "bere.bere.bere");
-                }
-            });
-        }
-
-        for(int i = 0; i < outgoingCallWeekDayButtons.size(); i++){
-            Button weekDayButton = outgoingCallWeekDayButtons.get(i);
-            final int index = i + 1;
-            weekDayButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Schedule schedule = mOutgoingSchedule.get(index);
-
-                    if(schedule == null){
-
-                        schedule = new Schedule();
-                        schedule.setWeekDay(index);
-                        schedule.setContactId(mContact.getId());
-                        schedule.setBlockType(BlockType.OUTGOING);
-                    }
-
-                    PickTimeFragment pickTimeFragment = PickTimeFragment.newInstance(schedule, BlockType.OUTGOING);
-                    pickTimeFragment.setTargetFragment(SingleContactFragment.this,PICK_SCHEDULE_TIME_REQUEST_CODE);
-                    pickTimeFragment.show(getFragmentManager(), "bere.bere.bere");
-                }
-            });
-        }
+        //set the view according to the model data
+        updateUI(BlockType.INCOMING);
+        updateUI(BlockType.OUTGOING);
 
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    private class OutgoingRadioButtonsClickedListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View view) {
+            //is the button checked?
+            boolean checked = ((RadioButton) view).isChecked();
+            //check which radio button is checked
+            switch(view.getId()){
+                case R.id.dontBlockOutgoingRadio:
+                    if(checked) {
+                        mContact.setOutGoingBlockedState(BlockState.DONT_BLOCK);
+                    }
+                    break;
+                case R.id.alwaysBlockOutgoingRadio:
+                    if(checked){
+                        mContact.setOutGoingBlockedState(BlockState.ALWAYS_BLOCK);
+                    }
+                    break;
+                case R.id.scheduledOutgoingRadio:
+
+                    if(checked){
+                        mContact.setOutGoingBlockedState(BlockState.SCHEDULED_BLOCK);
+                    }
+                    break;
+            }
+            //update the UI
+            updateUI(BlockType.OUTGOING);
+        }
+    }
+
+    private class IncomingRadioButtonsClickedListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View view) {
+            //is the button checked?
+            boolean checked = ((RadioButton) view).isChecked();
+            //check which radio button is checked
+            switch(view.getId()){
+                case R.id.dontBlockIncomingRadio:
+                    if(checked) {
+                        mContact.setIncomingBlockedState(BlockState.DONT_BLOCK);
+                    }
+                    break;
+                case R.id.alwaysBlockIncomingRadio:
+                    if(checked){
+                        mContact.setIncomingBlockedState(BlockState.ALWAYS_BLOCK);
+                    }
+                    break;
+                case R.id.scheduledIncomingRadio:
+                    if(checked){
+                        mContact.setIncomingBlockedState(BlockState.SCHEDULED_BLOCK);
+                    }
+                    break;
+            }
+            //update the UI
+            updateUI(BlockType.INCOMING);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if(resultCode != Activity.RESULT_OK) return;
+
+        switch(requestCode){
+            case PICK_SCHEDULE_TIME_REQUEST_CODE:
+
+                if(data != null){
+
+                    Schedule schedule = (Schedule) data.getSerializableExtra(PickTimeFragment.SCHEDULE);
+                    //check if both start and end times are set. otherwise don't process anything
+                    if(schedule.getEndTime() == null || schedule.getStartTime() == null){
+
+                        return;
+                    }
+
+                    Map<Integer, Schedule> scheduleMap = null;
+                    List<Button> buttonList = null;
+                    int weekDay = schedule.getWeekDay();
+
+                    if(schedule.getBlockType() == BlockType.INCOMING){
+
+                        scheduleMap = mIncomingSchedule;
+                        buttonList = incomingCallWeekDayButtons;
+                    }
+                    else if(schedule.getBlockType() == BlockType.OUTGOING){
+
+                        scheduleMap = mOutgoingSchedule;
+                        buttonList = outgoingCallWeekDayButtons;
+                    }
+
+                    Schedule existingSchedule = scheduleMap.get(weekDay);
+                    //check if this is a new schedule or the updated schedule start and/or end time is different from original
+                    if(existingSchedule == null ||
+                            (existingSchedule.getStartTime().compareTo(schedule.getStartTime()) != 0 ||
+                                existingSchedule.getEndTime().compareTo(schedule.getEndTime()) != 0)){
+                        //update the list
+                        scheduleMap.put(weekDay, schedule);
+                        //update the button
+                        Button weekDayButton = buttonList.get(weekDay);
+                        setSingleButtonLabel(weekDayButton, schedule);
+                        //update corresponding map content changed flat
+                        if(schedule.getBlockType() == BlockType.INCOMING){
+                            mIsIncomingScheduleChanged = true;
+                        }
+                        else{
+                            mIsOutgoingScheduleChanged = true;
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    private void setButtonLabels(List<Button> buttonsList, Map<Integer, Schedule> scheduleMap){
+
+        Button weekDayButton;
+        Schedule schedule;
+        //set the button labels
+        for(int i = 0; i < buttonsList.size(); i++){
+
+            weekDayButton = buttonsList.get(i);
+            schedule = scheduleMap.get(i);
+
+            setSingleButtonLabel(weekDayButton, schedule);
+        }
+    }
+
+    private void setSingleButtonLabel(Button button, Schedule schedule){
+
+        if(schedule == null){
+
+            button.setText(R.string.scheduledNotSetButtonLabel);
+        }
+        else{
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(schedule.getStartTime());
+            String startTime = "";
+            startTime += cal.get(Calendar.HOUR);
+            startTime += ": " + cal.get(Calendar.MINUTE);
+
+            String endTime = "";
+            cal.setTime(schedule.getEndTime());
+            endTime+= cal.get(Calendar.HOUR);
+            endTime+=": " + cal.get(Calendar.MINUTE);
+
+            button.setText(startTime + " - " + endTime);
+        }
+    }
+
+    /*
+        generic type of ui controls updater. Based on the block type(incoming/outgoing)
+        it changes the corresponding UI controls
+     */
+    private void updateUI(int blockType){
+
+        int blockedState = (blockType == BlockType.INCOMING) ? mContact.getIncomingBlockedState() : mContact.getOutGoingBlockedState();
+        RadioButton alwaysBlockRadio = (blockType == BlockType.INCOMING) ? alwaysBlockIncomingRadio : alwaysBlockOutgoingRadio;
+        RadioButton dontBlockRadio = (blockType == BlockType.INCOMING) ? dontBlockIncomingRadio : dontBlockOutgoingRadio;
+        RadioButton scheduledBlockRadio = (blockType == BlockType.INCOMING) ? scheduledIncomingRadio : scheduledOutgoingRadio;
+        TableLayout scheduleTableLayout = (blockType == BlockType.INCOMING) ? incomingScheduleTable : outgoingScheduleTable;
+        Map<Integer,Schedule> scheduleMap = (blockType == BlockType.INCOMING) ? mIncomingSchedule : mOutgoingSchedule;
+        List<Button> buttonList = (blockType == BlockType.INCOMING) ? incomingCallWeekDayButtons : outgoingCallWeekDayButtons;
+
+        switch(blockedState){
+            case BlockState.ALWAYS_BLOCK:
+                //check the always block radio button
+                //hide the scheduled view
+                alwaysBlockRadio.setChecked(true);
+                scheduleTableLayout.setVisibility(View.GONE);
+
+                break;
+            case BlockState.DONT_BLOCK:
+                //check the don't block radio button
+                //hide the scheduled view
+                dontBlockRadio.setChecked(true);
+                scheduleTableLayout.setVisibility(View.GONE);
+                break;
+            case BlockState.SCHEDULED_BLOCK:
+                //check the scheduled radio button
+                //show the scheduled view
+                scheduledBlockRadio.setChecked(true);
+                scheduleTableLayout.setVisibility(View.VISIBLE);
+                //this method's purpose is to change view. But below, DB query is included to reduce the number of places
+                //query is done. In addition whenever the query was made this method would also be called anyways.
+                if(scheduleMap == null) {
+
+                    scheduleMap = dataBaseHelper.queryContactSchedule(mContact.getId(), blockType);
+                    //assign the queried map to the corresponding(incoming/ougoing) map
+                    if(blockType == BlockType.INCOMING){
+                        mIncomingSchedule = scheduleMap;
+                    }
+                    else mOutgoingSchedule = scheduleMap;
+                }
+                setButtonLabels(buttonList, scheduleMap);
+                attachClickListenersToWeekDayButtons(blockType);
+                break;
+            default:
+        }
+    }
+
+    private void attachClickListenersToWeekDayButtons(final int blockType){
+
+        final Map<Integer,Schedule> scheduleMap = (blockType == BlockType.INCOMING) ? mIncomingSchedule : mOutgoingSchedule;
+        List<Button> buttonList = (blockType == BlockType.INCOMING) ? incomingCallWeekDayButtons : outgoingCallWeekDayButtons;
+
+        for(int i = 0; i < buttonList.size(); i++){
+            Button weekDayButton = buttonList.get(i);
+            final int index = i;
+            weekDayButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Schedule schedule = scheduleMap.get(index);
+
+                    if(schedule == null){
+
+                        schedule = new Schedule();
+                        schedule.setWeekDay(index);
+                        schedule.setContactId(mContact.getId());
+                        schedule.setBlockType(blockType);
+                    }
+
+                    PickTimeFragment pickTimeFragment = PickTimeFragment.newInstance(schedule, blockType);
+                    pickTimeFragment.setTargetFragment(SingleContactFragment.this,PICK_SCHEDULE_TIME_REQUEST_CODE);
+                    pickTimeFragment.show(getFragmentManager(), "bere.bere.bere");
+                }
+            });
         }
     }
 
@@ -343,8 +414,8 @@ public class SingleContactFragment extends Fragment {
     public void onPause(){
         super.onPause();
         dataBaseHelper.updateContact(mContact);
-        if(mIncomingSchedule != null) dataBaseHelper.updateSchedules(mIncomingSchedule);
-        if(mOutgoingSchedule != null)  dataBaseHelper.updateSchedules(mOutgoingSchedule);
+        if(mIsIncomingScheduleChanged) dataBaseHelper.updateSchedules(mIncomingSchedule);
+        if(mIsOutgoingScheduleChanged)  dataBaseHelper.updateSchedules(mOutgoingSchedule);
     }
 
     @Override
@@ -377,147 +448,5 @@ public class SingleContactFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
-    }
-
-    private class OutgoingRadioButtonsClickedListener implements View.OnClickListener{
-
-        @Override
-        public void onClick(View view) {
-            //is the button checked?
-            boolean checked = ((RadioButton) view).isChecked();
-            //check which radio button is checked
-            switch(view.getId()){
-                case R.id.dontBlockOutgoingRadio:
-                    if(checked) {
-                        mContact.setOutGoingBlockedState(BlockState.DONT_BLOCK);
-                        outgoingScheduleTable.setVisibility(View.GONE);
-                    }
-                    break;
-                case R.id.alwaysBlockOutgoingRadio:
-                    if(checked){
-                        mContact.setOutGoingBlockedState(BlockState.ALWAYS_BLOCK);
-                        outgoingScheduleTable.setVisibility(View.GONE);
-                    }
-                    break;
-                case R.id.scheduledOutgoingRadio:
-
-                    if(checked){
-                        mContact.setOutGoingBlockedState(BlockState.SCHEDULED_BLOCK);
-                        outgoingScheduleTable.setVisibility(View.VISIBLE);
-                        //read outgoing block schedule for current contact
-                        mOutgoingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.OUTGOING);
-                        setButtonLabels(outgoingCallWeekDayButtons, mOutgoingSchedule);
-                    }
-                    break;
-            }
-        }
-    }
-
-    private class IncomingRadioButtonsClickedListener implements View.OnClickListener{
-
-        @Override
-        public void onClick(View view) {
-            //is the button checked?
-            boolean checked = ((RadioButton) view).isChecked();
-            //check which radio button is checked
-            switch(view.getId()){
-                case R.id.dontBlockIncomingRadio:
-                    if(checked) {
-                        mContact.setIncomingBlockedState(BlockState.DONT_BLOCK);
-                        incomingScheduleTable.setVisibility(View.GONE);
-                    }
-                    break;
-                case R.id.alwaysBlockIncomingRadio:
-                    if(checked){
-                        mContact.setIncomingBlockedState(BlockState.ALWAYS_BLOCK);
-                        incomingScheduleTable.setVisibility(View.GONE);
-                    }
-                    break;
-                case R.id.scheduledIncomingRadio:
-                    if(checked){
-
-                        mContact.setOutGoingBlockedState(BlockState.SCHEDULED_BLOCK);
-                        incomingScheduleTable.setVisibility(View.VISIBLE);
-                        //read outgoing block schedule for current contact
-                        mIncomingSchedule = dataBaseHelper.queryContactSchedule(mContact.getId(), BlockType.INCOMING);
-                        setButtonLabels(incomingCallWeekDayButtons, mIncomingSchedule);
-                    }
-                    break;
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-
-        if(resultCode != Activity.RESULT_OK) return;
-
-        switch(requestCode){
-            case PICK_SCHEDULE_TIME_REQUEST_CODE:
-
-                if(data != null){
-
-                    Schedule schedule = (Schedule) data.getSerializableExtra(PickTimeFragment.SCHEDULE);
-                    //TODO: will schedule always be non-null?
-                    Map<Integer, Schedule> scheduleMap = null;
-                    List<Button> buttonList = null;
-
-                    if(schedule.getBlockType() == BlockType.INCOMING){
-
-                        scheduleMap = mIncomingSchedule;
-                        buttonList = incomingCallWeekDayButtons;
-                    }
-                    else if(schedule.getBlockType() == BlockType.OUTGOING){
-
-                        scheduleMap = mOutgoingSchedule;
-                        buttonList = outgoingCallWeekDayButtons;
-                    }
-                    //update the list
-                    int weekDay = schedule.getWeekDay();
-                    scheduleMap.put(weekDay, schedule);
-                    //update the button
-                    Button weekDayButton = buttonList.get(weekDay);
-                    setSingleButtonLabel(weekDayButton, schedule);
-                }
-                break;
-        }
-
-    }
-
-    private void setButtonLabels(List<Button> buttonsList, Map<Integer, Schedule> scheduleMap){
-
-        Button weekDayButton;
-        Schedule schedule;
-        //set the button labels
-        for(int i = 0; i < buttonsList.size(); i++){
-
-            weekDayButton = buttonsList.get(i);
-            schedule = scheduleMap.get(i+1);
-
-           setSingleButtonLabel(weekDayButton, schedule);
-        }
-    }
-
-    private void setSingleButtonLabel(Button button, Schedule schedule){
-
-        if(schedule == null){
-
-            button.setText(R.string.scheduledNotSetButtonLabel);
-        }
-        else{
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(schedule.getStartTime());
-            String startTime = "";
-            startTime += cal.get(Calendar.HOUR);
-            startTime += ": " + cal.get(Calendar.MINUTE);
-
-            String endTime = "";
-            cal.setTime(schedule.getEndTime());
-            endTime+= cal.get(Calendar.HOUR);
-            endTime+=": " + cal.get(Calendar.MINUTE);
-
-            button.setText(startTime + " - " + endTime);
-        }
     }
 }

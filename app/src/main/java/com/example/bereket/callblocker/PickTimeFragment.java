@@ -154,6 +154,25 @@ public class PickTimeFragment extends DialogFragment {
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(returnedTime);
 
+                    //validate date - check if end time is not earlier than start time
+                    if(changeTarget == TimePickerFragment.START_TIME){
+
+                        if(mSchedule.getEndTime() != null && returnedTime.compareTo(mSchedule.getEndTime()) > 1){ //start time is older than end time
+                            Toast.makeText(getActivity(), R.string.start_time_is_older_than_end_time, Toast.LENGTH_SHORT)
+                                    .show();
+                            return;
+                        }
+                    }
+                    else if(changeTarget == TimePickerFragment.END_TIME){
+
+                        if(mSchedule.getStartTime() != null && returnedTime.compareTo(mSchedule.getStartTime()) < 1){ //end time is earlier than start time
+                            Toast.makeText(getActivity(), R.string.end_time_is_earlier_than_end_time, Toast.LENGTH_SHORT)
+                                    .show();
+                            return;
+                        }
+                    }
+
+
                     if(changeTarget == TimePickerFragment.START_TIME){
 
                         mSchedule.setStartTime(returnedTime);

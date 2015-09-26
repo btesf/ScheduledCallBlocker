@@ -243,8 +243,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             contact.setDisplayNumber(displayNumber);
             contact.setContactName(contactName);
             contact.setIsNumberStandardized(isNumberStandardized);
-            contact.setIncomingBlockedState(outgoingBlockedState);
-            contact.setOutGoingBlockedState(incomingBlockedState);
+            contact.setIncomingBlockedState(incomingBlockedState);
+            contact.setOutGoingBlockedState(outgoingBlockedState);
             contact.setIncomingBlockedCount(incomingBlockedCount);
             contact.setOutgoingBlockedCount(outgoingBlockedCount);
 
@@ -327,7 +327,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         for(Schedule schedule : schedules.values()){
 
-            builder.append("( '" +  schedule.getContactId() + "', '" + schedule.getWeekDay() + "', '" + schedule.getStartTime() +"', '" + schedule.getEndTime() + "', '" + schedule.getBlockType() + "'),");
+            builder.append("( '" +  schedule.getContactId() + "', '" + schedule.getWeekDay() + "', '" + schedule.getStartTime().getTime() +"', '" + schedule.getEndTime().getTime() + "', '" + schedule.getBlockType() + "'),");
         }
         //remove the last comma
         builder.deleteCharAt(builder.length() - 1);
