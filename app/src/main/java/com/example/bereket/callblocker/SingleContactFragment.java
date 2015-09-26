@@ -235,8 +235,9 @@ public class SingleContactFragment extends Fragment {
                 if(data != null){
 
                     Schedule schedule = (Schedule) data.getSerializableExtra(PickTimeFragment.SCHEDULE);
-                    //check if both start and end times are set. otherwise don't process anything
-                    if(schedule.getEndTime() == null || schedule.getStartTime() == null){
+                    //if only one of start or end times is set do nothing - it is an incomplete time setting
+                    if((schedule.getEndTime() == null && schedule.getStartTime() != null) ||
+                            (schedule.getEndTime() != null && schedule.getStartTime() == null)){
 
                         return;
                     }
@@ -244,6 +245,7 @@ public class SingleContactFragment extends Fragment {
                     Map<Integer, Schedule> scheduleMap = null;
                     List<Button> buttonList = null;
                     int weekDay = schedule.getWeekDay();
+                    boolean mapChangedFlag = false;
 
                     if(schedule.getBlockType() == BlockType.INCOMING){
 
@@ -256,17 +258,33 @@ public class SingleContactFragment extends Fragment {
                         buttonList = outgoingCallWeekDayButtons;
                     }
 
+                    Button weekDayButton = buttonList.get(weekDay);
                     Schedule existingSchedule = scheduleMap.get(weekDay);
+
+                    //if both start and end times are set to null, then the scheduled is canceled - check and remove from scheduleMap
+                    if(schedule.getEndTime() == null && schedule.getStartTime() == null){
+                        //if an element exists with current date, remove from map - else do nothing
+                        if(existingSchedule != null){
+                            scheduleMap.remove(weekDay);
+                            setSingleButtonLabel(weekDayButton, null);
+                            mapChangedFlag = true;
+                        }
+                    }
                     //check if this is a new schedule or the updated schedule start and/or end time is different from original
-                    if(existingSchedule == null ||
+                    else if(existingSchedule == null ||
                             (existingSchedule.getStartTime().compareTo(schedule.getStartTime()) != 0 ||
                                 existingSchedule.getEndTime().compareTo(schedule.getEndTime()) != 0)){
                         //update the list
                         scheduleMap.put(weekDay, schedule);
-                        //update the button
-                        Button weekDayButton = buttonList.get(weekDay);
+                        //update the button label
                         setSingleButtonLabel(weekDayButton, schedule);
-                        //update corresponding map content changed flat
+                        //set mapChangedFlag to refleced changed
+                        mapChangedFlag = true;
+                    }
+
+                    //update corresponding map content changed flag
+                    if(mapChangedFlag){
+
                         if(schedule.getBlockType() == BlockType.INCOMING){
                             mIsIncomingScheduleChanged = true;
                         }

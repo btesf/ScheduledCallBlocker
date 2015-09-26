@@ -323,15 +323,21 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 BLOCK_SCHEDULE_TO + ", " +
                 BLOCK_SCHEDULE_BLOCK_TYPE + ") values ";
 
-        StringBuilder builder = new StringBuilder();
-
+        StringBuilder insertQueryBuilder = new StringBuilder();
+        StringBuilder deleteQueryIdsBuilder = new StringBuilder();
+//TODO bad way of accessing a single schedule
+        Schedule tempSchedule = null;
         for(Schedule schedule : schedules.values()){
-
-            builder.append("( '" +  schedule.getContactId() + "', '" + schedule.getWeekDay() + "', '" + schedule.getStartTime().getTime() +"', '" + schedule.getEndTime().getTime() + "', '" + schedule.getBlockType() + "'),");
+            if(tempSchedule == null) tempSchedule = schedule;
+            insertQueryBuilder.append("( '" +  schedule.getContactId() + "', '" + schedule.getWeekDay() + "', '" + schedule.getStartTime().getTime() +"', '" + schedule.getEndTime().getTime() + "', '" + schedule.getBlockType() + "'),");
+            deleteQueryIdsBuilder.append(schedule.getWeekDay() + ",");
         }
         //remove the last comma
-        builder.deleteCharAt(builder.length() - 1);
+        insertQueryBuilder.deleteCharAt(insertQueryBuilder.length() - 1);
+        deleteQueryIdsBuilder.deleteCharAt(deleteQueryIdsBuilder.length() - 1);
 
-        getWritableDatabase().execSQL(query + builder.toString());
+        getWritableDatabase().execSQL(query + insertQueryBuilder.toString());
+        //delete removed schedules - if any
+        getWritableDatabase().execSQL("DELETE FROM " + BLOCK_SCHEDULE_TABLE + " WHERE " + BLOCK_SCHEDULE_CONTACT_ID + " = '" + tempSchedule.getContactId() + "' AND " + BLOCK_SCHEDULE_BLOCK_TYPE + " = " + tempSchedule.getBlockType() + " AND " + BLOCK_SCHEDULE_WEEK_DAY + " NOT IN (" + deleteQueryIdsBuilder.toString() + " )");
     }
 }
