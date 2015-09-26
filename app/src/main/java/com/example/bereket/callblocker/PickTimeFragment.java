@@ -32,10 +32,11 @@ public class PickTimeFragment extends DialogFragment {
 
     private Schedule mSchedule;
 
-    private Button startTimeButton;
-    private Button endTimeButton;
+    //private Button startTimeButton;
+    //private Button endTimeButton;
     private TextView startTimeTextView;
     private TextView endTimeTextView;
+    private Button clearTimeButton;
 
     public static PickTimeFragment newInstance(Schedule schedule, int blockType) {
         PickTimeFragment fragment = new PickTimeFragment();
@@ -66,7 +67,7 @@ public class PickTimeFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(v);
         builder.setTitle(R.string.pick_time);
-        builder.setPositiveButton(R.string.button_ok_text, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.button_save_text, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -78,17 +79,36 @@ public class PickTimeFragment extends DialogFragment {
                 getTargetFragment().onActivityResult(SingleContactFragment.PICK_SCHEDULE_TIME_REQUEST_CODE, Activity.RESULT_OK, intent);
             }
         });
+
+        builder.setNegativeButton(R.string.button_cancel_button, new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                getTargetFragment().onActivityResult(SingleContactFragment.PICK_SCHEDULE_TIME_REQUEST_CODE, Activity.RESULT_CANCELED, null);
+            }
+        });
        // builder.setNegativeButton(R.string.button_cancel_button, null);
 
-        startTimeButton = (Button) v.findViewById(R.id.start_time_button);
-        endTimeButton = (Button) v.findViewById(R.id.end_time_button);
+        //startTimeButton = (Button) v.findViewById(R.id.start_time_button);
+        //endTimeButton = (Button) v.findViewById(R.id.end_time_button);
         startTimeTextView = (TextView) v.findViewById(R.id.start_time_label);
         endTimeTextView = (TextView) v.findViewById(R.id.end_time_label);
+        clearTimeButton = (Button) v.findViewById(R.id.clear_time_button);
 
         startTimeTextView.setText(getFormattedTime(mSchedule.getStartTime()));
         endTimeTextView.setText(getFormattedTime(mSchedule.getEndTime()));
 
-        startTimeButton.setOnClickListener(new View.OnClickListener() {
+/*        startTimeButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mSchedule.getStartTime(), TimePickerFragment.START_TIME);
+                timePickerFragment.setTargetFragment(PickTimeFragment.this,TIME_PICKER_DIALOG_REQUEST_CODE);
+                timePickerFragment.show(getFragmentManager(), "bere.bere.bere");
+            }
+        });*/
+
+        startTimeTextView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -98,13 +118,30 @@ public class PickTimeFragment extends DialogFragment {
             }
         });
 
-        endTimeButton.setOnClickListener(new View.OnClickListener(){
+/*        endTimeButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mSchedule.getEndTime(), TimePickerFragment.END_TIME);
                 timePickerFragment.setTargetFragment(PickTimeFragment.this,TIME_PICKER_DIALOG_REQUEST_CODE);
                 timePickerFragment.show(getFragmentManager(), "bere.bere.bere");
+            }
+        });*/
+
+        endTimeTextView.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mSchedule.getEndTime(), TimePickerFragment.END_TIME);
+                timePickerFragment.setTargetFragment(PickTimeFragment.this,TIME_PICKER_DIALOG_REQUEST_CODE);
+                timePickerFragment.show(getFragmentManager(), "bere.bere.bere");
+            }
+        });
+
+        clearTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,9 @@ public class SingleContactFragment extends Fragment {
     public static final String ARG_PARAM1 = "param1";
     public static final int PICK_SCHEDULE_TIME_REQUEST_CODE = 0;
 
+    private int WEEK_DAY_BUTTON_POSITION_IN_LAYOUT = 1;
+    private int WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT = 0;
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -61,9 +65,6 @@ public class SingleContactFragment extends Fragment {
     private RadioButton dontBlockIncomingRadio, alwaysBlockIncomingRadio, scheduledIncomingRadio;
     private RadioButton dontBlockOutgoingRadio, alwaysBlockOutgoingRadio, scheduledOutgoingRadio;
 
-    //ugly and many controls
-    private Button incomingCallMondayButton, incomingCallTuesdayButton, incomingCallWednesdayButton, incomingCallThursdayButton, incomingCallFridayButton, incomingCallSaturdayButton, incomingCallSundayButton;
-    private Button outgoingCallMondayButton, outgoingCallTuesdayButton, outgoingCallWednesdayButton, outgoingCallThursdayButton, outgoingCallFridayButton, outgoingCallSaturdayButton, outgoingCallSundayButton;
     private List<Button> incomingCallWeekDayButtons;
     private List<Button> outgoingCallWeekDayButtons;
 
@@ -139,37 +140,23 @@ public class SingleContactFragment extends Fragment {
         alwaysBlockOutgoingRadio.setOnClickListener(new OutgoingRadioButtonsClickedListener());
         scheduledOutgoingRadio.setOnClickListener(new OutgoingRadioButtonsClickedListener());
 
-        incomingCallMondayButton = (Button) view.findViewById(R.id.incomingCallMondayButton);
-        incomingCallTuesdayButton = (Button) view.findViewById(R.id.incomingCallTuesdayButton);
-        incomingCallWednesdayButton = (Button) view.findViewById(R.id.incomingCallWednesdayButton);
-        incomingCallThursdayButton = (Button) view.findViewById(R.id.incomingCallThursdayButton);
-        incomingCallFridayButton = (Button) view.findViewById(R.id.incomingCallFridayButton);
-        incomingCallSaturdayButton = (Button) view.findViewById(R.id.incomingCallSaturdayButton);
-        incomingCallSundayButton = (Button) view.findViewById(R.id.incomingCallSundayButton);
-        outgoingCallMondayButton = (Button) view.findViewById(R.id.outgoingCallMondayButton);
-        outgoingCallTuesdayButton = (Button) view.findViewById(R.id.outgoingCallTuesdayButton);
-        outgoingCallWednesdayButton = (Button) view.findViewById(R.id.outgoingCallWednesdayButton);
-        outgoingCallThursdayButton = (Button) view.findViewById(R.id.outgoingCallThursdayButton);
-        outgoingCallFridayButton = (Button) view.findViewById(R.id.outgoingCallFridayButton);
-        outgoingCallSaturdayButton = (Button) view.findViewById(R.id.outgoingCallSaturdayButton);
-        outgoingCallSundayButton = (Button) view.findViewById(R.id.outgoingCallSundayButton);
+        for (int i = 0; i < incomingScheduleTable.getChildCount(); i++) {
+            TableRow row = (TableRow)incomingScheduleTable.getChildAt(i);
+            Button button = (Button) row.getChildAt(WEEK_DAY_BUTTON_POSITION_IN_LAYOUT);
+            TextView textView = (TextView) row.getChildAt(WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT);
+            //get string resource id from its name and set the value to text view
+            textView.setText(getActivity().getResources().getIdentifier("weekDay_"+i, "string", getActivity().getPackageName()));
+            incomingCallWeekDayButtons.add(button);
+        }
 
-
-        incomingCallWeekDayButtons.add(incomingCallMondayButton);
-        incomingCallWeekDayButtons.add(incomingCallTuesdayButton);
-        incomingCallWeekDayButtons.add(incomingCallWednesdayButton);
-        incomingCallWeekDayButtons.add(incomingCallThursdayButton);
-        incomingCallWeekDayButtons.add(incomingCallFridayButton);
-        incomingCallWeekDayButtons.add(incomingCallSaturdayButton);
-        incomingCallWeekDayButtons.add(incomingCallSundayButton);
-
-        outgoingCallWeekDayButtons.add(outgoingCallMondayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallTuesdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallWednesdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallThursdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallFridayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallSaturdayButton);
-        outgoingCallWeekDayButtons.add(outgoingCallSundayButton);
+        for (int i = 0; i < outgoingScheduleTable.getChildCount(); i++) {
+            TableRow row = (TableRow)outgoingScheduleTable.getChildAt(i);
+            Button button = (Button) row.getChildAt(WEEK_DAY_BUTTON_POSITION_IN_LAYOUT);
+            TextView textView = (TextView) row.getChildAt(WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT);
+            //get string resource id from its name and set the value to text view
+            textView.setText(getActivity().getResources().getIdentifier("weekDay_"+i, "string", getActivity().getPackageName()));
+            outgoingCallWeekDayButtons.add(button);
+        }
 
         //set the view according to the model data
         updateUI(BlockType.INCOMING);
@@ -367,7 +354,7 @@ public class SingleContactFragment extends Fragment {
                 if(scheduleMap == null) {
 
                     scheduleMap = dataBaseHelper.queryContactSchedule(mContact.getId(), blockType);
-                    //assign the queried map to the corresponding(incoming/ougoing) map
+                    //assign the queried map to the corresponding(incoming/outoing) map
                     if(blockType == BlockType.INCOMING){
                         mIncomingSchedule = scheduleMap;
                     }

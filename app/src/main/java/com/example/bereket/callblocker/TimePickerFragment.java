@@ -61,6 +61,14 @@ public class TimePickerFragment extends DialogFragment {
             }
         });
 
+        builder.setNegativeButton(R.string.button_cancel_button, new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                getTargetFragment().onActivityResult(PickTimeFragment.TIME_PICKER_DIALOG_REQUEST_CODE, Activity.RESULT_CANCELED, null);
+            }
+        });
+
         final TimePicker timePicker = (TimePicker)v.findViewById(R.id.time_picker);
 
         changeTarget = getArguments().getInt(CHANGE_TARGET);
