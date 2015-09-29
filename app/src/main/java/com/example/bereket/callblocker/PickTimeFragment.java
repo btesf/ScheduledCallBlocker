@@ -166,6 +166,8 @@ public class PickTimeFragment extends DialogFragment {
                         return;
                     }
 
+                    if(returnedTime == null) return;
+
                     String formattedTime = "";
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(returnedTime);
@@ -173,7 +175,7 @@ public class PickTimeFragment extends DialogFragment {
                     //validate date - check if end time is not earlier than start time
                     if(changeTarget == TimePickerFragment.START_TIME){
 
-                        if(mSchedule.getEndTime() != null && returnedTime.compareTo(mSchedule.getEndTime()) > 1){ //start time is older than end time
+                        if(mSchedule.getEndTime() != null && returnedTime.compareTo(mSchedule.getEndTime()) > 0){ //start time is older than end time
                             Toast.makeText(getActivity(), R.string.start_time_is_older_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
                             return;
@@ -181,7 +183,7 @@ public class PickTimeFragment extends DialogFragment {
                     }
                     else if(changeTarget == TimePickerFragment.END_TIME){
 
-                        if(mSchedule.getStartTime() != null && returnedTime.compareTo(mSchedule.getStartTime()) < 1){ //end time is earlier than start time
+                        if(mSchedule.getStartTime() != null && returnedTime.compareTo(mSchedule.getStartTime()) < 0){ //end time is earlier than start time
                             Toast.makeText(getActivity(), R.string.end_time_is_earlier_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
                             return;

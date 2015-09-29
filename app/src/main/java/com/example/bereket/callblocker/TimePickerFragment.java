@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.TimePicker;
 
@@ -51,11 +52,11 @@ public class TimePickerFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                if(getTargetFragment() == null)
+                if (getTargetFragment() == null)
                     return;
 
                 Intent intent = new Intent();
-                intent.putExtra(SELECTED_TIME, mDate);
+                intent.putExtra(SELECTED_TIME, getArguments().getSerializable(SELECTED_TIME));
                 intent.putExtra(CHANGE_TARGET, changeTarget);
                 getTargetFragment().onActivityResult(PickTimeFragment.TIME_PICKER_DIALOG_REQUEST_CODE, Activity.RESULT_OK, intent);
             }
@@ -80,6 +81,7 @@ public class TimePickerFragment extends DialogFragment {
 
         timePicker.setCurrentHour(cal.get(Calendar.HOUR_OF_DAY));
         timePicker.setCurrentMinute(cal.get(Calendar.MINUTE));
+        timePicker.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
 
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener(){
 

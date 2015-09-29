@@ -63,4 +63,14 @@ public class Schedule implements Serializable{
     public void setBlockType(int mBlockType) {
         this.mBlockType = mBlockType;
     }
+
+    public void copySchedule(Schedule schedule){
+
+        mId = schedule.getId();
+        mContactId = schedule.getContactId();
+        mWeekDay = schedule.getWeekDay();
+        mStartTime = schedule.getStartTime();
+        mEndTime = schedule.getEndTime();
+        mBlockType = schedule.getBlockType();
+    }
 }

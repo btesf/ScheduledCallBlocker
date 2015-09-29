@@ -70,6 +70,8 @@ public class SingleContactFragment extends Fragment {
 
     //Database property
     private DataBaseHelper dataBaseHelper;
+    //time format helper class
+    TimeFormatHelper mTimeFormatHelper;
 
     private OnFragmentInteractionListener mListener;
 
@@ -109,6 +111,7 @@ public class SingleContactFragment extends Fragment {
         }
         //instantiate DB Helper
         dataBaseHelper = new DataBaseHelper(getActivity());
+        mTimeFormatHelper = TimeFormatHelper.getInstance(getActivity());
     }
 
     @Override
@@ -319,17 +322,8 @@ public class SingleContactFragment extends Fragment {
         }
         else{
 
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(schedule.getStartTime());
-            String startTime = "";
-            startTime += cal.get(Calendar.HOUR);
-            startTime += ": " + cal.get(Calendar.MINUTE);
-
-            String endTime = "";
-            cal.setTime(schedule.getEndTime());
-            endTime+= cal.get(Calendar.HOUR);
-            endTime+=": " + cal.get(Calendar.MINUTE);
-
+            String startTime = mTimeFormatHelper.getTimeWithSystemTimeFormat(schedule.getStartTime());
+            String endTime = mTimeFormatHelper.getTimeWithSystemTimeFormat(schedule.getEndTime());
             button.setText(startTime + " - " + endTime);
         }
     }
@@ -397,16 +391,19 @@ public class SingleContactFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    Schedule schedule = scheduleMap.get(index);
+                    Schedule existingSchedule = scheduleMap.get(index);
+                    Schedule schedule = new Schedule();;
 
-                    if(schedule == null){
+                    if(existingSchedule == null){
 
-                        schedule = new Schedule();
                         schedule.setWeekDay(index);
                         schedule.setContactId(mContact.getId());
                         schedule.setBlockType(blockType);
                     }
-
+                    else{
+                        //copy values to new schedule. Otherwise the schedule in the map will be passes by reference and it will be modified directly
+                        schedule.copySchedule(existingSchedule);
+                    }
                     PickTimeFragment pickTimeFragment = PickTimeFragment.newInstance(schedule, blockType);
                     pickTimeFragment.setTargetFragment(SingleContactFragment.this,PICK_SCHEDULE_TIME_REQUEST_CODE);
                     pickTimeFragment.show(getFragmentManager(), "bere.bere.bere");
