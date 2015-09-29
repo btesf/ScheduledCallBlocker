@@ -31,6 +31,7 @@ public class PickTimeFragment extends DialogFragment {
 
 
     private Schedule mSchedule;
+    private TimeHelper mTimeHelper;
 
     private TextView startTimeTextView;
     private TextView endTimeTextView;
@@ -48,12 +49,14 @@ public class PickTimeFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
+        if (getArguments() != null) { //TODO what about if argument is null?
             Schedule schedule = (Schedule)getArguments().getSerializable(SCHEDULE);
             if(schedule != null){
                 mSchedule = schedule;
             }
         }
+
+        mTimeHelper = TimeHelper.getInstance(getActivity());
     }
 
     @Override
@@ -135,7 +138,7 @@ public class PickTimeFragment extends DialogFragment {
 
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
-            formattedTime += cal.get(Calendar.HOUR_OF_DAY) + " : " + cal.get(Calendar.MINUTE);
+            formattedTime +=  mTimeHelper.getTimeWithSystemTimeFormat(date);
         }
         else{
 
@@ -175,7 +178,7 @@ public class PickTimeFragment extends DialogFragment {
                     //validate date - check if end time is not earlier than start time
                     if(changeTarget == TimePickerFragment.START_TIME){
 
-                        if(mSchedule.getEndTime() != null && returnedTime.compareTo(mSchedule.getEndTime()) > 0){ //start time is older than end time
+                        if(mSchedule.getEndTime() != null && mTimeHelper.compareTimes(returnedTime, mSchedule.getEndTime()) > 0){ //start time is older than end time
                             Toast.makeText(getActivity(), R.string.start_time_is_older_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
                             return;
@@ -183,7 +186,7 @@ public class PickTimeFragment extends DialogFragment {
                     }
                     else if(changeTarget == TimePickerFragment.END_TIME){
 
-                        if(mSchedule.getStartTime() != null && returnedTime.compareTo(mSchedule.getStartTime()) < 0){ //end time is earlier than start time
+                        if(mSchedule.getStartTime() != null && mTimeHelper.compareTimes(returnedTime, mSchedule.getStartTime()) < 0){ //end time is earlier than start time
                             Toast.makeText(getActivity(), R.string.end_time_is_earlier_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
                             return;
@@ -193,12 +196,12 @@ public class PickTimeFragment extends DialogFragment {
                     if(changeTarget == TimePickerFragment.START_TIME){
 
                         mSchedule.setStartTime(returnedTime);
-                        startTimeTextView.setText(cal.get(Calendar.HOUR_OF_DAY) + " : " + cal.get(Calendar.MINUTE));
+                        startTimeTextView.setText(mTimeHelper.getTimeWithSystemTimeFormat(returnedTime));
                     }
                     else if(changeTarget == TimePickerFragment.END_TIME){
 
                         mSchedule.setEndTime(returnedTime);
-                        endTimeTextView.setText(cal.get(Calendar.HOUR_OF_DAY) + " : " + cal.get(Calendar.MINUTE));
+                        endTimeTextView.setText(mTimeHelper.getTimeWithSystemTimeFormat(returnedTime));
                     }
                 }
 

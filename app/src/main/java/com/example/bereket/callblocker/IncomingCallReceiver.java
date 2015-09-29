@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.android.internal.telephony.ITelephony;
 
 import java.lang.reflect.Method;
+import java.util.Calendar;
 
 /**
  * Created by bereket on 8/17/15.
@@ -32,8 +33,11 @@ public class IncomingCallReceiver extends BroadcastReceiver {
     private class PhoneCallStateListener extends PhoneStateListener {
 
         private Context context;
+        private ScheduleManager mScheduleManager;
+
         public PhoneCallStateListener(Context context){
             this.context = context;
+            mScheduleManager = ScheduleManager.getInstance(context);
         }
 
 
@@ -80,27 +84,26 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                         ITelephony telephonyService = (ITelephony) method.invoke(telephonyManager);
                         if(incomingNumber.equals(blockedContact.getPhoneNumber())) {
                             //if outgoing call is blocked proceed with blocking
-                            if (blockedContact.getIncomingBlockedState() == 1) {
+                            if (blockedContact.getIncomingBlockedState() == BlockState.ALWAYS_BLOCK) {
                                 //telephonyService.silenceRinger();//Security exception problem
                                 telephonyService = (ITelephony) method.invoke(telephonyManager);
                                 telephonyService.silenceRinger();
                                 telephonyService.endCall();
-
-                                Intent i  = new Intent(context, CallBlockerActivity.class);
-                                PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
-                                Notification notification = new NotificationCompat.Builder(context)
-                                        .setTicker("Call blocker")
-                                        .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                                        .setContentTitle("New incoming call intercepted")
-                                        .setContentText(incomingNumber + " is intercepted")
-                                        .setContentIntent(pi)
-                                        .setAutoCancel(true)
-                                        .build();
-
-                                NotificationManager notificationManager = (NotificationManager)
-                                        context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                notificationManager.notify(0, notification);
-
+                                sendNotification(blockedContact.getDisplayNumber());
+                            }
+                            else if(blockedContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
+                                //get all the scheduled calls for this number
+                                Calendar cal = Calendar.getInstance();
+                                //get weekDay of today
+                                int weekDay = TimeHelper.convertJavaDayOfWeekWithCallBlockerType(cal.get(Calendar.DAY_OF_WEEK));
+                                //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
+                                cal = TimeHelper.getBenchmarkCalendar();
+                                if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.INCOMING, weekDay, cal.getTime())){
+                                    setResultData(null);
+                                    //not recommended to abort broadcast
+                                    //abortBroadcast();
+                                    sendNotification(blockedContact.getDisplayNumber());
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -116,6 +119,23 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             }
             //check if there are any non-standardized numbers and run standardizing service
             super.onCallStateChanged(state, incomingNumber);
+        }
+
+        private void sendNotification(String phoneNumber){
+            Intent i  = new Intent(context, CallBlockerActivity.class);
+            PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
+            Notification notification = new NotificationCompat.Builder(context)
+                    .setTicker("Call blocker")
+                    .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                    .setContentTitle("New incoming call intercepted")
+                    .setContentText(phoneNumber + " is intercepted")
+                    .setContentIntent(pi)
+                    .setAutoCancel(true)
+                    .build();
+
+            NotificationManager notificationManager = (NotificationManager)
+                    context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(0, notification);
         }
     }
 }

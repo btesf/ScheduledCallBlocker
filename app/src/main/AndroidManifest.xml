@@ -37,12 +37,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".NumberStandardizer" >
-            <intent-filter android:priority="0">
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
-
         <receiver android:name=".NetworkConnectionReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.SIM_STATE_CHANGED" />

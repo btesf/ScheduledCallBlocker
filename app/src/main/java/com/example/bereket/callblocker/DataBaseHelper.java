@@ -340,4 +340,16 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         //delete removed schedules - if any
         getWritableDatabase().execSQL("DELETE FROM " + BLOCK_SCHEDULE_TABLE + " WHERE " + BLOCK_SCHEDULE_CONTACT_ID + " = '" + tempSchedule.getContactId() + "' AND " + BLOCK_SCHEDULE_BLOCK_TYPE + " = " + tempSchedule.getBlockType() + " AND " + BLOCK_SCHEDULE_WEEK_DAY + " NOT IN (" + deleteQueryIdsBuilder.toString() + " )");
     }
+
+    public boolean timeExistsInSchedule(String contactId, int blockType, int weekDay, long time){
+
+        String query = "SELECT * FROM " + BLOCK_SCHEDULE_TABLE + " WHERE " + BLOCK_SCHEDULE_CONTACT_ID + " = ? AND " + BLOCK_SCHEDULE_BLOCK_TYPE +
+                " = ? AND " + BLOCK_SCHEDULE_WEEK_DAY + " = ? AND " + BLOCK_SCHEDULE_FROM + " <= ?  AND " + BLOCK_SCHEDULE_TO + " >= ?";
+
+        Cursor cursor = getReadableDatabase().rawQuery(query, new String[]{contactId, String.valueOf(blockType), String.valueOf(weekDay), String.valueOf(time), String.valueOf(time)});
+
+        if(cursor != null && cursor.getCount() > 0)
+            return true;
+        else return false;
+    }
 }

@@ -5,26 +5,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +61,7 @@ public class SingleContactFragment extends Fragment {
     //Database property
     private DataBaseHelper dataBaseHelper;
     //time format helper class
-    TimeFormatHelper mTimeFormatHelper;
+    TimeHelper mTimeHelper;
 
     private OnFragmentInteractionListener mListener;
 
@@ -111,7 +101,7 @@ public class SingleContactFragment extends Fragment {
         }
         //instantiate DB Helper
         dataBaseHelper = new DataBaseHelper(getActivity());
-        mTimeFormatHelper = TimeFormatHelper.getInstance(getActivity());
+        mTimeHelper = TimeHelper.getInstance(getActivity());
     }
 
     @Override
@@ -322,8 +312,8 @@ public class SingleContactFragment extends Fragment {
         }
         else{
 
-            String startTime = mTimeFormatHelper.getTimeWithSystemTimeFormat(schedule.getStartTime());
-            String endTime = mTimeFormatHelper.getTimeWithSystemTimeFormat(schedule.getEndTime());
+            String startTime = mTimeHelper.getTimeWithSystemTimeFormat(schedule.getStartTime());
+            String endTime = mTimeHelper.getTimeWithSystemTimeFormat(schedule.getEndTime());
             button.setText(startTime + " - " + endTime);
         }
     }

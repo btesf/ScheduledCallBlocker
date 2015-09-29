@@ -52,4 +52,9 @@ public class ScheduleManager {
 
         return mDataHelper.updateSchedule(schedule);
     }
+
+    public boolean timeExistsInSchedule(String contactId, int blockType, int weekDay,Date currentTime){
+
+        return mDataHelper.timeExistsInSchedule(contactId, blockType, weekDay, currentTime.getTime());
+    }
 }

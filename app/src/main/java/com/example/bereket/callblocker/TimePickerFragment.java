@@ -13,7 +13,6 @@ import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Created by bereket on 9/21/15.
@@ -88,7 +87,16 @@ public class TimePickerFragment extends DialogFragment {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
 
-               Calendar cal = Calendar.getInstance();
+               Calendar cal = TimeHelper.getBenchmarkCalendar();
+               //if time is end time, set the second to 59 (last second in a minute) - because start minute could be the same as end minute - and it is valid
+               //the only way to differentiate them is by the second value
+               if(changeTarget == START_TIME){
+                  cal.set(Calendar.SECOND, 0);
+               }
+               else{ //end time
+                   cal.set(Calendar.SECOND, 59);
+               }
+
                cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
                cal.set(Calendar.MINUTE, minute);
 
