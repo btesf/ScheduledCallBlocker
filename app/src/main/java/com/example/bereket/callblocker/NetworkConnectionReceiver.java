@@ -29,9 +29,9 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
                 Log.d("bere.bere.bere", "Default........unknown state");
         }
 
-        ComponentName receiver = new ComponentName(context, "com.example.bereket.callblocker.NetworkConnectionReceiver.class");
+        //ComponentName receiver = new ComponentName(context, "com.example.bereket.callblocker.NetworkConnectionReceiver.class");
 
-        PackageManager pm = context.getPackageManager();
-        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        //PackageManager pm = context.getPackageManager();
+        //pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
 }

@@ -104,7 +104,7 @@ public class ContactManager {
         if(countryCode != null){
 
             try {
-                Phonenumber.PhoneNumber numberProto = phoneUtil.parse(formattedPhoneNumber, countryCode);
+                Phonenumber.PhoneNumber numberProto = phoneUtil.parse(formattedPhoneNumber, countryCode.toUpperCase());
                 //Since you know the country you can format it as follows:
                 formattedPhoneNumber = phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.E164 );
             } catch (NumberParseException e) {

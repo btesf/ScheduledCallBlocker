@@ -1,23 +1,22 @@
 package com.example.bereket.callblocker;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.view.View;
+import android.util.Log;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by bereket on 9/21/15.
+ * Created by bereket on 9/30/15.
  */
-public class TimePickerFragment extends DialogFragment {
+public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener{
 
     private Date mDate;
     private int changeTarget;
@@ -43,68 +42,41 @@ public class TimePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
 
-        View v = getActivity().getLayoutInflater().inflate(R.layout.dialog_time, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(v);
-        builder.setTitle(R.string.pick_time);
-        builder.setPositiveButton(R.string.button_ok_text, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                if (getTargetFragment() == null)
-                    return;
-
-                Intent intent = new Intent();
-                intent.putExtra(SELECTED_TIME, getArguments().getSerializable(SELECTED_TIME));
-                intent.putExtra(CHANGE_TARGET, changeTarget);
-                getTargetFragment().onActivityResult(PickTimeFragment.TIME_PICKER_DIALOG_REQUEST_CODE, Activity.RESULT_OK, intent);
-            }
-        });
-
-        builder.setNegativeButton(R.string.button_cancel_button, new DialogInterface.OnClickListener(){
-
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                getTargetFragment().onActivityResult(PickTimeFragment.TIME_PICKER_DIALOG_REQUEST_CODE, Activity.RESULT_CANCELED, null);
-            }
-        });
-
-        final TimePicker timePicker = (TimePicker)v.findViewById(R.id.time_picker);
-
         changeTarget = getArguments().getInt(CHANGE_TARGET);
         Object dateObject = getArguments().getSerializable(CURRENT_TIME);
         mDate = dateObject == null ? new Date() : (Date) dateObject;
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(mDate);
+        //Create and return a new instance of TimePickerDialog
+        return new TimePickerDialog(getActivity(),this, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
+                DateFormat.is24HourFormat(getActivity()));
+    }
 
-        timePicker.setCurrentHour(cal.get(Calendar.HOUR_OF_DAY));
-        timePicker.setCurrentMinute(cal.get(Calendar.MINUTE));
-        timePicker.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
+    //onTimeSet() callback method
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute){
 
-        timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener(){
+        Calendar cal = TimeHelper.getBenchmarkCalendar();
+        //if time is end time, set the second to 59 (last second in a minute) - because start minute could be the same as end minute - and it is valid
+        //the only way to differentiate them is by the second value
+        if(changeTarget == START_TIME){
+            cal.set(Calendar.SECOND, 0);
+        }
+        else{ //end time
+            cal.set(Calendar.SECOND, 59);
+        }
 
-            @Override
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        cal.set(Calendar.MINUTE, minute);
 
-               Calendar cal = TimeHelper.getBenchmarkCalendar();
-               //if time is end time, set the second to 59 (last second in a minute) - because start minute could be the same as end minute - and it is valid
-               //the only way to differentiate them is by the second value
-               if(changeTarget == START_TIME){
-                  cal.set(Calendar.SECOND, 0);
-               }
-               else{ //end time
-                   cal.set(Calendar.SECOND, 59);
-               }
+        mDate = cal.getTime();
 
-               cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-               cal.set(Calendar.MINUTE, minute);
+        if (getTargetFragment() == null)
+            return;
 
-               mDate = cal.getTime();
-               getArguments().putSerializable(SELECTED_TIME, mDate);
-            }
-        });
-
-        return builder.create();
+        Intent intent = new Intent();
+        intent.putExtra(SELECTED_TIME, mDate);
+        intent.putExtra(CHANGE_TARGET, changeTarget);
+        getTargetFragment().onActivityResult(PickTimeFragment.TIME_PICKER_DIALOG_REQUEST_CODE, Activity.RESULT_OK, intent);
     }
 }

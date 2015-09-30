@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -63,7 +64,8 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                     //get weekDay of today
                     int weekDay = TimeHelper.convertJavaDayOfWeekWithCallBlockerType(cal.get(Calendar.DAY_OF_WEEK));
                     //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
-                    cal = TimeHelper.getBenchmarkCalendar();
+                    cal = TimeHelper.setCalendarToBenchmarkTime(cal);
+
                     if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.OUTGOING, weekDay, cal.getTime())){
                         setResultData(null);
                         //not recommended to abort broadcast

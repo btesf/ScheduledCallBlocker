@@ -2,6 +2,7 @@ package com.example.bereket.callblocker;
 
 import android.content.Context;
 import android.text.format.DateFormat;
+import android.util.Log;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -58,10 +59,8 @@ public class TimeHelper {
     //returns true 0 if date1 = date2, +ve value if date1 is older than date 2, or returns -ve value if date2 is older than date1
     public int compareTimes(Date date1, Date date2){
 
-        int t1, t2;
-
-        t1 = (int) (date1.getTime() % ( 24*60*60*1000L));
-        t2 = (int) (date2.getTime() % ( 24*60*60*1000L));
+        int t1 = (int) date1.getTime();
+        int t2 = (int) date2.getTime();
 
         return t1 - t2;
     }
@@ -88,5 +87,14 @@ public class TimeHelper {
         return cal;
     }
 
+    public static Calendar setCalendarToBenchmarkTime(Calendar cal){
+        //Always set a constant date to be stored in DB - jan 1, 2000 xx:xx:000;
+        cal.set(Calendar.YEAR, 2000);
+        cal.set(Calendar.MONTH, 1);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return cal;
+    }
 
 }

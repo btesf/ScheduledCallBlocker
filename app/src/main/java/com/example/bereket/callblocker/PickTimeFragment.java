@@ -4,18 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -100,9 +96,9 @@ public class PickTimeFragment extends DialogFragment {
 
             @Override
             public void onClick(View v) {
-                TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mSchedule.getStartTime(), TimePickerFragment.START_TIME);
-                timePickerFragment.setTargetFragment(PickTimeFragment.this,TIME_PICKER_DIALOG_REQUEST_CODE);
-                timePickerFragment.show(getFragmentManager(), "bere.bere.bere");
+                TimePickerFragment timePickerFragmentOLD = TimePickerFragment.newInstance(mSchedule.getStartTime(), TimePickerFragment.START_TIME);
+                timePickerFragmentOLD.setTargetFragment(PickTimeFragment.this,TIME_PICKER_DIALOG_REQUEST_CODE);
+                timePickerFragmentOLD.show(getFragmentManager(), "bere.bere.bere");
             }
         });
 
@@ -110,9 +106,9 @@ public class PickTimeFragment extends DialogFragment {
 
             @Override
             public void onClick(View v) {
-                TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mSchedule.getEndTime(), TimePickerFragment.END_TIME);
-                timePickerFragment.setTargetFragment(PickTimeFragment.this,TIME_PICKER_DIALOG_REQUEST_CODE);
-                timePickerFragment.show(getFragmentManager(), "bere.bere.bere");
+                TimePickerFragment timePickerFragmentOLD = TimePickerFragment.newInstance(mSchedule.getEndTime(), TimePickerFragment.END_TIME);
+                timePickerFragmentOLD.setTargetFragment(PickTimeFragment.this,TIME_PICKER_DIALOG_REQUEST_CODE);
+                timePickerFragmentOLD.show(getFragmentManager(), "bere.bere.bere");
             }
         });
 
@@ -172,8 +168,6 @@ public class PickTimeFragment extends DialogFragment {
                     if(returnedTime == null) return;
 
                     String formattedTime = "";
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(returnedTime);
 
                     //validate date - check if end time is not earlier than start time
                     if(changeTarget == TimePickerFragment.START_TIME){
@@ -181,6 +175,7 @@ public class PickTimeFragment extends DialogFragment {
                         if(mSchedule.getEndTime() != null && mTimeHelper.compareTimes(returnedTime, mSchedule.getEndTime()) > 0){ //start time is older than end time
                             Toast.makeText(getActivity(), R.string.start_time_is_older_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
+                            Log.d("bere.bere.bere", "returned time : " + returnedTime.getTime() + ", end time " + mSchedule.getEndTime().getTime());
                             return;
                         }
                     }
@@ -189,6 +184,7 @@ public class PickTimeFragment extends DialogFragment {
                         if(mSchedule.getStartTime() != null && mTimeHelper.compareTimes(returnedTime, mSchedule.getStartTime()) < 0){ //end time is earlier than start time
                             Toast.makeText(getActivity(), R.string.end_time_is_earlier_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
+                            Log.d("bere.bere.bere", "returned time : " + returnedTime.getTime() + ", start time " + mSchedule.getStartTime().getTime());
                             return;
                         }
                     }

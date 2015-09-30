@@ -10,6 +10,7 @@ import android.media.AudioManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
@@ -82,7 +83,9 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                         Method method = clazz.getDeclaredMethod("getITelephony");
                         method.setAccessible(true);
                         ITelephony telephonyService = (ITelephony) method.invoke(telephonyManager);
+
                         if(incomingNumber.equals(blockedContact.getPhoneNumber())) {
+
                             //if outgoing call is blocked proceed with blocking
                             if (blockedContact.getIncomingBlockedState() == BlockState.ALWAYS_BLOCK) {
                                 //telephonyService.silenceRinger();//Security exception problem
@@ -91,17 +94,17 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                                 telephonyService.endCall();
                                 sendNotification(blockedContact.getDisplayNumber());
                             }
-                            else if(blockedContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
+                            else if(blockedContact.getIncomingBlockedState() == BlockState.SCHEDULED_BLOCK){
                                 //get all the scheduled calls for this number
                                 Calendar cal = Calendar.getInstance();
                                 //get weekDay of today
                                 int weekDay = TimeHelper.convertJavaDayOfWeekWithCallBlockerType(cal.get(Calendar.DAY_OF_WEEK));
                                 //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
-                                cal = TimeHelper.getBenchmarkCalendar();
+                                cal = TimeHelper.setCalendarToBenchmarkTime(cal);
                                 if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.INCOMING, weekDay, cal.getTime())){
-                                    setResultData(null);
-                                    //not recommended to abort broadcast
-                                    //abortBroadcast();
+                                    telephonyService = (ITelephony) method.invoke(telephonyManager);
+                                    telephonyService.silenceRinger();
+                                    telephonyService.endCall();
                                     sendNotification(blockedContact.getDisplayNumber());
                                 }
                             }
