@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.format.DateFormat;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,6 +17,8 @@ public class TimeHelper {
 
     private static TimeHelper mTimeHelper;
     private Context mContext;
+    private SimpleDateFormat amPmDateFormat = new SimpleDateFormat("hh:mm a");
+    private SimpleDateFormat _24HourFormat = new SimpleDateFormat("HH:mm");
 
     private TimeHelper(Context context){
 
@@ -37,21 +40,21 @@ public class TimeHelper {
      */
     public String getTimeWithSystemTimeFormat(Date date){
 
-        String time = "";
+        if(date == null){
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
+            return " -- : -- ";
+        }
 
         boolean is24HourFormat = DateFormat.is24HourFormat(mContext);
 
-        time += is24HourFormat ? cal.get(Calendar.HOUR_OF_DAY) : cal.get(Calendar.HOUR);
-        time += ": " + cal.get(Calendar.MINUTE);
+        if(is24HourFormat){
 
-        if(!is24HourFormat){
-            time += cal.get(Calendar.AM_PM) ==  Calendar.PM ? " PM" : " AM";
+            return _24HourFormat.format(date);
         }
+        else{//am/pm format
 
-        return time;
+            return amPmDateFormat.format(date);
+        }
     }
 
     //this method compares the time part of a date. Used the underlying binary(long int) value of date to make it faster
