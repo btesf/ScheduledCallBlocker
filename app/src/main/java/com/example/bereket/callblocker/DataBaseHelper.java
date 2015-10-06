@@ -252,6 +252,44 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public LogCursor queryLogs(){
+        //Equivalent to "select * from LogRecord order by start_date asc"
+        Cursor wrapped = getReadableDatabase().rawQuery("SELECT A.*, B." + NAME + " AS ContactName, B." + DISPLAY_NUMBER + " AS ContactNumber FROM " + CALL_LOG_TABLE +
+                " A, " + BLOCKED_LIST_TABLE + " B ORDER BY " + CALL_LOG_TIME + " DESC ", null);//   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
+        return new LogCursor(wrapped);
+    }
+
+    public static class LogCursor extends CursorWrapper{
+
+        public LogCursor(Cursor cursor) {
+            super(cursor);
+        }
+
+        public LogRecord getLog(){
+
+            if(isBeforeFirst() || isAfterLast()) return null;
+
+            LogRecord logRecord = new LogRecord();
+
+            int callLogId = getInt(getColumnIndex(CALL_LOG_ID));
+            String contactId = getString(getColumnIndex(CALL_LOG_CONTACT_ID));
+            int callBlockType = getInt(getColumnIndex(CALL_LOG_BLOCK_TYPE));
+            long callLogTime = getLong(getColumnIndex(CALL_LOG_TIME));
+            String contactName = getString(getColumnIndex("ContactName"));
+            String contactNumber = getString(getColumnIndex("ContactNumber"));
+
+            logRecord.setId(callLogId);
+            logRecord.setBlockType(callBlockType);
+            logRecord.setContactId(contactId);
+            logRecord.setLogDate(new Date(callLogTime));
+            logRecord.setContactName(contactName);
+            logRecord.setContactPhone(contactNumber);
+
+            return logRecord;
+        }
+    }
+
+
     //schedule
     public boolean insertSchedule(String contactId, Date startTime, Date endTime, int blockType){
 
