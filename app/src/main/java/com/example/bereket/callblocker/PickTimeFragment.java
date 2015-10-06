@@ -89,8 +89,8 @@ public class PickTimeFragment extends DialogFragment {
         endTimeTextView = (TextView) v.findViewById(R.id.end_time_label);
         clearTimeButton = (Button) v.findViewById(R.id.clear_time_button);
 
-        startTimeTextView.setText(getFormattedTime(mSchedule.getStartTime()));
-        endTimeTextView.setText(getFormattedTime(mSchedule.getEndTime()));
+        startTimeTextView.setText(mTimeHelper.getTimeWithSystemTimeFormat(mSchedule.getStartTime()));
+        endTimeTextView.setText(mTimeHelper.getTimeWithSystemTimeFormat(mSchedule.getEndTime()));
 
         startTimeTextView.setOnClickListener(new View.OnClickListener() {
 
@@ -118,30 +118,12 @@ public class PickTimeFragment extends DialogFragment {
                 mSchedule.setEndTime(null);
                 mSchedule.setStartTime(null);
                 //reset time labels
-                startTimeTextView.setText(getFormattedTime(null));
-                endTimeTextView.setText(getFormattedTime(null));
+                startTimeTextView.setText(mTimeHelper.getTimeWithSystemTimeFormat(null));
+                endTimeTextView.setText(mTimeHelper.getTimeWithSystemTimeFormat(null));
             }
         });
 
         return builder.create();
-    }
-
-    private String getFormattedTime(Date date){
-
-        String formattedTime = "";
-
-        if(date != null){
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            formattedTime +=  mTimeHelper.getTimeWithSystemTimeFormat(date);
-        }
-        else{
-
-            formattedTime += " -- : -- ";
-        }
-
-        return formattedTime;
     }
 
     @Override
@@ -175,7 +157,6 @@ public class PickTimeFragment extends DialogFragment {
                         if(mSchedule.getEndTime() != null && mTimeHelper.compareTimes(returnedTime, mSchedule.getEndTime()) > 0){ //start time is older than end time
                             Toast.makeText(getActivity(), R.string.start_time_is_older_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
-                            Log.d("bere.bere.bere", "returned time : " + returnedTime.getTime() + ", end time " + mSchedule.getEndTime().getTime());
                             return;
                         }
                     }
@@ -184,7 +165,6 @@ public class PickTimeFragment extends DialogFragment {
                         if(mSchedule.getStartTime() != null && mTimeHelper.compareTimes(returnedTime, mSchedule.getStartTime()) < 0){ //end time is earlier than start time
                             Toast.makeText(getActivity(), R.string.end_time_is_earlier_than_end_time, Toast.LENGTH_SHORT)
                                     .show();
-                            Log.d("bere.bere.bere", "returned time : " + returnedTime.getTime() + ", start time " + mSchedule.getStartTime().getTime());
                             return;
                         }
                     }
