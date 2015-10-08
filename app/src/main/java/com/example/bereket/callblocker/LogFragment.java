@@ -1,7 +1,10 @@
 package com.example.bereket.callblocker;
 
 import android.app.Activity;
+import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,8 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class LogFragment extends Fragment {
+import java.text.SimpleDateFormat;
+
+public class LogFragment extends ListFragment  implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>  {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -25,6 +32,8 @@ public class LogFragment extends Fragment {
     private DataBaseHelper.LogCursor mLogCursor;
 
     private OnFragmentInteractionListener mListener;
+
+    private static int LOG_LIST_LOADER = 1;
 
     /**
      * Use this factory method to create a new instance of
@@ -58,28 +67,50 @@ public class LogFragment extends Fragment {
 
         mLogManager = LogManager.getInstance(getActivity());
         setHasOptionsMenu(true);
+        getLoaderManager().initLoader(LOG_LIST_LOADER, null, this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View v = super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_log, container, false);
+        ListView listView = (ListView) v.findViewById(android.R.id.list);
 
         return v;
+    }
+
+    @Override
+    public Loader<DataBaseHelper.LogCursor> onCreateLoader(int i, Bundle bundle) {
+        return new LogLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<DataBaseHelper.LogCursor> logCursorLoader, DataBaseHelper.LogCursor logCursor) {
+        //Create an adapter to point at this cursor
+        LogListAdaptor adapter = new LogListAdaptor((DataBaseHelper.LogCursor)logCursor);
+        setListAdapter(adapter);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<DataBaseHelper.LogCursor> logCursorLoader) {
+        setListAdapter(null);
     }
 
 
     private class LogListAdaptor extends CursorAdapter {
 
-        public LogListAdaptor(DataBaseHelper.ContactCursor contactCursor){
-            super(getActivity(), contactCursor, 0);
+        public LogListAdaptor(DataBaseHelper.LogCursor logCursor){
+            super(getActivity(), logCursor, 0);
+            mLogCursor = logCursor;
         }
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            return null; //TODO: inflate a view and return here -- inflater.inflate(R.layout.single_contact_view, viewGroup, false);
+            View v = inflater.inflate(R.layout.fragment_log, viewGroup, false);
+            return v; //TODO: inflate a view and return here -- inflater.inflate(R.layout.single_contact_view, viewGroup, false);
         }
 
         @Override
@@ -88,16 +119,12 @@ public class LogFragment extends Fragment {
 
             //set up the start date text view
             //TODO: bind a data with view here
-/*            TextView contactNameTextView = (TextView) view.findViewById(R.id.contact_name);
-            TextView contactPhoneTextView = (TextView) view.findViewById(R.id.contact_phone_number);
+            TextView logContactNameTextView = (TextView) view.findViewById(R.id.log_contact_phone);
+            TextView logDateTextView = (TextView) view.findViewById(R.id.log_contact_date);
 
-            CheckBox outGoingCheckBox = (CheckBox) view.findViewById(R.id.outgoing_call_blocked_checkbox);
-            CheckBox inComingCheckBox = (CheckBox) view.findViewById(R.id.incoming_call_blocked_checkbox);
-
-            contactNameTextView.setText(contact.getContactName());
-            contactPhoneTextView.setText(contact.getDisplayNumber());
-            outGoingCheckBox.setChecked(contact.getOutGoingBlockedState() == 1 ? true : false);
-            inComingCheckBox.setChecked(contact.getIncomingBlockedState() == 1 ? true : false);*/
+            logContactNameTextView.setText(logRecord.getContactName());
+            //TODO: format the stardard way. determine if the time format is 24/12 from the system and format the date accordingly
+            logDateTextView.setText(new SimpleDateFormat("mm/dd/yyyy hh:mm a").format(logRecord.getLogDate()));
         }
     }
 
@@ -124,6 +151,12 @@ public class LogFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        getLoaderManager().restartLoader(LOG_LIST_LOADER, null, this);
     }
 
     /**

@@ -23,6 +23,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".LogActivity"
+            android:label="@string/app_name" >
+        </activity>
+
         <receiver android:name=".OutgoingCallReceiver" >
             <intent-filter android:priority="0" >
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />

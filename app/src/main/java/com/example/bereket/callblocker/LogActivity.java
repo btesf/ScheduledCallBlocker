@@ -1,11 +1,12 @@
 package com.example.bereket.callblocker;
 
 import android.app.Fragment;
+import android.net.Uri;
 
 /**
  * Created by bereket on 10/6/15.
  */
-public class LogActivity extends SingleFragmentActivity implements BlockedListFragment.OnFragmentInteractionListener{
+public class LogActivity extends SingleFragmentActivity implements LogFragment.OnFragmentInteractionListener{
     @Override
     protected Fragment createFragment() {
 
@@ -16,7 +17,7 @@ public class LogActivity extends SingleFragmentActivity implements BlockedListFr
     }
 
     @Override
-    public void onFragmentInteraction(String id) {
+    public void onFragmentInteraction(Uri uri) {
 
     }
 }

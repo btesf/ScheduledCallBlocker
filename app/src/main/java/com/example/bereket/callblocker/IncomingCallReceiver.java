@@ -35,10 +35,12 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
         private Context context;
         private ScheduleManager mScheduleManager;
+        private LogManager mLogManager;
 
         public PhoneCallStateListener(Context context){
             this.context = context;
             mScheduleManager = ScheduleManager.getInstance(context);
+            mLogManager = LogManager.getInstance(context);
         }
 
 
@@ -86,6 +88,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
                         if(incomingNumber.equals(blockedContact.getPhoneNumber())) {
 
+                            boolean callBlocked = false;
                             //if outgoing call is blocked proceed with blocking
                             if (blockedContact.getIncomingBlockedState() == BlockState.ALWAYS_BLOCK) {
                                 //telephonyService.silenceRinger();//Security exception problem
@@ -93,6 +96,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                                 telephonyService.silenceRinger();
                                 telephonyService.endCall();
                                 sendNotification(blockedContact.getDisplayNumber());
+                                callBlocked = true;
                             }
                             else if(blockedContact.getIncomingBlockedState() == BlockState.SCHEDULED_BLOCK){
                                 //get all the scheduled calls for this number
@@ -106,7 +110,13 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                                     telephonyService.silenceRinger();
                                     telephonyService.endCall();
                                     sendNotification(blockedContact.getDisplayNumber());
+                                    callBlocked = true;
                                 }
+                            }
+
+                            if(callBlocked){
+                                //TODO: remove db call from here and run it under different service
+                                mLogManager.insertLog(blockedContact.getId(), BlockType.INCOMING);
                             }
                         }
                     } catch (Exception e) {

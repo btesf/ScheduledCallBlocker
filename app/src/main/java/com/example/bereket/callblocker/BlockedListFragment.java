@@ -203,6 +203,10 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                 startActivityForResult(intent, REQUEST_NEW_CONTACT);
                 return true;
+            case R.id.menu_item_show_log:
+                intent = new Intent(getActivity(), LogActivity.class);
+                startActivityForResult(intent, CONTACTS_LIST_LOADER);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

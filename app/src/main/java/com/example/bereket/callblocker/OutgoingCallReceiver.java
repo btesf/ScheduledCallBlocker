@@ -19,12 +19,14 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
 
     private Context mContext;
     private ScheduleManager mScheduleManager;
+    private LogManager mLogManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
         mContext = context;
         mScheduleManager = ScheduleManager.getInstance(mContext);
+        mLogManager = LogManager.getInstance(mContext);
         //Determine the country code from current network (instead of system setting)
         //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
         TelephonyManager tm = (TelephonyManager)context.getSystemService(mContext.TELEPHONY_SERVICE);
@@ -51,12 +53,15 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
             }
 
             if(phoneNumber.equals(blockedContact.getPhoneNumber())){
+
+                boolean callBlocked = false;
                 //if outgoing call is blocked proceed with blocking
                 if(blockedContact.getOutGoingBlockedState() == BlockState.ALWAYS_BLOCK){
                     setResultData(null);
                     //not recommended to abort broadcast
                     //abortBroadcast();
                     sendNotification(blockedContact.getDisplayNumber());
+                    callBlocked = true;
                 }
                 else if(blockedContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
                     //get all the scheduled calls for this number
@@ -71,7 +76,13 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                         //not recommended to abort broadcast
                         //abortBroadcast();
                         sendNotification(blockedContact.getDisplayNumber());
+                        callBlocked = true;
                     }
+                }
+
+                if(callBlocked){
+                    //TODO: remove db call from here and run it under different service
+                    mLogManager.insertLog(blockedContact.getId(), BlockType.INCOMING);
                 }
             }
         }

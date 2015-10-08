@@ -252,12 +252,32 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public LogCursor queryLogs(){
+    public LogCursor queryAllLogs(){
         //Equivalent to "select * from LogRecord order by start_date asc"
         Cursor wrapped = getReadableDatabase().rawQuery("SELECT A.*, B." + NAME + " AS ContactName, B." + DISPLAY_NUMBER + " AS ContactNumber FROM " + CALL_LOG_TABLE +
                 " A, " + BLOCKED_LIST_TABLE + " B ORDER BY " + CALL_LOG_TIME + " DESC ", null);//   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
         return new LogCursor(wrapped);
     }
+
+    public LogCursor querySingleContactLog(String contactId){
+
+        Cursor wrapped = getReadableDatabase().rawQuery("SELECT A.*, B." + NAME + " AS ContactName, B." + DISPLAY_NUMBER + " AS ContactNumber FROM " + CALL_LOG_TABLE +
+                " A, " + BLOCKED_LIST_TABLE + " B WHERE A." + CALL_LOG_CONTACT_ID + " = ? ORDER BY " + CALL_LOG_TIME + " DESC ", new String[]{contactId}); //   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
+        return new LogCursor(wrapped);
+    }
+
+    public boolean insertLog(String contactId, int blockType){
+
+        ContentValues cv = new ContentValues();
+        cv.put(CALL_LOG_CONTACT_ID, contactId);
+        cv.put(CALL_LOG_BLOCK_TYPE, blockType);
+        cv.put(CALL_LOG_TIME, (new Date()).getTime());
+
+        if(getWritableDatabase().insert(CALL_LOG_TABLE, null, cv) == -1)
+            return false;
+        else return true;
+    }
+
 
     public static class LogCursor extends CursorWrapper{
 
