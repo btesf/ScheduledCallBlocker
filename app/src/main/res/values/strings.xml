@@ -39,4 +39,6 @@
     <string name="from_text">From:</string>
     <string name="end_text">To:</string>
     <string name="show_log">logs</string>
+    <string name="clear_log">clear log</string>
+    <string name="clearAllSchedulesText">clear all</string>
 </resources>

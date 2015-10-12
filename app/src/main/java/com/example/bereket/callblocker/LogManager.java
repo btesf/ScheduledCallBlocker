@@ -43,4 +43,9 @@ public class LogManager {
         return mDatabaseHelper.insertLog(contactId, blockType);
     }
 
+    public boolean deleteLogs(){
+
+       return mDatabaseHelper.deleteLogs();
+    }
+
 }

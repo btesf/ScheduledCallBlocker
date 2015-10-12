@@ -32,9 +32,9 @@ public class ScheduleManager {
         return mScheduleManager;
     }
 
-    public void insertSchedule(String contactId, Date startTime, Date endTime, int blockType){
+    public void insertSchedule(String contactId, Date startTime, Date endTime, int blockType, int weekDay){
 
-        mDataHelper.insertSchedule(contactId, startTime, endTime, blockType);
+        mDataHelper.insertSchedule(contactId, startTime, endTime, blockType, weekDay);
     }
 
     public boolean deleteSchedule(Schedule schedule){

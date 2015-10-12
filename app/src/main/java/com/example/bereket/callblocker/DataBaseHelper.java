@@ -278,6 +278,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         else return true;
     }
 
+    //TODO : don't return any feedback after deleting? not good DB transaction management practice
+    public boolean deleteLogs(){
+
+        return getWritableDatabase().delete(CALL_LOG_TABLE, null, null) == 0 ? false : true;
+    }
+
 
     public static class LogCursor extends CursorWrapper{
 
@@ -309,15 +315,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-
     //schedule
-    public boolean insertSchedule(String contactId, Date startTime, Date endTime, int blockType){
+    public boolean insertSchedule(String contactId, Date startTime, Date endTime, int blockType, int weekDay){
 
         ContentValues cv = new ContentValues();
         cv.put(BLOCK_SCHEDULE_CONTACT_ID, contactId);
         cv.put(BLOCK_SCHEDULE_FROM, startTime.getTime());
         cv.put(BLOCK_SCHEDULE_TO, endTime.getTime());
         cv.put(BLOCK_SCHEDULE_BLOCK_TYPE, blockType);
+        cv.put(BLOCK_SCHEDULE_WEEK_DAY, weekDay);
 
         return getWritableDatabase().insert(BLOCK_SCHEDULE_TABLE, null, cv) == -1 ? false : true;
 
@@ -325,7 +331,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteSchedule(Schedule schedule){
 
-       return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_WEEK_DAY + " = ?", new String[]{schedule.getContactId(), String.valueOf(schedule.getWeekDay())}) != 0 ? true : false;
+       return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_WEEK_DAY + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{schedule.getContactId(), String.valueOf(schedule.getWeekDay()), String.valueOf(schedule.getBlockType())}) != 0 ? true : false;
+    }
+
+
+    public boolean deleteAllSchedules(String contactId, Integer blockType){
+
+        return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{contactId, String.valueOf(blockType)}) != 0 ? true : false;
     }
 
     public Map<Integer,Schedule> queryContactSchedule(String contactId, int blockType){
@@ -393,10 +405,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         //remove the last comma
         insertQueryBuilder.deleteCharAt(insertQueryBuilder.length() - 1);
         deleteQueryIdsBuilder.deleteCharAt(deleteQueryIdsBuilder.length() - 1);
-
-        getWritableDatabase().execSQL(query + insertQueryBuilder.toString());
         //delete removed schedules - if any
-        getWritableDatabase().execSQL("DELETE FROM " + BLOCK_SCHEDULE_TABLE + " WHERE " + BLOCK_SCHEDULE_CONTACT_ID + " = '" + tempSchedule.getContactId() + "' AND " + BLOCK_SCHEDULE_BLOCK_TYPE + " = " + tempSchedule.getBlockType() + " AND " + BLOCK_SCHEDULE_WEEK_DAY + " NOT IN (" + deleteQueryIdsBuilder.toString() + " )");
+       // getWritableDatabase().execSQL("DELETE FROM " + BLOCK_SCHEDULE_TABLE + " WHERE " + BLOCK_SCHEDULE_CONTACT_ID + " = '" + tempSchedule.getContactId() + "' AND " + BLOCK_SCHEDULE_BLOCK_TYPE + " = " + tempSchedule.getBlockType() + " AND " + BLOCK_SCHEDULE_WEEK_DAY + " NOT IN (" + deleteQueryIdsBuilder.toString() + " )");
+        getWritableDatabase().execSQL(query + insertQueryBuilder.toString());
     }
 
     public boolean timeExistsInSchedule(String contactId, int blockType, int weekDay, long time){

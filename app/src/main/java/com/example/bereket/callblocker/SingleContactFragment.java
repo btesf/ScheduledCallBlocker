@@ -13,6 +13,7 @@ import android.widget.RadioButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class SingleContactFragment extends Fragment {
 
     private int WEEK_DAY_BUTTON_POSITION_IN_LAYOUT = 1;
     private int WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT = 0;
+    private int CLEAR_ALL_SCHEDULES_BUTTON_POSITION_IN_LAYOUT = 0;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -133,7 +135,10 @@ public class SingleContactFragment extends Fragment {
         alwaysBlockOutgoingRadio.setOnClickListener(new OutgoingRadioButtonsClickedListener());
         scheduledOutgoingRadio.setOnClickListener(new OutgoingRadioButtonsClickedListener());
 
-        for (int i = 0; i < incomingScheduleTable.getChildCount(); i++) {
+        int incomingScheduleTableChildCount = incomingScheduleTable.getChildCount();
+        int outgoingScheduleTableChildCount = outgoingScheduleTable.getChildCount();
+
+        for (int i = 0; i < incomingScheduleTableChildCount - 1; i++) { //the last row is 'clear all' button
             TableRow row = (TableRow)incomingScheduleTable.getChildAt(i);
             Button button = (Button) row.getChildAt(WEEK_DAY_BUTTON_POSITION_IN_LAYOUT);
             TextView textView = (TextView) row.getChildAt(WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT);
@@ -141,8 +146,16 @@ public class SingleContactFragment extends Fragment {
             textView.setText(getActivity().getResources().getIdentifier("weekDay_"+i, "string", getActivity().getPackageName()));
             incomingCallWeekDayButtons.add(button);
         }
+        //last incoming schedule table row - clear all schedule button
+        Button clearAllIncomingSchedule = (Button) ((TableRow)incomingScheduleTable.getChildAt(incomingScheduleTableChildCount -1)).getChildAt(CLEAR_ALL_SCHEDULES_BUTTON_POSITION_IN_LAYOUT);
+        clearAllIncomingSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(), "incoming call clear button is clicked ", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        for (int i = 0; i < outgoingScheduleTable.getChildCount(); i++) {
+        for (int i = 0; i < outgoingScheduleTableChildCount - 1; i++) { //the last row is 'clear all' button
             TableRow row = (TableRow)outgoingScheduleTable.getChildAt(i);
             Button button = (Button) row.getChildAt(WEEK_DAY_BUTTON_POSITION_IN_LAYOUT);
             TextView textView = (TextView) row.getChildAt(WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT);
@@ -150,6 +163,14 @@ public class SingleContactFragment extends Fragment {
             textView.setText(getActivity().getResources().getIdentifier("weekDay_"+i, "string", getActivity().getPackageName()));
             outgoingCallWeekDayButtons.add(button);
         }
+        //last outgoing schedule table row - clear schedule button
+        Button clearAllOutgoingSchedule = (Button) ((TableRow)outgoingScheduleTable.getChildAt(outgoingScheduleTableChildCount -1)).getChildAt(CLEAR_ALL_SCHEDULES_BUTTON_POSITION_IN_LAYOUT);
+        clearAllOutgoingSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(), "outgoing call clear button is clicked ", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         //set the view according to the model data
         updateUI(BlockType.INCOMING);
