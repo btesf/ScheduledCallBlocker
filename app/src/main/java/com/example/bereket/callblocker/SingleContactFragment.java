@@ -62,6 +62,7 @@ public class SingleContactFragment extends Fragment {
 
     //Database property
     private DataBaseHelper dataBaseHelper;
+    private ScheduleManager mScheduleManager;
     //time format helper class
     TimeHelper mTimeHelper;
 
@@ -104,6 +105,7 @@ public class SingleContactFragment extends Fragment {
         //instantiate DB Helper
         dataBaseHelper = new DataBaseHelper(getActivity());
         mTimeHelper = TimeHelper.getInstance(getActivity());
+        mScheduleManager = ScheduleManager.getInstance(getActivity());
     }
 
     @Override
@@ -281,30 +283,25 @@ public class SingleContactFragment extends Fragment {
                         if(existingSchedule != null){
                             scheduleMap.remove(weekDay);
                             setSingleButtonLabel(weekDayButton, null);
-                            mapChangedFlag = true;
+                            mScheduleManager.deleteSchedule(existingSchedule);
                         }
                     }
-                    //check if this is a new schedule or the updated schedule start and/or end time is different from original
-                    else if(existingSchedule == null ||
-                            (existingSchedule.getStartTime().compareTo(schedule.getStartTime()) != 0 ||
-                                existingSchedule.getEndTime().compareTo(schedule.getEndTime()) != 0)){
+                    //check if this is a new schedule
+                    else if(existingSchedule == null){
                         //update the list
                         scheduleMap.put(weekDay, schedule);
                         //update the button label
                         setSingleButtonLabel(weekDayButton, schedule);
                         //set mapChangedFlag to refleced changed
-                        mapChangedFlag = true;
+                        mScheduleManager.insertSchedule(schedule);
                     }
-
-                    //update corresponding map content changed flag
-                    if(mapChangedFlag){
-
-                        if(schedule.getBlockType() == BlockType.INCOMING){
-                            mIsIncomingScheduleChanged = true;
-                        }
-                        else{
-                            mIsOutgoingScheduleChanged = true;
-                        }
+                    else if ((existingSchedule.getStartTime().compareTo(schedule.getStartTime()) != 0 ||
+                                existingSchedule.getEndTime().compareTo(schedule.getEndTime()) != 0)){ //else update schedule start and/or end time is different from original
+                        //update the list
+                        scheduleMap.put(weekDay, schedule);
+                        //update the button label
+                        setSingleButtonLabel(weekDayButton, schedule);
+                       mScheduleManager.updateSchedule(schedule);
                     }
                 }
                 break;
@@ -427,8 +424,8 @@ public class SingleContactFragment extends Fragment {
     public void onPause(){
         super.onPause();
         dataBaseHelper.updateContact(mContact);
-        if(mIsIncomingScheduleChanged) dataBaseHelper.updateSchedules(mIncomingSchedule);
-        if(mIsOutgoingScheduleChanged)  dataBaseHelper.updateSchedules(mOutgoingSchedule);
+/*        if(mIsIncomingScheduleChanged) dataBaseHelper.updateSchedules(mIncomingSchedule);
+        if(mIsOutgoingScheduleChanged)  dataBaseHelper.updateSchedules(mOutgoingSchedule);*/
     }
 
     @Override

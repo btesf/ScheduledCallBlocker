@@ -46,6 +46,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     //scheduled block table
     private static String BLOCK_SCHEDULE_TABLE = "BlockSchedule";
+    private static String BLOCK_SCHEDULE_ID = "_id";
     private static String BLOCK_SCHEDULE_CONTACT_ID = "contactId";
     private static String BLOCK_SCHEDULE_WEEK_DAY = "weekDay";
     private static String BLOCK_SCHEDULE_FROM = "startTime";
@@ -96,12 +97,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         //scheduled block table
         String createBlockScheduleTable = " CREATE TABLE " + BLOCK_SCHEDULE_TABLE + " (" +
+                BLOCK_SCHEDULE_ID + " integer primary key autoincrement, " +
                 BLOCK_SCHEDULE_CONTACT_ID + " char(10), " +
                 BLOCK_SCHEDULE_WEEK_DAY + " tinyint, " +
                 BLOCK_SCHEDULE_BLOCK_TYPE + " tinyint, " +
                 BLOCK_SCHEDULE_FROM + " long, " +
                 BLOCK_SCHEDULE_TO + " long, " +
-                " PRIMARY KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ", " + BLOCK_SCHEDULE_WEEK_DAY + ")" +
                 " FOREIGN KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + "), "  +
                 " FOREIGN KEY (" + BLOCK_SCHEDULE_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") "  +
                 ")";
