@@ -15,7 +15,7 @@ public class LogManager {
     private LogManager(Context context){
 
         mContext = context;
-        mDatabaseHelper = new DataBaseHelper(context);
+        mDatabaseHelper = DataBaseHelper.getInstance(context);
     }
 
     public static LogManager getInstance(Context context){
@@ -41,6 +41,22 @@ public class LogManager {
     public boolean insertLog(String contactId, int blockType){
 
         return mDatabaseHelper.insertLog(contactId, blockType);
+    }
+
+    public boolean log(Contact contact, int blockType){
+
+        int count;
+
+        if(blockType == BlockType.INCOMING){
+            count = contact.getIncomingBlockedCount();
+            contact.setIncomingBlockedCount(++count);//increment count by 1
+        }
+        else{ // OUTGOING
+            count = contact.getOutgoingBlockedCount();
+            contact.setOutgoingBlockedCount(++count);//increment count by 1
+        }
+
+        return insertLog(contact.getId(), blockType) && mDatabaseHelper.updateContact(contact);
     }
 
     public boolean deleteLogs(){

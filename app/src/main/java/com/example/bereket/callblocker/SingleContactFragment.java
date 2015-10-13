@@ -61,8 +61,8 @@ public class SingleContactFragment extends Fragment {
     private List<Button> outgoingCallWeekDayButtons;
 
     //Database property
-    private DataBaseHelper dataBaseHelper;
     private ScheduleManager mScheduleManager;
+    private ContactManager mContactManager;
     //time format helper class
     TimeHelper mTimeHelper;
 
@@ -103,9 +103,9 @@ public class SingleContactFragment extends Fragment {
             }
         }
         //instantiate DB Helper
-        dataBaseHelper = new DataBaseHelper(getActivity());
         mTimeHelper = TimeHelper.getInstance(getActivity());
         mScheduleManager = ScheduleManager.getInstance(getActivity());
+        mContactManager = ContactManager.getInstance(getActivity());
     }
 
     @Override
@@ -210,6 +210,8 @@ public class SingleContactFragment extends Fragment {
                     }
                     break;
             }
+
+            mContactManager.updateContact(mContact);
             //update the UI
             updateUI(BlockType.OUTGOING);
         }
@@ -239,6 +241,8 @@ public class SingleContactFragment extends Fragment {
                     }
                     break;
             }
+
+            mContactManager.updateContact(mContact);
             //update the UI
             updateUI(BlockType.INCOMING);
         }
@@ -308,7 +312,7 @@ public class SingleContactFragment extends Fragment {
                        mScheduleManager.updateSchedule(schedule);
                     }
                 }
-                break;
+            break;
         }
     }
 
@@ -377,7 +381,7 @@ public class SingleContactFragment extends Fragment {
                 //query is done. In addition whenever the query was made this method would also be called anyways.
                 if(scheduleMap == null) {
 
-                    scheduleMap = dataBaseHelper.queryContactSchedule(mContact.getId(), blockType);
+                    scheduleMap = mContactManager.queryContactSchedule(mContact.getId(), blockType);
                     //assign the queried map to the corresponding(incoming/outoing) map
                     if(blockType == BlockType.INCOMING){
                         mIncomingSchedule = scheduleMap;
@@ -427,7 +431,6 @@ public class SingleContactFragment extends Fragment {
     @Override
     public void onPause(){
         super.onPause();
-        dataBaseHelper.updateContact(mContact);
 /*        if(mIsIncomingScheduleChanged) dataBaseHelper.updateSchedules(mIncomingSchedule);
         if(mIsOutgoingScheduleChanged)  dataBaseHelper.updateSchedules(mOutgoingSchedule);*/
     }

@@ -19,7 +19,7 @@ public class ScheduleManager {
     private ScheduleManager(Context context){
 
         mContext = context;
-        mDataHelper = new DataBaseHelper(context);
+        mDataHelper = DataBaseHelper.getInstance(context);
     }
 
     public static ScheduleManager getInstance(Context context){

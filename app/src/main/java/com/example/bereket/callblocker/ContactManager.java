@@ -10,6 +10,8 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
+import java.util.Map;
+
 
 /**
  * Created by bereket on 8/11/15.
@@ -25,7 +27,7 @@ public class ContactManager {
     private ContactManager(Context context){
 
         mContext = context;
-        mDataHelper = new DataBaseHelper(context);
+        mDataHelper = DataBaseHelper.getInstance(context);
     }
 
     public static ContactManager getInstance(Context context){
@@ -66,6 +68,11 @@ public class ContactManager {
         mDataHelper.insertContact(contactId, phoneNumber, displayNumber, contactName, isNumberStandardized);
     }
 
+    public boolean updateContact(Contact contact){
+
+        return mDataHelper.updateContact(contact);
+    }
+
     public boolean deleteContact(Contact contact){
 
         return mDataHelper.deleteContact(contact);
@@ -76,6 +83,10 @@ public class ContactManager {
         return mDataHelper.getContactByPhoneNumber(phoneNumber);
     }
 
+    public Map<Integer,Schedule> queryContactSchedule(String contactId, int blockType){
+
+        return mDataHelper.queryContactSchedule(contactId, blockType);
+    }
 
     public void standardizeNonStandardContactPhones(String countryCode){
 

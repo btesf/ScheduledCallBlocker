@@ -62,8 +62,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static String NO_NAME_CONTACT = "No name";
 
+    private static DataBaseHelper mDatabaseHelper = null;
 
-    public DataBaseHelper(Context context){
+    public static DataBaseHelper getInstance(Context context){
+
+        if(mDatabaseHelper == null){
+
+            mDatabaseHelper = new DataBaseHelper(context);
+        }
+
+        return mDatabaseHelper;
+    }
+
+    private DataBaseHelper(Context context){
         super(context, DB_NAME, null, VERSION);
     }
 
@@ -160,6 +171,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         getWritableDatabase().execSQL(query);
     }
 
+    /*
+     directly add a new number
+     */
+
     public Contact getContactByPhoneNumber(String phoneNumber){
 
         Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, PHONE_NUMBER + " = ? ", new String[]{phoneNumber}, null, null, null);
@@ -197,7 +212,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return returnValue > 0 ? true : false;
     }
 
-    public void updateContact(Contact contact){
+    public boolean updateContact(Contact contact){
 
         ContentValues cv = new ContentValues();
         cv.put(NAME, contact.getContactName());
@@ -210,6 +225,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());
 
         int rows = getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{contact.getId()});
+
+        return rows < 1 ? false : true;
     }
 
     public ContactCursor queryContacts(){
@@ -381,6 +398,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if(cursor != null){
             cursor.close();
         }
+
         return scheduleMap;
     }
 

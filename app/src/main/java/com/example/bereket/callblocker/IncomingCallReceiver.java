@@ -116,7 +116,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
                             if(callBlocked){
                                 //TODO: remove db call from here and run it under different service
-                                mLogManager.insertLog(blockedContact.getId(), BlockType.INCOMING);
+                                mLogManager.log(blockedContact, BlockType.INCOMING);
                             }
                         }
                     } catch (Exception e) {
