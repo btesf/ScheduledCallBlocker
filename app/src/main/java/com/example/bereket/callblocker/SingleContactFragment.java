@@ -153,7 +153,9 @@ public class SingleContactFragment extends Fragment {
         clearAllIncomingSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "incoming call clear button is clicked ", Toast.LENGTH_SHORT).show();
+                mScheduleManager.deleteAllSchedulesForContact(mContact.getId(), BlockType.INCOMING);
+                mIncomingSchedule.clear();
+                updateUI(BlockType.INCOMING);
             }
         });
 
@@ -170,7 +172,9 @@ public class SingleContactFragment extends Fragment {
         clearAllOutgoingSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "outgoing call clear button is clicked ", Toast.LENGTH_SHORT).show();
+                mScheduleManager.deleteAllSchedulesForContact(mContact.getId(), BlockType.OUTGOING);
+                mOutgoingSchedule.clear();
+                updateUI(BlockType.OUTGOING);
             }
         });
 

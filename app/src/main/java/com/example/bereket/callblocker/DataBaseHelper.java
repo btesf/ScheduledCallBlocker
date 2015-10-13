@@ -214,7 +214,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public ContactCursor queryContacts(){
         //Equivalent to "select * from run order by start_date asc"
-        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
+        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME + " asc");
         return new ContactCursor(wrapped);
     }
 
@@ -330,13 +330,27 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public boolean updateSchedule(Schedule schedule){
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(BLOCK_SCHEDULE_CONTACT_ID, schedule.getContactId());
+        cv.put(BLOCK_SCHEDULE_FROM, schedule.getStartTime().getTime());
+        cv.put(BLOCK_SCHEDULE_TO, schedule.getEndTime().getTime());
+        cv.put(BLOCK_SCHEDULE_WEEK_DAY, schedule.getWeekDay());
+        cv.put(BLOCK_SCHEDULE_BLOCK_TYPE, schedule.getBlockType());
+
+        getWritableDatabase().update(BLOCK_SCHEDULE_TABLE, cv, BLOCK_SCHEDULE_ID + " = ? ", new String[]{String.valueOf(schedule.getId())});
+        return true;
+    }
+
     public boolean deleteSchedule(Schedule schedule){
 
-       return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_WEEK_DAY + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{schedule.getContactId(), String.valueOf(schedule.getWeekDay()), String.valueOf(schedule.getBlockType())}) != 0 ? true : false;
+       return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_ID + " = ? ", new String[]{String.valueOf(schedule.getId())}) != 0 ? true : false;
     }
 
 
-    public boolean deleteAllSchedules(String contactId, Integer blockType){
+    public boolean deleteAllSchedulesForContact(String contactId, Integer blockType){
 
         return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{contactId, String.valueOf(blockType)}) != 0 ? true : false;
     }
@@ -353,6 +367,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             schedule = new Schedule();
 
+            schedule.setId(cursor.getInt(cursor.getColumnIndex(BLOCK_SCHEDULE_ID)));
             schedule.setContactId(contactId);
             schedule.setStartTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_FROM))));
             schedule.setEndTime(new Date(cursor.getLong(cursor.getColumnIndex(BLOCK_SCHEDULE_TO))));
@@ -367,48 +382,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return scheduleMap;
-    }
-
-    public boolean updateSchedule(Schedule schedule){
-
-        ContentValues cv = new ContentValues();
-
-        cv.put(BLOCK_SCHEDULE_CONTACT_ID, schedule.getContactId());
-        cv.put(BLOCK_SCHEDULE_FROM, schedule.getStartTime().getTime());
-        cv.put(BLOCK_SCHEDULE_TO, schedule.getEndTime().getTime());
-        cv.put(BLOCK_SCHEDULE_WEEK_DAY, schedule.getWeekDay());
-        cv.put(BLOCK_SCHEDULE_BLOCK_TYPE, schedule.getBlockType());
-
-        getWritableDatabase().update(BLOCK_SCHEDULE_TABLE, cv, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_WEEK_DAY + " = ?", new String[]{schedule.getContactId(), String.valueOf(schedule.getWeekDay())});
-        return true;
-    }
-
-    public void updateSchedules(Map<Integer, Schedule> schedules){
-
-        if(schedules.keySet().size() < 1) return;
-
-        String query = "INSERT OR REPLACE INTO " + BLOCK_SCHEDULE_TABLE + " (" +
-                BLOCK_SCHEDULE_CONTACT_ID + ", " +
-                BLOCK_SCHEDULE_WEEK_DAY + ", " +
-                BLOCK_SCHEDULE_FROM + ", " +
-                BLOCK_SCHEDULE_TO + ", " +
-                BLOCK_SCHEDULE_BLOCK_TYPE + ") values ";
-
-        StringBuilder insertQueryBuilder = new StringBuilder();
-        StringBuilder deleteQueryIdsBuilder = new StringBuilder();
-//TODO bad way of accessing a single schedule
-        Schedule tempSchedule = null;
-        for(Schedule schedule : schedules.values()){
-            if(tempSchedule == null) tempSchedule = schedule;
-            insertQueryBuilder.append("( '" +  schedule.getContactId() + "', '" + schedule.getWeekDay() + "', '" + schedule.getStartTime().getTime() +"', '" + schedule.getEndTime().getTime() + "', '" + schedule.getBlockType() + "'),");
-            deleteQueryIdsBuilder.append(schedule.getWeekDay() + ",");
-        }
-        //remove the last comma
-        insertQueryBuilder.deleteCharAt(insertQueryBuilder.length() - 1);
-        deleteQueryIdsBuilder.deleteCharAt(deleteQueryIdsBuilder.length() - 1);
-        //delete removed schedules - if any
-       // getWritableDatabase().execSQL("DELETE FROM " + BLOCK_SCHEDULE_TABLE + " WHERE " + BLOCK_SCHEDULE_CONTACT_ID + " = '" + tempSchedule.getContactId() + "' AND " + BLOCK_SCHEDULE_BLOCK_TYPE + " = " + tempSchedule.getBlockType() + " AND " + BLOCK_SCHEDULE_WEEK_DAY + " NOT IN (" + deleteQueryIdsBuilder.toString() + " )");
-        getWritableDatabase().execSQL(query + insertQueryBuilder.toString());
     }
 
     public boolean timeExistsInSchedule(String contactId, int blockType, int weekDay, long time){

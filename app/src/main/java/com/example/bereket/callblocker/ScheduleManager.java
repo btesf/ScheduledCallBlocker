@@ -42,6 +42,11 @@ public class ScheduleManager {
         return mDataHelper.deleteSchedule(schedule);
     }
 
+    public boolean deleteAllSchedulesForContact(String contactId, Integer blockType){
+
+        return mDataHelper.deleteAllSchedulesForContact(contactId, blockType);
+    }
+
     public List<Schedule> querySchedule(Schedule schedule){
 
         //return mDataHelper.querySchedule(schedule);
