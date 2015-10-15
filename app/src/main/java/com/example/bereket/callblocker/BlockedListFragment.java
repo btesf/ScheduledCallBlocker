@@ -27,6 +27,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Date;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -43,6 +45,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
 
     private static int REQUEST_NEW_CONTACT = 1;
     private static int CONTACTS_LIST_LOADER = 2;
+    private static int ADD_CONTACT_MANUALLY = 3;
 
     //Activity request codes
     private final Integer SINGLE_CONTACT_ACTIVITY_RESULT = 0;
@@ -203,6 +206,10 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                 startActivityForResult(intent, REQUEST_NEW_CONTACT);
                 return true;
+            case R.id.menu_item_manually_add_contact:
+                intent = new Intent(getActivity(), AddNewPhoneActivity.class);
+                startActivityForResult(intent, ADD_CONTACT_MANUALLY);
+                return true;
             case R.id.menu_item_show_log:
                 intent = new Intent(getActivity(), LogActivity.class);
                 startActivityForResult(intent, CONTACTS_LIST_LOADER);
@@ -337,6 +344,13 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 mContactManager.insertContact(id, phoneNumber, contactName);
                 ((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
             }
+        }
+        else if(requestCode == ADD_CONTACT_MANUALLY){
+            //do something about it
+            String str = data.getStringExtra("addedPhoneNumber");
+            //TODO get proper id here /standardized
+            mContactManager.insertContact(String.valueOf((new Date()).getTime()), str, null);
+            ((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
         }
     }
 }

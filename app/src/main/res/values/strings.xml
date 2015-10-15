@@ -41,4 +41,8 @@
     <string name="show_log">logs</string>
     <string name="clear_log">clear log</string>
     <string name="clearAllSchedulesText">clear all</string>
+    <string name="newPhoneNumberString">Phone number</string>
+    <string name="save_new_number">Save</string>
+    <string name="cancel_new_number">Cancel</string>
+    <string name="title_activity_add_new_phone">AddNewPhoneActivity</string>
 </resources>
