@@ -129,7 +129,7 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
 
             logContactNameTextView.setText(logRecord.getContactName());
             //TODO: format the stardard way. determine if the time format is 24/12 from the system and format the date accordingly
-            logDateTextView.setText(new SimpleDateFormat("mm/dd/yyyy hh:mm a").format(logRecord.getLogDate()));
+            logDateTextView.setText(new SimpleDateFormat("dd/MM/yyyy hh:mm a").format(logRecord.getLogDate()));
         }
     }
 

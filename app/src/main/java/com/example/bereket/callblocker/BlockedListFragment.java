@@ -342,7 +342,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             else{
 
                 mContactManager.insertContact(id, phoneNumber, contactName);
-                ((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+                //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
             }
         }
         else if(requestCode == ADD_CONTACT_MANUALLY){
@@ -350,7 +350,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             String str = data.getStringExtra("addedPhoneNumber");
             //TODO get proper id here /standardized
             mContactManager.insertContact(String.valueOf((new Date()).getTime()), str, null);
-            ((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+            //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
         }
     }
 }

@@ -33,7 +33,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
         String countryCodeValue = tm.getNetworkCountryIso();
 
         //if the phone has no network, (where we cannot determine countryCodeValue - will be null), we don't need to process any interception
-        if(countryCodeValue != null){
+        if(countryCodeValue != null && !countryCodeValue.isEmpty()){
 
             String phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             phoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCodeValue);
@@ -41,7 +41,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
             ContactManager contactManager = ContactManager.getInstance(mContext);
             //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
             if(contactManager.nonStandardizedPreferenceEnabled()){
-
+Log.d("bere.bere.bere", "Preference is enabled");
                 contactManager.standardizeNonStandardContactPhones(countryCodeValue);
             }
 

@@ -93,7 +93,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         //holds blocked contacts records
         String createBlockedListTable = " CREATE TABLE " +  BLOCKED_LIST_TABLE + " (" +
-                ID + " char(10) primary key, " +
+                ID + " char(12) primary key, " +
                 NAME + " varchar(100), " +
                 PHONE_NUMBER + " char(20), " +
                 DISPLAY_NUMBER + " char(20), " +
@@ -177,7 +177,16 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public Contact getContactByPhoneNumber(String phoneNumber){
 
-        Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, PHONE_NUMBER + " = ? ", new String[]{phoneNumber}, null, null, null);
+        //There are two kinds of numbers inserted into the database. 1. From contact, 2. directly (manuall)
+        /*
+        The problem is when a new number is added manually and the phone is out of network, the number won't be standardized.
+        After standardization (always happening before number is searched in blocked table), there will be two similar numbers; one from contact, other manual
+        but with similar phone number signature. The only way to determine which is which is to give an id format which can be easily be differentiated .
+        - give very high value for non contact numbers and,
+        - give very low value for contact numbers
+        then, taking the top 1 will always return the least number
+         */
+        Cursor cursor = getWritableDatabase().rawQuery("SELECT * FROM " + BLOCKED_LIST_TABLE + " WHERE " + PHONE_NUMBER + " = ?  ORDER BY " + ID + " ASC LIMIT 1 ", new String[]{phoneNumber});
 
         if(cursor != null && cursor.getCount() > 0) {
 
@@ -271,9 +280,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public LogCursor queryAllLogs(){
-        //Equivalent to "select * from LogRecord order by start_date asc"
+        //
         Cursor wrapped = getReadableDatabase().rawQuery("SELECT A.*, B." + NAME + " AS ContactName, B." + DISPLAY_NUMBER + " AS ContactNumber FROM " + CALL_LOG_TABLE +
-                " A, " + BLOCKED_LIST_TABLE + " B ORDER BY " + CALL_LOG_TIME + " DESC ", null);//   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
+                " A INNER JOIN " + BLOCKED_LIST_TABLE + " B ON A." + CALL_LOG_CONTACT_ID + " = B." + ID + " ORDER BY " + CALL_LOG_TIME + " DESC ", null);//   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
         return new LogCursor(wrapped);
     }
 
@@ -412,5 +421,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if(cursor != null && cursor.getCount() > 0)
             return true;
         else return false;
+    }
+
+    //TODO something should be returned from the query outcome
+    public void cleanUpDuplicateContacts(){
+
+        String query = "DELETE FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " NOT IN (" +
+                "SELECT MIN(" + ID + ") FROM " + BLOCKED_LIST_TABLE + " WHERE " + PHONE_NUMBER + " IN (SELECT " + PHONE_NUMBER + " FROM " + BLOCKED_LIST_TABLE + "  GROUP BY " + PHONE_NUMBER + " HAVING COUNT(*) > 1 )" +
+                " ) ";
+
+        getWritableDatabase().execSQL(query);
     }
 }
