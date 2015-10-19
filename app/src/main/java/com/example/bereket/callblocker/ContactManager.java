@@ -2,6 +2,7 @@ package com.example.bereket.callblocker;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -11,6 +12,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
+import java.io.File;
 import java.util.Map;
 
 
@@ -23,7 +25,6 @@ public class ContactManager {
     private Context mContext;
 
     public static String NON_STANDARDIZED_NUMBER_EXIST = "non.standard.number.exists";
-    public static String PREFERENCE_PRIVATE_CONTEXT_FILE = "com.example.bereket.callblocker.private";
     private static ContactManager mContactManager = null;
 
     private ContactManager(Context context){
@@ -59,15 +60,14 @@ public class ContactManager {
         String phoneNumber = standardizePhoneNumber(displayNumber, countryCodeValue);
 
         if(countryCodeValue != null && !countryCodeValue.isEmpty()){ // if network is available (in service area)
-Log.d("bere.bere.bere", "number insert: network is available");
+
             isNumberStandardized = true;
         }
         else{
-Log.d("bere.bere.bere", "number insert: network is unavailable");
             //set system preference and that will fire a standardizing service to run when any telephone event is triggered
             setNonStandardizedPreference(true);
         }
-Log.d("bere.bere.bere", "Non standardized preference enabled : " + nonStandardizedPreferenceEnabled());
+
         mDataHelper.insertContact(contactId, phoneNumber, displayNumber, contactName, isNumberStandardized);
     }
 
@@ -92,23 +92,23 @@ Log.d("bere.bere.bere", "Non standardized preference enabled : " + nonStandardiz
     }
 
     public void standardizeNonStandardContactPhones(String countryCode){
-Log.d("bere.bere.bere", "Number standardization method is run");
+
         DataBaseHelper.ContactCursor contactCursor = mDataHelper.getNonStandardizedPhoneContacts();
 
         if(contactCursor != null){
-Log.d("bere.bere.bere", "Non standardized contacts are available");
             while (contactCursor.moveToNext()){
 
                 Contact nonStandardContact = contactCursor.getContact();
                 nonStandardContact.setPhoneNumber(standardizePhoneNumber(nonStandardContact.getPhoneNumber(), countryCode));
                 nonStandardContact.setIsNumberStandardized(true);
+                //TODO how is updating unstandardized contact would work here - doesn't it time consuming?
+                mDataHelper.updateContact(nonStandardContact);
             }
 
             contactCursor.close();
             setNonStandardizedPreference(false);
             //delete duplicate numbers
             mDataHelper.cleanUpDuplicateContacts();
-Log.d("bere.bere.bere", "duplicates are removed....");
         }
     }
 
@@ -133,16 +133,12 @@ Log.d("bere.bere.bere", "duplicates are removed....");
     }
 
     public boolean nonStandardizedPreferenceEnabled(){
-Log.d("bere.bere.bere", String.valueOf(PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(NON_STANDARDIZED_NUMBER_EXIST, false)));
 
-return  (mContext.getApplicationContext()).getSharedPreferences(PREFERENCE_PRIVATE_CONTEXT_FILE, Context.MODE_PRIVATE).getBoolean(NON_STANDARDIZED_NUMBER_EXIST, false);
-       // return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(NON_STANDARDIZED_NUMBER_EXIST, true);
+        return  PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(NON_STANDARDIZED_NUMBER_EXIST, false);
     }
 
     public void setNonStandardizedPreference(boolean exists){
 
-        (mContext.getApplicationContext()).getSharedPreferences(PREFERENCE_PRIVATE_CONTEXT_FILE, Context.MODE_PRIVATE).edit().putBoolean(NON_STANDARDIZED_NUMBER_EXIST, exists);
-/*       PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).edit()
-                .putBoolean(NON_STANDARDIZED_NUMBER_EXIST, exists); */
+        PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).edit().putBoolean(NON_STANDARDIZED_NUMBER_EXIST, exists).commit();
     }
 }

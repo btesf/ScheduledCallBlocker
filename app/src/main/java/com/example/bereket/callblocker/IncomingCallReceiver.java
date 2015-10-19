@@ -46,7 +46,6 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
-
             //Determine the country code from current network (instead of system setting)
             //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
             TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);

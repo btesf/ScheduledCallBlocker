@@ -41,7 +41,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
             ContactManager contactManager = ContactManager.getInstance(mContext);
             //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
             if(contactManager.nonStandardizedPreferenceEnabled()){
-Log.d("bere.bere.bere", "Preference is enabled");
+
                 contactManager.standardizeNonStandardContactPhones(countryCodeValue);
             }
 
