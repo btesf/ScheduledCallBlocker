@@ -45,4 +45,5 @@
     <string name="save_new_number">Save</string>
     <string name="cancel_new_number">Cancel</string>
     <string name="title_activity_add_new_phone">AddNewPhoneActivity</string>
+    <string name="wrong_phone_number_format">Invalid phone number format</string>
 </resources>

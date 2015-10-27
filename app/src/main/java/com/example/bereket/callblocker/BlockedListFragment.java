@@ -118,19 +118,24 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
                 switch (item.getItemId()) {
                     case R.id.context_menu_delete_contact:
-                        ContactListAdaptor adapter = (ContactListAdaptor)getListAdapter();
 
-                        Contact contact = ((DataBaseHelper.ContactCursor)adapter.getCursor()).getContact();
-                        boolean contactDeleted = mContactManager.deleteContact(contact);
-                        mode.finish();
-                        if(contactDeleted){
-                            //adapter.notifyDataSetChanged();
-                            //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
-                            getLoaderManager().restartLoader(0, null, BlockedListFragment.this);
+                        ContactListAdaptor adapter = (ContactListAdaptor)getListAdapter();
+                        boolean isContactDeleted = false;
+
+                        for(int i=adapter.getCount()-1; i>=0; i--){
+
+                            if(getListView().isItemChecked(i)){
+                                isContactDeleted = mContactManager.deleteContact(((DataBaseHelper.ContactCursor)adapter.getItem(i)).getContact());
+                            }
                         }
-                        return true;
+
+                       if(isContactDeleted) getLoaderManager().restartLoader(0, null, BlockedListFragment.this);
+
+                       return true;
+
                     default:
                         return false;
                 }
@@ -263,7 +268,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             CheckBox outGoingCheckBox = (CheckBox) view.findViewById(R.id.outgoing_call_blocked_checkbox);
             CheckBox inComingCheckBox = (CheckBox) view.findViewById(R.id.incoming_call_blocked_checkbox);
 
-            contactNameTextView.setText(contact.getContactName());
+            contactNameTextView.setText(contact.getContactName() + "  (" + contact.getIncomingBlockedCount() + ", " +  contact.getOutgoingBlockedCount() + " )");
             contactPhoneTextView.setText(contact.getDisplayNumber());
             outGoingCheckBox.setChecked(contact.getOutGoingBlockedState() == 1 ? true : false);
             inComingCheckBox.setChecked(contact.getIncomingBlockedState() == 1 ? true : false);
@@ -320,7 +325,8 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 pCur.moveToFirst();
 
                 phoneNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-/*                        int type = pCur.getInt(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+
+/*              int type = pCur.getInt(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
                 switch (type) {
                     case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
                     // do something with the Home number here...
@@ -341,16 +347,18 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             }
             else{
 
-                mContactManager.insertContact(id, phoneNumber, contactName);
-                //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+                mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName);
             }
         }
         else if(requestCode == ADD_CONTACT_MANUALLY){
-            //do something about it
-            String str = data.getStringExtra("addedPhoneNumber");
-            //TODO get proper id here /standardized
-            mContactManager.insertContact(String.valueOf((new Date()).getTime()), str, null);
-            //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+
+            if(data != null){
+                //do something about it
+                String str = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
+                //TODO get proper id here /standardized
+                mContactManager.insertContact(String.valueOf((new Date()).getTime()), str, null);
+                //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+            }
         }
     }
 }

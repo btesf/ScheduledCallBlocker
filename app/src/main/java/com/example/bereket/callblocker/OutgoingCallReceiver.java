@@ -7,8 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -28,62 +26,56 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
         mScheduleManager = ScheduleManager.getInstance(mContext);
         mLogManager = LogManager.getInstance(mContext);
         //Determine the country code from current network (instead of system setting)
-        //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
-        TelephonyManager tm = (TelephonyManager)context.getSystemService(mContext.TELEPHONY_SERVICE);
-        String countryCodeValue = tm.getNetworkCountryIso();
+        ContactManager contactManager = ContactManager.getInstance(mContext);
 
+        String countryCodeValue = contactManager.getCountryCodeFromNetwork();
         //if the phone has no network, (where we cannot determine countryCodeValue - will be null), we don't need to process any interception
         if(countryCodeValue != null && !countryCodeValue.isEmpty()){
 
             String phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             phoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCodeValue);
-
-            ContactManager contactManager = ContactManager.getInstance(mContext);
             //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
             if(contactManager.nonStandardizedPreferenceEnabled()){
 
                 contactManager.standardizeNonStandardContactPhones(countryCodeValue);
             }
 
-            Contact blockedContact = contactManager.getContactByPhoneNumber(phoneNumber);
+            Contact blockedContact = contactManager.getContactByStandardizedPhoneNumber(phoneNumber);
 
             if(blockedContact == null){
 
                 return;
             }
 
-            if(phoneNumber.equals(blockedContact.getPhoneNumber())){
+            boolean callBlocked = false;
+            //if outgoing call is blocked proceed with blocking
+            if(blockedContact.getOutGoingBlockedState() == BlockState.ALWAYS_BLOCK){
+                setResultData(null);
+                //not recommended to abort broadcast
+                //abortBroadcast();
+                sendNotification(blockedContact.getDisplayNumber());
+                callBlocked = true;
+            }
+            else if(blockedContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
+                //get all the scheduled calls for this number
+                Calendar cal = Calendar.getInstance();
+                //get weekDay of today
+                int weekDay = TimeHelper.convertJavaDayOfWeekWithCallBlockerType(cal.get(Calendar.DAY_OF_WEEK));
+                //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
+                cal = TimeHelper.setCalendarToBenchmarkTime(cal);
 
-                boolean callBlocked = false;
-                //if outgoing call is blocked proceed with blocking
-                if(blockedContact.getOutGoingBlockedState() == BlockState.ALWAYS_BLOCK){
+                if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.OUTGOING, weekDay, cal.getTime())){
                     setResultData(null);
                     //not recommended to abort broadcast
                     //abortBroadcast();
                     sendNotification(blockedContact.getDisplayNumber());
                     callBlocked = true;
                 }
-                else if(blockedContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
-                    //get all the scheduled calls for this number
-                    Calendar cal = Calendar.getInstance();
-                    //get weekDay of today
-                    int weekDay = TimeHelper.convertJavaDayOfWeekWithCallBlockerType(cal.get(Calendar.DAY_OF_WEEK));
-                    //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
-                    cal = TimeHelper.setCalendarToBenchmarkTime(cal);
+            }
 
-                    if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.OUTGOING, weekDay, cal.getTime())){
-                        setResultData(null);
-                        //not recommended to abort broadcast
-                        //abortBroadcast();
-                        sendNotification(blockedContact.getDisplayNumber());
-                        callBlocked = true;
-                    }
-                }
-
-                if(callBlocked){
-                    //TODO: remove db call from here and run it under different service
-                    mLogManager.log(blockedContact, BlockType.INCOMING);
-                }
+            if(callBlocked){
+                //TODO: remove db call from here and run it under different service
+                mLogManager.log(blockedContact, BlockType.INCOMING);
             }
         }
         //else { /*  if country code value is null, it means there is no network (no sim is inserted/phone is in airplane mode)*/}

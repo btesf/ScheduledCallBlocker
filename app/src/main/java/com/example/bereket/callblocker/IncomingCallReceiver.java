@@ -10,7 +10,6 @@ import android.media.AudioManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
@@ -46,13 +45,11 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
-            //Determine the country code from current network (instead of system setting)
-            //TODO better to use system wide configuration setting to get country code if the value is empty from telephone manager
-            TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);
-            String countryCodeValue = tm.getNetworkCountryIso();
 
-            incomingNumber = ContactManager.standardizePhoneNumber(incomingNumber, countryCodeValue);
             ContactManager contactManager = ContactManager.getInstance(context);
+            //Determine the country code from current network (instead of system setting)
+            String countryCodeValue = contactManager.getCountryCodeFromNetwork();
+            incomingNumber = ContactManager.standardizePhoneNumber(incomingNumber, countryCodeValue);
             //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
             if(contactManager.nonStandardizedPreferenceEnabled()){
 
@@ -63,18 +60,13 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
                 case TelephonyManager.CALL_STATE_RINGING:
 
-                    Contact blockedContact = contactManager.getContactByPhoneNumber(incomingNumber);
+                    Contact blockedContact = contactManager.getContactByStandardizedPhoneNumber(incomingNumber);
 
                     if(blockedContact == null){
 
                         break;
                     }
 
-                    //check if current phone number is standardized; if not standardize
-                    String phoneNumber = blockedContact.getPhoneNumber();
-                    if(!blockedContact.isIsNumberStandardized()){
-                        phoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCodeValue);
-                    }
                     AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
                     //Turn ON the mute
                     audioManager.setStreamMute(AudioManager.STREAM_RING, true);

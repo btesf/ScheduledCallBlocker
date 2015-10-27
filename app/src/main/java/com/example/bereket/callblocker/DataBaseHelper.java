@@ -114,8 +114,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 BLOCK_SCHEDULE_BLOCK_TYPE + " tinyint, " +
                 BLOCK_SCHEDULE_FROM + " long, " +
                 BLOCK_SCHEDULE_TO + " long, " +
-                " FOREIGN KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + "), "  +
-                " FOREIGN KEY (" + BLOCK_SCHEDULE_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") "  +
+                " FOREIGN KEY (" + BLOCK_SCHEDULE_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + ") ON DELETE CASCADE ON UPDATE CASCADE, "  +
+                " FOREIGN KEY (" + BLOCK_SCHEDULE_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") ON DELETE CASCADE ON UPDATE CASCADE"  +
                 ")";
 
         //call log table
@@ -124,8 +124,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 CALL_LOG_CONTACT_ID + " char(10), " +
                 CALL_LOG_BLOCK_TYPE + " tinyint, " +
                 CALL_LOG_TIME + " datetime," +
-                " FOREIGN KEY (" + CALL_LOG_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + "), "  +
-                " FOREIGN KEY (" + CALL_LOG_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") "  +
+                " FOREIGN KEY (" + CALL_LOG_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + ") ON DELETE CASCADE ON UPDATE CASCADE, "  +
+                " FOREIGN KEY (" + CALL_LOG_BLOCK_TYPE + ") REFERENCES " + BLOCK_TYPE_TABLE + "(" + BLOCK_TYPE_ID + ") ON DELETE CASCADE ON UPDATE CASCADE"  +
                 " )";
 
         //block type reference insert string
@@ -198,6 +198,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             return contact;
         }
         else {
+            cursor.close();
             return null;
         }
     }
@@ -212,6 +213,26 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
 
         else return null;
+    }
+
+    //overloaded method
+    public boolean insertContact(Contact contact){
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(ID, contact.getId());
+        cv.put(NAME, contact.getContactName());// = "name";
+        cv.put(PHONE_NUMBER, contact.getPhoneNumber());// = "PhoneNumber";
+        cv.put(DISPLAY_NUMBER, contact.getDisplayNumber());// = "DisplayNumber";
+        cv.put(OUTGOING_CALL_BLOCKED, contact.getOutGoingBlockedState());// = "OutgoingCall";
+        cv.put(INCOMING_CALL_BLOCKED, contact.getIncomingBlockedState());// = "IncomingCall";
+        cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());// = "BlockedOutgoingCalls";
+        cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());// = "BlockedIncomingCalls";
+        cv.put(IS_NUMBER_STANDARDIZED, contact.isIsNumberStandardized());// = "IsNumberStandardized";
+
+        long result = getWritableDatabase().insert(BLOCKED_LIST_TABLE, null, cv);
+
+        return result == -1 ? false : true;
     }
 
     public boolean deleteContact(Contact contact){
@@ -236,6 +257,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         int rows = getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{contact.getId()});
 
         return rows < 1 ? false : true;
+    }
+
+    public void updateContactId(String oldContactId, String newContactId){
+
+       String query = "UPDATE " + BLOCKED_LIST_TABLE + " SET " + ID + " = " + newContactId + " WHERE " + ID + " = " + oldContactId;
+
+       getWritableDatabase().execSQL(query);
     }
 
     public ContactCursor queryContacts(){
@@ -426,10 +454,37 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     //TODO something should be returned from the query outcome
     public void cleanUpDuplicateContacts(){
 
+        String targetContacts = " CREATE TEMP TABLE TargetContact AS SELECT " + PHONE_NUMBER + " FROM " + BLOCKED_LIST_TABLE + "  GROUP BY " + PHONE_NUMBER + " HAVING COUNT(*) > 1";
+
+        String sumQuery = " CREATE TEMP TABLE BlockedCount AS " +
+                            " SELECT A." + ID + " ContactId, B.* FROM " + BLOCKED_LIST_TABLE + " A " +
+                            " LEFT JOIN ( SELECT SUM(" + NO_OF_TIMES_OUTGOING_BLOCKED + " ) OutgoingCount, SUM(" + NO_OF_TIMES_INCOMING_BLOCKED + ") IncomingCount, "
+                            + PHONE_NUMBER + " PhoneNumber FROM " + BLOCKED_LIST_TABLE +
+                            " GROUP BY " + PHONE_NUMBER + ") B " + " ON B." + PHONE_NUMBER + " = " + " A." + PHONE_NUMBER ;
+
+        getWritableDatabase().execSQL( targetContacts);
+        getWritableDatabase().execSQL( sumQuery);
+
+        String updateCountQuery = " REPLACE INTO " + BLOCKED_LIST_TABLE + " (" + ID + " ," + NAME + ", " + PHONE_NUMBER + ", " +
+                DISPLAY_NUMBER + ", " + OUTGOING_CALL_BLOCKED + ", " + INCOMING_CALL_BLOCKED + ", " + IS_NUMBER_STANDARDIZED +
+                ", " + NO_OF_TIMES_OUTGOING_BLOCKED + ", " + NO_OF_TIMES_INCOMING_BLOCKED + ") " +
+                " SELECT C." + ID + ", C." + NAME + ", C." + PHONE_NUMBER + ", C." + DISPLAY_NUMBER + ", C." + OUTGOING_CALL_BLOCKED +
+                ", C." + INCOMING_CALL_BLOCKED + ", C." + IS_NUMBER_STANDARDIZED + ", BlockedCount.OutgoingCount, BlockedCount.IncomingCount FROM BlockedCount " +
+                " INNER JOIN " + BLOCKED_LIST_TABLE + " C ON C." + ID + " = BlockedCount.ContactId " +
+                " INNER JOIN TargetContact TC ON TC." + PHONE_NUMBER + " = C." + PHONE_NUMBER;
+
+        getWritableDatabase().execSQL(updateCountQuery );
+
+        //TODO optimize the sub query . It is not a good idea to use subquery on where clause
         String query = "DELETE FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " NOT IN (" +
-                "SELECT MIN(" + ID + ") FROM " + BLOCKED_LIST_TABLE + " WHERE " + PHONE_NUMBER + " IN (SELECT " + PHONE_NUMBER + " FROM " + BLOCKED_LIST_TABLE + "  GROUP BY " + PHONE_NUMBER + " HAVING COUNT(*) > 1 )" +
-                " ) ";
+                "SELECT MIN(" + ID + ") FROM " + BLOCKED_LIST_TABLE + " WHERE " + PHONE_NUMBER + " IN (SELECT " + PHONE_NUMBER + " FROM TargetContact))";
 
         getWritableDatabase().execSQL(query);
+
+        String dropBlockedCountTempTableQuery = " DROP TABLE BlockedCount ";
+        String dropTargetContactTempTableQuery = " DROP TABLE TargetContact ";
+
+        getWritableDatabase().execSQL(dropBlockedCountTempTableQuery);
+        getWritableDatabase().execSQL(dropTargetContactTempTableQuery);
     }
 }
