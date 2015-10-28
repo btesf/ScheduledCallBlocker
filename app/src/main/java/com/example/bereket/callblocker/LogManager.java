@@ -33,12 +33,12 @@ public class LogManager {
         return mDatabaseHelper.queryAllLogs();
     }
 
-    public DataBaseHelper.LogCursor querySingleContactLog(String contactId){
+    public DataBaseHelper.LogCursor querySingleContactLog(long contactId){
 
         return mDatabaseHelper.querySingleContactLog(contactId);
     }
 
-    public boolean insertLog(String contactId, int blockType){
+    public boolean insertLog(long contactId, int blockType){
 
         return mDatabaseHelper.insertLog(contactId, blockType);
     }

@@ -9,7 +9,7 @@ import java.util.Date;
 public class Schedule implements Serializable{
 
     private int mId;
-    private String mContactId;
+    private long mContactId;
     private int mWeekDay;
     private Date mStartTime;
     private Date mEndTime;
@@ -24,11 +24,11 @@ public class Schedule implements Serializable{
         this.mId = mId;
     }
 
-    public String getContactId() {
+    public long getContactId() {
         return mContactId;
     }
 
-    public void setContactId(String mContactId) {
+    public void setContactId(long mContactId) {
         this.mContactId = mContactId;
     }
 

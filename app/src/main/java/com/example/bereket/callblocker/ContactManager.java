@@ -70,7 +70,7 @@ public class ContactManager {
         newContact.setOutGoingBlockedState(oldContact.getOutGoingBlockedState());
     }
 
-    public void insertNewOrUpdateExistingContact(String contactId, String displayNumber, String contactName){
+    public void insertNewOrUpdateExistingContact(Long contactId, String displayNumber, String contactName){
         /* check if number exists in contact. If exists then check if the two numbers are inserted differently (i.e one manually, the other from contact).
           That can be identified by comparing the two ids. Both ids will be the same if inserted from contact. If so just call the insertContact... method and
           it will update any newly modified contact details without changing contact id.
@@ -121,17 +121,14 @@ public class ContactManager {
 
                 copyContactDetails(oldContact, newContact); //from old to new
                 //if both ids are similar the new contact must have come from phone's contact. - otherwise current timestamp would be returned and the ids will differ
-                if(oldContact.getId().equals(newContact.getId())){
+                if(oldContact.getId() == newContact.getId()){
 
                     updateContact(newContact);
                 }
                 else{
-
-                    long oldContactId = Long.valueOf(oldContact.getId().toString());
-                    long newContactId = Long.valueOf(newContact.getId().toString());
                     //if the latest id is timestamp, check if there is an older contact (by comparing ids) and update the contact if the older contact id is greater than the new one
                     //i.e - if the new contact comes from contact list, it will be less than the new one - we want to update this time.
-                    if(oldContactId > newContactId){
+                    if(oldContact.getId() > newContact.getId()){
                         //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                         mDataHelper.updateContactId(oldContact.getId(), newContact.getId());
                         updateContact(newContact);
@@ -180,7 +177,7 @@ public class ContactManager {
         return countryCodeValue;
     }
 
-    public Map<Integer,Schedule> queryContactSchedule(String contactId, int blockType){
+    public Map<Integer,Schedule> queryContactSchedule(long contactId, int blockType){
 
         return mDataHelper.queryContactSchedule(contactId, blockType);
     }

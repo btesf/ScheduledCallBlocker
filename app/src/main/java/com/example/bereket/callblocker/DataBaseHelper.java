@@ -93,7 +93,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         //holds blocked contacts records
         String createBlockedListTable = " CREATE TABLE " +  BLOCKED_LIST_TABLE + " (" +
-                ID + " char(12) primary key, " +
+                ID + " integer primary key, " +
                 NAME + " varchar(100), " +
                 PHONE_NUMBER + " char(20), " +
                 DISPLAY_NUMBER + " char(20), " +
@@ -109,7 +109,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         //scheduled block table
         String createBlockScheduleTable = " CREATE TABLE " + BLOCK_SCHEDULE_TABLE + " (" +
                 BLOCK_SCHEDULE_ID + " integer primary key autoincrement, " +
-                BLOCK_SCHEDULE_CONTACT_ID + " char(10), " +
+                BLOCK_SCHEDULE_CONTACT_ID + " integer, " +
                 BLOCK_SCHEDULE_WEEK_DAY + " tinyint, " +
                 BLOCK_SCHEDULE_BLOCK_TYPE + " tinyint, " +
                 BLOCK_SCHEDULE_FROM + " long, " +
@@ -121,7 +121,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         //call log table
         String createCallLogTable = " CREATE TABLE " +  CALL_LOG_TABLE + " ( " +
                 CALL_LOG_ID + " integer primary key autoincrement, " +
-                CALL_LOG_CONTACT_ID + " char(10), " +
+                CALL_LOG_CONTACT_ID + " integer, " +
                 CALL_LOG_BLOCK_TYPE + " tinyint, " +
                 CALL_LOG_TIME + " datetime," +
                 " FOREIGN KEY (" + CALL_LOG_CONTACT_ID + ") REFERENCES " + BLOCKED_LIST_TABLE + "(" + ID + ") ON DELETE CASCADE ON UPDATE CASCADE, "  +
@@ -227,7 +227,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteContact(Contact contact){
 
-        int returnValue = getWritableDatabase().delete(BLOCKED_LIST_TABLE, ID + " = ? ", new String[]{contact.getId()});
+        int returnValue = getWritableDatabase().delete(BLOCKED_LIST_TABLE, ID + " = ? ", new String[]{String.valueOf(contact.getId())});
 
         return returnValue > 0 ? true : false;
     }
@@ -244,12 +244,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());
 
-        int rows = getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{contact.getId()});
+        int rows = getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{String.valueOf(contact.getId())});
 
         return rows < 1 ? false : true;
     }
 
-    public void updateContactId(String oldContactId, String newContactId){
+    public void updateContactId(long oldContactId, long newContactId){
 
        String query = "UPDATE " + BLOCKED_LIST_TABLE + " SET " + ID + " = " + newContactId + " WHERE " + ID + " = " + oldContactId;
 
@@ -273,7 +273,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             Contact contact = new Contact();
 
-            String contactId = getString(getColumnIndex(ID));
+            long contactId = getLong(getColumnIndex(ID));
             String phoneNumber = getString(getColumnIndex(PHONE_NUMBER));
             String displayNumber = getString(getColumnIndex(DISPLAY_NUMBER));
             String contactName = getString(getColumnIndex(NAME));
@@ -304,14 +304,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return new LogCursor(wrapped);
     }
 
-    public LogCursor querySingleContactLog(String contactId){
+    public LogCursor querySingleContactLog(long contactId){
 
         Cursor wrapped = getReadableDatabase().rawQuery("SELECT A.*, B." + NAME + " AS ContactName, B." + DISPLAY_NUMBER + " AS ContactNumber FROM " + CALL_LOG_TABLE +
-                " A, " + BLOCKED_LIST_TABLE + " B WHERE A." + CALL_LOG_CONTACT_ID + " = ? ORDER BY " + CALL_LOG_TIME + " DESC ", new String[]{contactId}); //   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
+                " A, " + BLOCKED_LIST_TABLE + " B WHERE A." + CALL_LOG_CONTACT_ID + " = ? ORDER BY " + CALL_LOG_TIME + " DESC ", new String[]{String.valueOf(contactId)}); //   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
         return new LogCursor(wrapped);
     }
 
-    public boolean insertLog(String contactId, int blockType){
+    public boolean insertLog(long contactId, int blockType){
 
         ContentValues cv = new ContentValues();
         cv.put(CALL_LOG_CONTACT_ID, contactId);
@@ -361,7 +361,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     //schedule
-    public boolean insertSchedule(String contactId, Date startTime, Date endTime, int blockType, int weekDay){
+    public boolean insertSchedule(long contactId, Date startTime, Date endTime, int blockType, int weekDay){
 
         ContentValues cv = new ContentValues();
         cv.put(BLOCK_SCHEDULE_CONTACT_ID, contactId);
@@ -394,14 +394,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean deleteAllSchedulesForContact(String contactId, Integer blockType){
+    public boolean deleteAllSchedulesForContact(long contactId, Integer blockType){
 
-        return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{contactId, String.valueOf(blockType)}) != 0 ? true : false;
+        return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{String.valueOf(contactId), String.valueOf(blockType)}) != 0 ? true : false;
     }
 
-    public Map<Integer,Schedule> queryContactSchedule(String contactId, int blockType){
+    public Map<Integer,Schedule> queryContactSchedule(long contactId, int blockType){
 
-        Cursor cursor = getReadableDatabase().query(BLOCK_SCHEDULE_TABLE, null, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{contactId, String.valueOf(blockType)}, null, null, BLOCK_SCHEDULE_WEEK_DAY  + " asc");
+        Cursor cursor = getReadableDatabase().query(BLOCK_SCHEDULE_TABLE, null, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{String.valueOf(contactId), String.valueOf(blockType)}, null, null, BLOCK_SCHEDULE_WEEK_DAY  + " asc");
 
         Map<Integer,Schedule> scheduleMap = new HashMap<>();
         Schedule schedule;
@@ -429,12 +429,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return scheduleMap;
     }
 
-    public boolean timeExistsInSchedule(String contactId, int blockType, int weekDay, long time){
+    public boolean timeExistsInSchedule(long contactId, int blockType, int weekDay, long time){
 
         String query = "SELECT * FROM " + BLOCK_SCHEDULE_TABLE + " WHERE " + BLOCK_SCHEDULE_CONTACT_ID + " = ? AND " + BLOCK_SCHEDULE_BLOCK_TYPE +
                 " = ? AND " + BLOCK_SCHEDULE_WEEK_DAY + " = ? AND " + BLOCK_SCHEDULE_FROM + " <= ?  AND " + BLOCK_SCHEDULE_TO + " >= ?";
 
-        Cursor cursor = getReadableDatabase().rawQuery(query, new String[]{contactId, String.valueOf(blockType), String.valueOf(weekDay), String.valueOf(time), String.valueOf(time)});
+        Cursor cursor = getReadableDatabase().rawQuery(query, new String[]{String.valueOf(contactId), String.valueOf(blockType), String.valueOf(weekDay), String.valueOf(time), String.valueOf(time)});
 
         if(cursor != null && cursor.getCount() > 0)
             return true;
@@ -464,6 +464,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 " INNER JOIN TargetContact TC ON TC." + PHONE_NUMBER + " = C." + PHONE_NUMBER;
 
         getWritableDatabase().execSQL(updateCountQuery );
+
+        //TODO: referring tables are not updated - instead when records in blockedList are deleted, data in these tables are deleted cascadingly
 
         //TODO optimize the sub query . It is not a good idea to use subquery on where clause
         String query = "DELETE FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " NOT IN (" +

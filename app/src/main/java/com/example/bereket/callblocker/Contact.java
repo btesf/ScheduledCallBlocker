@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class Contact implements Serializable {
 
-    private String mId;
+    private long mId;
     private String mPhoneNumber;
     private String mDisplayNumber;
     private String mContactName;
@@ -17,11 +17,11 @@ public class Contact implements Serializable {
     private int mIncomingBlockedCount;
     private int mOutgoingBlockedCount;
 
-    public String getId(){
+    public long getId(){
         return mId;
     }
 
-    public void setId(String id){
+    public void setId(long id){
         mId = id;
     }
 

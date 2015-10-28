@@ -42,7 +42,7 @@ public class ScheduleManager {
         return mDataHelper.deleteSchedule(schedule);
     }
 
-    public boolean deleteAllSchedulesForContact(String contactId, Integer blockType){
+    public boolean deleteAllSchedulesForContact(long contactId, Integer blockType){
 
         return mDataHelper.deleteAllSchedulesForContact(contactId, blockType);
     }
@@ -58,7 +58,7 @@ public class ScheduleManager {
         return mDataHelper.updateSchedule(schedule);
     }
 
-    public boolean timeExistsInSchedule(String contactId, int blockType, int weekDay,Date currentTime){
+    public boolean timeExistsInSchedule(long contactId, int blockType, int weekDay,Date currentTime){
 
         return mDataHelper.timeExistsInSchedule(contactId, blockType, weekDay, currentTime.getTime());
     }

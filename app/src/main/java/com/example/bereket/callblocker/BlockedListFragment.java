@@ -311,7 +311,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             //go to the first row
             c.moveToFirst();
 
-            String id = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+            long id = c.getLong(c.getColumnIndex(ContactsContract.Contacts._ID));
             String contactName = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             String phoneNumber = null;
 
@@ -320,7 +320,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                     ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                     null,
                     ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                    new String[]{id}, null);
+                    new String[]{String.valueOf(id)}, null);
 
                 pCur.moveToFirst();
 
@@ -356,7 +356,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 //do something about it
                 String phoneNumber = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
 
-                mContactManager.insertNewOrUpdateExistingContact(String.valueOf((new Date()).getTime()),  phoneNumber, null);
+                mContactManager.insertNewOrUpdateExistingContact((new Date()).getTime(),  phoneNumber, null);
             }
         }
     }
