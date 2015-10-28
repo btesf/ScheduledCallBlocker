@@ -354,10 +354,9 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
 
             if(data != null){
                 //do something about it
-                String str = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
-                //TODO get proper id here /standardized
-                mContactManager.insertContact(String.valueOf((new Date()).getTime()), str, null);
-                //((ContactListAdaptor)getListAdapter()).notifyDataSetChanged();
+                String phoneNumber = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
+
+                mContactManager.insertNewOrUpdateExistingContact(String.valueOf((new Date()).getTime()),  phoneNumber, null);
             }
         }
     }

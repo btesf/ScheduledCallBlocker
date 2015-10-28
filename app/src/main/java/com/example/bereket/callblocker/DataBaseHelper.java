@@ -148,27 +148,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         //upgrade database goes here
     }
 
-    /*
-     * <writable_database>.insert(..., <content_value>) is not used in favor of INSERT OR REPLACE statement
-     * to avoid multiple queries to verify uniqueness of contact ID but updating some columns
+    /**
+     * the method below is overrided for the sake of enforcing foreign key support in sqlite. By default foreign keys are set to off in sqlite
+     * I want to enable foreign key support everytime a DB is opened
      */
-    public void insertContact(String contactId, String phoneNumber,  String displayNumber, String contactName, Boolean isNumberStandardized){
-
-        if(phoneNumber == null || phoneNumber.isEmpty()) return;
-
-        String query = "INSERT OR REPLACE INTO " + BLOCKED_LIST_TABLE  + " (" +
-                        ID + ", " + PHONE_NUMBER + ", " + DISPLAY_NUMBER + ", " + NAME + ", " +
-                        OUTGOING_CALL_BLOCKED + ", " + INCOMING_CALL_BLOCKED + ", " + IS_NUMBER_STANDARDIZED + ", " +
-                        NO_OF_TIMES_OUTGOING_BLOCKED + ", " + NO_OF_TIMES_INCOMING_BLOCKED + ") " +
-                        "VALUES ('" + contactId + "', '" + phoneNumber + "', '" + displayNumber + "', '" +
-                        ((contactName == null || contactName.isEmpty()) ? NO_NAME_CONTACT : contactName) + "', '" +
-                        isNumberStandardized + "', " +
-                        "COALESCE((SELECT " + INCOMING_CALL_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default not blocked
-                        "COALESCE((SELECT " + INCOMING_CALL_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default not blocked
-                        "COALESCE((SELECT " + NO_OF_TIMES_OUTGOING_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0), " + //default to zero
-                        "COALESCE((SELECT " + NO_OF_TIMES_INCOMING_BLOCKED + " FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " = " + contactId + "), 0))"; //default to zero
-
-        getWritableDatabase().execSQL(query);
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.execSQL("PRAGMA foreign_keys=ON;");
+        }
     }
 
     /*
@@ -221,7 +211,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
 
         cv.put(ID, contact.getId());
-        cv.put(NAME, contact.getContactName());// = "name";
+        cv.put(NAME, contact.getContactName() == null ? NO_NAME_CONTACT : contact.getContactName());// = "name";
         cv.put(PHONE_NUMBER, contact.getPhoneNumber());// = "PhoneNumber";
         cv.put(DISPLAY_NUMBER, contact.getDisplayNumber());// = "DisplayNumber";
         cv.put(OUTGOING_CALL_BLOCKED, contact.getOutGoingBlockedState());// = "OutgoingCall";

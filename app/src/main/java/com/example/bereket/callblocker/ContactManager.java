@@ -21,6 +21,7 @@ public class ContactManager {
 
     public static String NON_STANDARDIZED_NUMBER_EXIST = "non.standard.number.exists";
     private static ContactManager mContactManager = null;
+    private static String NO_NAME_CONTACT = "No name";
 
     private ContactManager(Context context){
 
@@ -46,28 +47,6 @@ public class ContactManager {
     public void insertContact(Contact contact){
 
         mDataHelper.insertContact(contact);
-    }
-
-    public void insertContact(String contactId, String displayNumber, String contactName){
-
-        String countryCodeValue = null;
-        //to make sure if a number is standardized (into E-164 format) before it is stored. Otherwise a system preference will be set so that a standardizing service would run
-        boolean isNumberStandardized = false;
-
-        countryCodeValue = getCountryCodeFromNetwork();
-        //standardize phone number
-        String phoneNumber = standardizePhoneNumber(displayNumber, countryCodeValue);
-
-        if(countryCodeValue != null && !countryCodeValue.isEmpty()){ // if network is available (in service area)
-
-            isNumberStandardized = true;
-        }
-        else{
-            //set system preference and that will fire a standardizing service to run when any telephone event is triggered
-            setNonStandardizedPreference(true);
-        }
-
-        mDataHelper.insertContact(contactId, phoneNumber, displayNumber, contactName, isNumberStandardized);
     }
 
     public Contact getEmptyContact(){
@@ -121,6 +100,7 @@ public class ContactManager {
 
         newContact.setId(contactId);
         newContact.setDisplayNumber(displayNumber);
+        newContact.setPhoneNumber(phoneNumber);
         newContact.setContactName(contactName);
         newContact.setIsNumberStandardized(isNumberStandardized);
 
@@ -140,13 +120,23 @@ public class ContactManager {
             else{
 
                 copyContactDetails(oldContact, newContact); //from old to new
-                //if old contact exists and id is the same, just update the contact details (in case some of them are changed later)
-                if(!oldContact.getId().equals(newContact.getId())){
-                    //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
-                    mDataHelper.updateContactId(oldContact.getId(), newContact.getId());
-                }
+                //if both ids are similar the new contact must have come from phone's contact. - otherwise current timestamp would be returned and the ids will differ
+                if(oldContact.getId().equals(newContact.getId())){
 
-                updateContact(newContact);
+                    updateContact(newContact);
+                }
+                else{
+
+                    long oldContactId = Long.valueOf(oldContact.getId().toString());
+                    long newContactId = Long.valueOf(newContact.getId().toString());
+                    //if the latest id is timestamp, check if there is an older contact (by comparing ids) and update the contact if the older contact id is greater than the new one
+                    //i.e - if the new contact comes from contact list, it will be less than the new one - we want to update this time.
+                    if(oldContactId > newContactId){
+                        //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
+                        mDataHelper.updateContactId(oldContact.getId(), newContact.getId());
+                        updateContact(newContact);
+                    }
+                }
             }
         }
     }
