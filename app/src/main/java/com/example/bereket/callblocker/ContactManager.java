@@ -3,11 +3,14 @@ package com.example.bereket.callblocker;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
+import android.widget.Toast;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -20,8 +23,10 @@ public class ContactManager {
     private Context mContext;
 
     public static String NON_STANDARDIZED_NUMBER_EXIST = "non.standard.number.exists";
+    public static String COUNTRY_CODE_PREFERENCE = "country.code.preference.value";
     private static ContactManager mContactManager = null;
     private static String NO_NAME_CONTACT = "No name";
+    private static String TEMPORARY_COUNTRY_CODE_VALUE = "US";
 
     private ContactManager(Context context){
 
@@ -106,8 +111,62 @@ public class ContactManager {
 
         //if country code cannot be decided just insert the number
         if(isNumberStandardized == false){
+            // try to find out if there are any duplicate numbers - try to prevent from inserting any duplicate numbers
+            //mDataHelper.insertContact(newContact);
+            List<Contact> temporarilyStandardizedNumbers;
+            //if country code preference is set try to standardize the number using it
+            if(isCountryCodePreferenceSet()){
 
-            mDataHelper.insertContact(newContact);
+                String countryCodePreferenceValue = getCountryCodePreference();
+
+                newContact.setPhoneNumber(standardizePhoneNumber(displayNumber, countryCodePreferenceValue));
+                newContact.setIsNumberStandardized(true);
+                //get a list of temporarily standardized number (check if there are any un-standardized number in the list and standardize them  before comparing the phoneNumber against the list)
+                temporarilyStandardizedNumbers = getTemporarilyStandardizedContactPhones(countryCodePreferenceValue);
+
+                Contact contact = numberExistsInTemporaryList(newContact.getPhoneNumber(), temporarilyStandardizedNumbers);
+
+                if(contact != null){
+                    //if the newContact Id is less than or equal to the existing one, this means the new contact comes from the phone contact
+                    if(newContact.getId() <= contact.getId()){
+                        copyContactDetails(contact, newContact);
+                        //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
+                        mDataHelper.updateContactId(contact.getId(), newContact.getId());
+                        updateContact(newContact);
+                        //TODO remove the line below - it is temporary
+                        Toast.makeText(mContext, "New number is replaced by new one", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
+                        Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else{
+                    //TODO: better to set number standardized preference to true and update existing contact (if current contact id is less than the existing
+                    mDataHelper.insertContact(newContact);
+                }
+                //we used the preference value, thus no need to set global nonStandardPreference indicator setting/value to true
+                setNonStandardizedPreference(false);
+            }
+            else{
+
+                String tempCountryCodeValue = TEMPORARY_COUNTRY_CODE_VALUE;
+
+                phoneNumber = standardizePhoneNumber(displayNumber, tempCountryCodeValue);
+                //get a list of temporarily standardized numbers (if there will be any un-standardized numbers, standardize them using the temporary country code value first)
+                temporarilyStandardizedNumbers = getTemporarilyStandardizedContactPhones(tempCountryCodeValue);
+
+                Contact contact = numberExistsInTemporaryList(phoneNumber, temporarilyStandardizedNumbers);
+
+                if(contact != null){
+                    //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
+                    Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                }
+                else{
+
+                    mDataHelper.insertContact(newContact);
+                }
+            }
         }
         else{
 
@@ -173,6 +232,10 @@ public class ContactManager {
             //get it from preference
             //TODO get it from preference setting
         }
+        else{
+            //save country code value in preference for later use
+            setCountryCodePreference(countryCodeValue);
+        }
 
         return countryCodeValue;
     }
@@ -223,6 +286,52 @@ public class ContactManager {
         return formattedPhoneNumber;
     }
 
+    private List<Contact> getTemporarilyStandardizedContactPhones(String countryCode){
+
+        List<Contact> contacts = new ArrayList<Contact>();
+
+        DataBaseHelper.ContactCursor contactCursor = mDataHelper.queryContacts();
+
+        if(contactCursor != null){
+
+            while (contactCursor.moveToNext()){
+
+                Contact contact = contactCursor.getContact();
+
+                if(!contact.isIsNumberStandardized()){
+
+                    contact.setPhoneNumber(standardizePhoneNumber(contact.getPhoneNumber(), countryCode));
+                    contact.setIsNumberStandardized(true);
+                }
+
+                contacts.add(contact);
+            }
+
+            contactCursor.close();
+        }
+
+        return contacts;
+    }
+
+    private Contact numberExistsInTemporaryList(String phoneNumber, List<Contact> temporaryContactList){
+
+        Contact contact = null;
+
+        if(temporaryContactList.size() > 0){
+
+           for(Contact c : temporaryContactList){
+
+               if(c.getPhoneNumber().equals(phoneNumber)){
+
+                   contact = c;
+                   break;
+               }
+           }
+        }
+
+        return contact;
+    }
+
     public boolean nonStandardizedPreferenceEnabled(){
 
         return  PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(NON_STANDARDIZED_NUMBER_EXIST, false);
@@ -238,5 +347,22 @@ public class ContactManager {
         final String numberFormatRegEx = "[+]?[0-9]{6,15}";
 
         return number.matches(numberFormatRegEx);
+    }
+
+    private void setCountryCodePreference(String countryCodePreference){
+
+        PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).edit().putString(COUNTRY_CODE_PREFERENCE, countryCodePreference).commit();
+    }
+
+    private String getCountryCodePreference(){
+
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getString(COUNTRY_CODE_PREFERENCE, null);
+    }
+
+    private boolean isCountryCodePreferenceSet(){
+
+        String countryCodeValue = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getString(COUNTRY_CODE_PREFERENCE, null);
+
+        return  (countryCodeValue == null || countryCodeValue.isEmpty()) ? true : false;
     }
 }

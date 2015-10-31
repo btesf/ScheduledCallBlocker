@@ -445,38 +445,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void cleanUpDuplicateContacts(){
 
         String targetContacts = " CREATE TEMP TABLE TargetContact AS SELECT " + PHONE_NUMBER + " FROM " + BLOCKED_LIST_TABLE + "  GROUP BY " + PHONE_NUMBER + " HAVING COUNT(*) > 1";
-
-        String sumQuery = " CREATE TEMP TABLE BlockedCount AS " +
-                            " SELECT A." + ID + " ContactId, B.* FROM " + BLOCKED_LIST_TABLE + " A " +
-                            " LEFT JOIN ( SELECT SUM(" + NO_OF_TIMES_OUTGOING_BLOCKED + " ) OutgoingCount, SUM(" + NO_OF_TIMES_INCOMING_BLOCKED + ") IncomingCount, "
-                            + PHONE_NUMBER + " PhoneNumber FROM " + BLOCKED_LIST_TABLE +
-                            " GROUP BY " + PHONE_NUMBER + ") B " + " ON B." + PHONE_NUMBER + " = " + " A." + PHONE_NUMBER ;
-
-        getWritableDatabase().execSQL( targetContacts);
-        getWritableDatabase().execSQL( sumQuery);
-
-        String updateCountQuery = " REPLACE INTO " + BLOCKED_LIST_TABLE + " (" + ID + " ," + NAME + ", " + PHONE_NUMBER + ", " +
-                DISPLAY_NUMBER + ", " + OUTGOING_CALL_BLOCKED + ", " + INCOMING_CALL_BLOCKED + ", " + IS_NUMBER_STANDARDIZED +
-                ", " + NO_OF_TIMES_OUTGOING_BLOCKED + ", " + NO_OF_TIMES_INCOMING_BLOCKED + ") " +
-                " SELECT C." + ID + ", C." + NAME + ", C." + PHONE_NUMBER + ", C." + DISPLAY_NUMBER + ", C." + OUTGOING_CALL_BLOCKED +
-                ", C." + INCOMING_CALL_BLOCKED + ", C." + IS_NUMBER_STANDARDIZED + ", BlockedCount.OutgoingCount, BlockedCount.IncomingCount FROM BlockedCount " +
-                " INNER JOIN " + BLOCKED_LIST_TABLE + " C ON C." + ID + " = BlockedCount.ContactId " +
-                " INNER JOIN TargetContact TC ON TC." + PHONE_NUMBER + " = C." + PHONE_NUMBER;
-
-        getWritableDatabase().execSQL(updateCountQuery );
-
-        //TODO: referring tables are not updated - instead when records in blockedList are deleted, data in these tables are deleted cascadingly
-
-        //TODO optimize the sub query . It is not a good idea to use subquery on where clause
+        String dropTargetContactTempTableQuery = " DROP TABLE TargetContact ";
+        //TODO optimize the sub query . It is not a good idea to use sub-query on where clause
         String query = "DELETE FROM " + BLOCKED_LIST_TABLE + " WHERE " + ID + " NOT IN (" +
                 "SELECT MIN(" + ID + ") FROM " + BLOCKED_LIST_TABLE + " WHERE " + PHONE_NUMBER + " IN (SELECT " + PHONE_NUMBER + " FROM TargetContact))";
 
+        getWritableDatabase().execSQL( targetContacts);
         getWritableDatabase().execSQL(query);
-
-        String dropBlockedCountTempTableQuery = " DROP TABLE BlockedCount ";
-        String dropTargetContactTempTableQuery = " DROP TABLE TargetContact ";
-
-        getWritableDatabase().execSQL(dropBlockedCountTempTableQuery);
         getWritableDatabase().execSQL(dropTargetContactTempTableQuery);
     }
 }
