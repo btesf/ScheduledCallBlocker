@@ -88,13 +88,10 @@ public class ContactManager {
         boolean isNumberStandardized = false;
 
         countryCodeValue = getCountryCodeFromNetwork();
-        //standardize phone number
-        String phoneNumber = standardizePhoneNumber(displayNumber, countryCodeValue);
 
         if(countryCodeValue != null && !countryCodeValue.isEmpty()){ // if network is available (in service area)
 
             isNumberStandardized = true;
-            standardizeNonStandardContactPhones(countryCodeValue);
         }
         else{
             //set system preference and that will fire a standardizing service to run when any telephone event is triggered
@@ -106,83 +103,14 @@ public class ContactManager {
 
         newContact.setId(contactId);
         newContact.setDisplayNumber(displayNumber);
-        newContact.setPhoneNumber(phoneNumber);
         newContact.setContactName(contactName);
         newContact.setIsNumberStandardized(isNumberStandardized);
 
         //if country code cannot be decided just insert the number
-        if(isNumberStandardized == false){
-            // try to find out if there are any duplicate numbers - try to prevent from inserting any duplicate numbers
-            //mDataHelper.insertContact(newContact);
-            List<Contact> temporarilyStandardizedNumbers;
-            //if country code preference is set try to standardize the number using it
-            if(isCountryCodePreferenceSet()){
-
-                String countryCodePreferenceValue = getCountryCodePreference();
-
-                newContact.setPhoneNumber(standardizePhoneNumber(displayNumber, countryCodePreferenceValue));
-                newContact.setIsNumberStandardized(true);
-                //get a list of temporarily standardized number (check if there are any un-standardized number in the list and standardize them  before comparing the phoneNumber against the list)
-                temporarilyStandardizedNumbers = getTemporarilyStandardizedContactPhones(countryCodePreferenceValue);
-
-                Contact contact = numberExistsInTemporaryList(newContact.getPhoneNumber(), temporarilyStandardizedNumbers);
-
-                if(contact != null){
-                    //if the newContact Id is less than or equal to the existing one, this means the new contact comes from the phone contact
-                    if(newContact.getId() <= contact.getId()){
-                        copyContactDetails(contact, newContact);
-                        //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
-                        mDataHelper.updateContactId(contact.getId(), newContact.getId());
-                        updateContact(newContact);
-                        //TODO remove the line below - it is temporary
-                        Toast.makeText(mContext, "New number is replaced by new one", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
-                        Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else{
-                    //TODO: better to set number standardized preference to true and update existing contact (if current contact id is less than the existing
-                    mDataHelper.insertContact(newContact);
-                }
-                //we used the preference value, thus no need to set global nonStandardPreference indicator setting/value to true
-                setNonStandardizedPreference(false);
-            }
-            else{
-
-                String tempCountryCodeValue = TEMPORARY_COUNTRY_CODE_VALUE;
-
-                phoneNumber = standardizePhoneNumber(displayNumber, tempCountryCodeValue);
-                //get a list of temporarily standardized numbers (if there will be any un-standardized numbers, standardize them using the temporary country code value first)
-                temporarilyStandardizedNumbers = getTemporarilyStandardizedContactPhones(tempCountryCodeValue);
-
-                Contact contact = numberExistsInTemporaryList(phoneNumber, temporarilyStandardizedNumbers);
-
-                if(contact != null){
-                    //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
-                    //Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
-                    //if the newContact Id is less than or equal to the existing one, this means the new contact comes from the phone contact
-                    if(newContact.getId() <= contact.getId()){
-                        copyContactDetails(contact, newContact);
-                        //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
-                        mDataHelper.updateContactId(contact.getId(), newContact.getId());
-                        updateContact(newContact);
-                        //TODO remove the line below - it is temporary
-                        Toast.makeText(mContext, "New number is replaced by new one", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
-                        Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else{
-
-                    mDataHelper.insertContact(newContact);
-                }
-            }
-        }
-        else{
+        if(isNumberStandardized){
+            //if there are un-standardized number saved before, standardize them now (network available) before checking for duplicates
+            standardizeNonStandardContactPhones(countryCodeValue);
+            newContact.setPhoneNumber(standardizePhoneNumber(displayNumber, countryCodeValue));
 
             Contact oldContact = getContactByPhoneNumber(displayNumber);
 
@@ -197,6 +125,8 @@ public class ContactManager {
                 if(oldContact.getId() == newContact.getId()){
 
                     updateContact(newContact);
+                    //TODO remove the line below - it is temporary
+                    Toast.makeText(mContext, "Contact is updated", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     //if the latest id is timestamp, check if there is an older contact (by comparing ids) and update the contact if the older contact id is greater than the new one
@@ -205,8 +135,58 @@ public class ContactManager {
                         //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                         mDataHelper.updateContactId(oldContact.getId(), newContact.getId());
                         updateContact(newContact);
+                        //TODO remove the line below - it is temporary
+                        Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
+                        Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        }
+        else{
+            // try to find out if there are any duplicate numbers - try to prevent from inserting any duplicate numbers
+            //mDataHelper.insertContact(newContact);
+            List<Contact> temporarilyStandardizedNumbers;
+            String countryCode;
+
+            if(isCountryCodePreferenceSet()){
+
+                countryCode = getCountryCodePreference();
+                newContact.setIsNumberStandardized(true);
+                //we used the preference value, thus no need to set global nonStandardPreference indicator setting/value to true
+                setNonStandardizedPreference(false);
+                newContact.setPhoneNumber(standardizePhoneNumber(displayNumber, countryCode));
+            }
+            else{
+
+                countryCode = TEMPORARY_COUNTRY_CODE_VALUE;
+                newContact.setPhoneNumber(displayNumber);
+            }
+            //get a list of temporarily standardized number (check if there are any un-standardized number in the list and standardize them  before comparing the phoneNumber against the list)
+            temporarilyStandardizedNumbers = getTemporarilyStandardizedContactPhones(countryCode);
+            String phoneNumber = standardizePhoneNumber(displayNumber, countryCode);
+            Contact contact = numberExistsInTemporaryList(phoneNumber, temporarilyStandardizedNumbers);
+
+            if(contact != null){
+                //if the newContact Id is less than or equal to the existing one, this means the new contact comes from the phone contact
+                if(newContact.getId() <= contact.getId()){
+                    copyContactDetails(contact, newContact);
+                    //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
+                    mDataHelper.updateContactId(contact.getId(), newContact.getId());
+                    updateContact(newContact);
+                    //TODO remove the line below - it is temporary
+                    Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
+                    Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else{
+                //TODO: better to set number standardized preference to true and update existing contact (if current contact id is less than the existing
+                mDataHelper.insertContact(newContact);
             }
         }
     }
