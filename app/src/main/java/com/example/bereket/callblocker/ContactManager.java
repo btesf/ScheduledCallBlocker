@@ -94,6 +94,7 @@ public class ContactManager {
         if(countryCodeValue != null && !countryCodeValue.isEmpty()){ // if network is available (in service area)
 
             isNumberStandardized = true;
+            standardizeNonStandardContactPhones(countryCodeValue);
         }
         else{
             //set system preference and that will fire a standardizing service to run when any telephone event is triggered
@@ -160,7 +161,20 @@ public class ContactManager {
 
                 if(contact != null){
                     //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
-                    Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                    //if the newContact Id is less than or equal to the existing one, this means the new contact comes from the phone contact
+                    if(newContact.getId() <= contact.getId()){
+                        copyContactDetails(contact, newContact);
+                        //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
+                        mDataHelper.updateContactId(contact.getId(), newContact.getId());
+                        updateContact(newContact);
+                        //TODO remove the line below - it is temporary
+                        Toast.makeText(mContext, "New number is replaced by new one", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
+                        Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else{
 
@@ -272,7 +286,7 @@ public class ContactManager {
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         //if country code is not null, standardize the number into E164 format
-        if(countryCode != null){
+        if(countryCode != null && !countryCode.isEmpty()){
 
             try {
                 Phonenumber.PhoneNumber numberProto = phoneUtil.parse(formattedPhoneNumber, countryCode.toUpperCase());
@@ -363,6 +377,6 @@ public class ContactManager {
 
         String countryCodeValue = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getString(COUNTRY_CODE_PREFERENCE, null);
 
-        return  (countryCodeValue == null || countryCodeValue.isEmpty()) ? true : false;
+        return  (countryCodeValue == null || countryCodeValue.isEmpty()) ? false : true;
     }
 }
