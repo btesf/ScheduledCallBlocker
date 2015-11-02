@@ -19,19 +19,29 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
 
         TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);
 
-
         switch(tm.getSimState()){
 
             case TelephonyManager.SIM_STATE_READY:
-                    Log.d("bere.bere.bere", "SIM CARD IS READY..........");
+
+                ContactManager contactManager = null;
+
+                try {
+                    contactManager = ContactManager.getInstance(context);
+                    String countryCodeValue = contactManager.getCountryCodeFromNetwork();
+//TODO: you should call a service from here - because on Receive won't run for more than few seconds - if not milliseconds. This is not an appropriate place to do such DB intensive work
+                    contactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                }
+                catch(Exception e){
+                    Log.d("bere.bere.bere", e.getMessage());
+                }
+
+                if(contactManager != null){
+                    //if all numbers are standardized, set the preference to false
+                    contactManager.setNonStandardizedPreference(false);
+                }
+
                 break;
             default:
-                Log.d("bere.bere.bere", "Default........unknown state");
         }
-
-        //ComponentName receiver = new ComponentName(context, "com.example.bereket.callblocker.NetworkConnectionReceiver.class");
-
-        //PackageManager pm = context.getPackageManager();
-        //pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
 }
