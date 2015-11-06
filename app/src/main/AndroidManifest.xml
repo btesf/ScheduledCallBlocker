@@ -51,6 +51,10 @@
             android:name=".AddNewPhoneActivity"
             android:label="@string/title_activity_add_new_phone" >
         </activity>
+        <activity
+            android:name=".SettingActivity"
+            android:label="@string/title_activity_preference" >
+        </activity>
     </application>
 
 </manifest>

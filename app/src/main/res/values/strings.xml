@@ -7,6 +7,7 @@
     <string name="phoneNumberIsEmpty">Cannot add contact. Phone number is empty</string>
     <string name="title_activity_single_contact">Manage contact</string>
 
+    <string name="preference_dialog_clear_type_key">ClearType</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="outgoing_call_blocked_string">Block outgoing call</string>
@@ -46,4 +47,48 @@
     <string name="cancel_new_number">Cancel</string>
     <string name="title_activity_add_new_phone">AddNewPhoneActivity</string>
     <string name="wrong_phone_number_format">Invalid phone number format</string>
+    <string name="global_categories">General setting</string>
+    <string name="global_call_block_settings">General call blocker settings</string>
+    <string name="block_all_settings">Block all settings</string>
+    <string name="block_all_settings_summary">Global block setting affecting all numbers</string>
+    <string name="block_all_incoming_string">Block all incoming calls</string>
+    <string name="block_all_outgoing_string">Block all outgoing calls</string>
+    <string name="block_all_incoming_string_summary">Blocks all incoming calls</string>
+    <string name="block_all_outgoing_string_summary">Blocks all outgoing calls</string>
+    <string name="incoming_block_category_title_string">Incoming block settings</string>
+    <string name="incoming_block_category_summary_string">Reset incoming call settings</string>
+    <string name="outgoing_block_category_title_string">Outgoing block settings</string>
+    <string name="outgoing_block_category_summary_string">Reset outgoing call settings</string>
+    <string name="notification_category_title_string">Notification settings</string>
+    <string name="notification_category_summary_string">Enable/disable call block notifications</string>
+    <string name="unblock_all_incoming_block_numbers_title">Un-block all \'always blocked\' numbers</string>
+    <string name="unblock_all_incoming_block_numbers_summary">Un-blocks incoming call blocked numbers</string>
+    <string name="clear_all_incoming_block_schedule_title">Un-block all scheduled block numbers</string>
+    <string name="clear_all_incoming_block_schedule_summary">Un-block all \\\'scheduled blocked\\\' numbers</string>
+
+    <string name="unblock_all_outgoing_block_numbers_title">Un-block all \'always blocked\' numbers</string>
+    <string name="unblock_all_outgoing_block_numbers_summary">Un-blocks outgoing call blocked numbers</string>
+    <string name="clear_all_outgoing_block_schedule_title">Un-block all scheduled block numbers</string>
+    <string name="clear_all_outgoing_block_schedule_summary">Un-block all \\\'scheduled blocked\\\' numbers</string>
+    <string name="title_activity_preference">Call blocker settings</string>
+    <string name="settings_string">Settings</string>
+    <string name="notification_settings_title">Notification settings</string>
+    <string name="notification_settings_summary">Enable/Disable call block notifications</string>
+    <string name="disable_incoming_block_notification">Disable incoming block notification</string>
+    <string name="disable_incoming_block_notification_summary">Disables notification from showing up when incoming call is intercepted</string>
+    <string name="disable_outgoing_block_notification_summary">Disables notification from showing up when outgoing call is intercepted</string>
+    <string name="disable_outgoing_block_notification">Disable outgoing block notification</string>
+    <string name="title_activity_preference_dialog">PreferenceDialogActivity</string>
+    <string name="title_activity_preference_dialog_option">PreferenceDialogOptionActivity</string>
+    <string name="clear_all_incoming">Clear incoming block</string>
+    <string name="clear_all_scheduled_incoming">Clear scheduled incoming block</string>
+    <string name="clear_all_all_time_incoming_blocked_number_question">Unblock all \'always block\' numbers?</string>
+    <string name="clear_all_scheduled_incoming_blocked_number_question">Unblock all scheduled block numbers?</string>
+    <string name="clear_all_outgoing">Clear outgoing block</string>
+    <string name="clear_all_scheduled_outgoing">Clear scheduled outgoing block</string>
+    <string name="clear_all_all_time_outgoing_blocked_number_question">Unblock all \'always block\' numbers?</string>
+    <string name="clear_all_scheduled_outgoing_blocked_number_question">Unblock all scheduled block numbers?</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear">Unblock</string>
+    <string name="clearValue">clearValue</string>
 </resources>

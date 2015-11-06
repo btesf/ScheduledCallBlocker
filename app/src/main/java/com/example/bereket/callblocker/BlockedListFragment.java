@@ -46,6 +46,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
     private static int REQUEST_NEW_CONTACT = 1;
     private static int CONTACTS_LIST_LOADER = 2;
     private static int ADD_CONTACT_MANUALLY = 3;
+    private static int CHANGE_PREFERENCE = 4;
 
     //Activity request codes
     private final Integer SINGLE_CONTACT_ACTIVITY_RESULT = 0;
@@ -219,6 +220,10 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 intent = new Intent(getActivity(), LogActivity.class);
                 startActivityForResult(intent, CONTACTS_LIST_LOADER);
                 return true;
+            case R.id.menu_item_settings:
+                intent = new Intent(getActivity(), SettingActivity.class);
+                startActivityForResult(intent, CHANGE_PREFERENCE);
+            return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

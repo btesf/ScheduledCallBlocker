@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="root_category_screen"
+    android:title="@string/global_categories"
+    android:summary="@string/global_call_block_settings">
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="block_all_settings_category"
+        android:title="@string/block_all_settings"
+        android:summary="@string/block_all_settings_summary">
+
+        <SwitchPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="block_all_incoming_numbers_pref_key"
+            android:title="@string/block_all_incoming_string"
+            android:summary="@string/block_all_incoming_string_summary" />
+
+        <SwitchPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="block_all_outgoing_numbers_pref_key"
+            android:title="@string/block_all_outgoing_string"
+            android:summary="@string/block_all_outgoing_string_summary">
+        </SwitchPreference>
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="incoming_call_settings_category"
+        android:title="@string/incoming_block_category_title_string"
+        android:summary="@string/incoming_block_category_summary_string">
+
+        <com.example.bereket.callblocker.ClearSettingPreference
+            android:title="@string/unblock_all_incoming_block_numbers_title"
+            android:summary="@string/unblock_all_incoming_block_numbers_summary"
+            android:dialogTitle="@string/clear_all_incoming"
+            android:dialogMessage="@string/clear_all_all_time_incoming_blocked_number_question"
+            android:negativeButtonText="@string/cancel"
+            android:positiveButtonText="@string/clear"
+            clearValue="1" />
+
+        <com.example.bereket.callblocker.ClearSettingPreference
+            android:title="@string/clear_all_incoming_block_schedule_title"
+            android:summary="@string/clear_all_incoming_block_schedule_summary"
+            android:dialogTitle="@string/clear_all_scheduled_incoming"
+            android:dialogMessage="@string/clear_all_scheduled_incoming_blocked_number_question"
+            android:negativeButtonText="@string/cancel"
+            android:positiveButtonText="@string/clear"
+            clearValue="2" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="outgoing_call_settings_category"
+        android:title="@string/outgoing_block_category_title_string"
+        android:summary="@string/outgoing_block_category_summary_string">
+
+        <com.example.bereket.callblocker.ClearSettingPreference
+            android:title="@string/unblock_all_outgoing_block_numbers_title"
+            android:summary="@string/unblock_all_outgoing_block_numbers_summary"
+            android:dialogTitle="@string/clear_all_scheduled_outgoing"
+            android:dialogMessage="@string/clear_all_scheduled_outgoing_blocked_number_question"
+            android:negativeButtonText="@string/cancel"
+            android:positiveButtonText="@string/clear"
+            clearValue="3" />
+
+        <com.example.bereket.callblocker.ClearSettingPreference
+            android:title="@string/clear_all_outgoing_block_schedule_title"
+            android:summary="@string/clear_all_outgoing_block_schedule_summary"
+            android:dialogTitle="@string/clear_all_scheduled_outgoing"
+            android:dialogMessage="@string/clear_all_scheduled_outgoing_blocked_number_question"
+            android:negativeButtonText="@string/cancel"
+            android:positiveButtonText="@string/clear"
+            clearValue="4" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="notification_settings_category"
+        android:title="@string/notification_category_title_string"
+        android:summary="@string/notification_category_summary_string">
+
+        <PreferenceScreen
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="notification_preferences_screen"
+            android:title="@string/notification_settings_title"
+            android:summary="@string/notification_settings_summary">
+
+            <CheckBoxPreference
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:key="disable_incoming_block_notification_pref_key"
+                android:title="@string/disable_incoming_block_notification"
+                android:summary="@string/disable_incoming_block_notification_summary">
+            </CheckBoxPreference>
+
+            <CheckBoxPreference
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:key="disable_outgoing_block_notification_pref_key"
+                android:title="@string/disable_outgoing_block_notification"
+                android:summary="@string/disable_outgoing_block_notification_summary">
+            </CheckBoxPreference>
+
+        </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>
