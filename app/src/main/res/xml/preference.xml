@@ -60,7 +60,7 @@
         <com.example.bereket.callblocker.ClearSettingPreference
             android:title="@string/unblock_all_outgoing_block_numbers_title"
             android:summary="@string/unblock_all_outgoing_block_numbers_summary"
-            android:dialogTitle="@string/clear_all_scheduled_outgoing"
+            android:dialogTitle="@string/clear_all_outgoing"
             android:dialogMessage="@string/clear_all_scheduled_outgoing_blocked_number_question"
             android:negativeButtonText="@string/cancel"
             android:positiveButtonText="@string/clear"
