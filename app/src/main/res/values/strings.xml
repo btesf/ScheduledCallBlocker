@@ -91,10 +91,17 @@
     <string name="cancel">Cancel</string>
     <string name="clear">Unblock</string>
     <string name="clearValue">clearValue</string>
-    <string name="confirm_disable_incoming_call_notification">Are you sure you want to disable blocked incoming call notification? You may not know when an incoming call is blocked. </string>
-    <string name="confirm_disable_incoming_call_notification_title">Disable incoming call notification</string>
-    <string name="confirm_disable_outgoing_call_notification">Are you sure you want to disable blocked outgoing call notification? You may not know when an outgoing call is blocked. </string>
-    <string name="confirm_disable_outgoing_call_notification_title">Disable outgoing call notification</string>
+    <string name="confirm_disable_incoming_call_notification">Are you sure? You may not know when an incoming call is blocked. </string>
+    <string name="confirm_disable_incoming_call_notification_title">Disable notification</string>
+    <string name="confirm_disable_outgoing_call_notification">Are you sure? You may not know when an outgoing call is blocked. </string>
+    <string name="confirm_disable_outgoing_call_notification_title">Disable notification</string>
+
+    <string name="confirm_block_all_incoming_calls">Are you sure you want to block all incoming calls?</string>
+    <string name="confirm_block_all_incoming_calls_title">Block all incoming calls</string>
+
+    <string name="confirm_block_all_outgoing_calls">Are you sure you want to block all outgoing calls?</string>
+    <string name="confirm_block_all_outgoing_calls_title">Block all outgoing calls</string>
+
     <string name="yes_text">Yes</string>
     <string name="no_text">No</string>
 </resources>

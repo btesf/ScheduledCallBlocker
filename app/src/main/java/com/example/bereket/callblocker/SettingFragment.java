@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,8 @@ public class SettingFragment extends PreferenceFragment {
         //get the incoming block disable/enable checkbox key
         Preference incomigCallCheckBoxPreference = findPreference("disable_incoming_block_notification_pref_key");
         Preference outgoigCallCheckBoxPreference = findPreference("disable_outgoing_block_notification_pref_key");
+        Preference blockAllIncomingCallSwitchPreference = findPreference("block_all_incoming_numbers_pref_key");
+        Preference blockAllOutgoingCallSwitchPreference = findPreference("block_all_outgoing_numbers_pref_key");
 
      /* preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -38,6 +41,72 @@ public class SettingFragment extends PreferenceFragment {
                 return false;
             }
         });*/
+
+        blockAllIncomingCallSwitchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(final Preference preference, Object o) {
+                //if enable is selected show an confirmation dialog and get confirmation from the user
+                if (((Boolean) o).equals(Boolean.TRUE)) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle(R.string.confirm_block_all_incoming_calls_title);
+                    builder.setMessage(R.string.confirm_block_all_incoming_calls);
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(R.string.yes_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            ((SwitchPreference) preference).setChecked(true);
+                        }
+                    });
+
+                    builder.setNegativeButton(R.string.no_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            ((SwitchPreference) preference).setChecked(false);
+                        }
+                    });
+
+                    builder.show();
+                }
+
+                return true;
+            }
+        });
+
+        blockAllOutgoingCallSwitchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(final Preference preference, Object o) {
+                //if enable is selected show an confirmation dialog and get confirmation from the user
+                if (((Boolean) o).equals(Boolean.TRUE)) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle(R.string.confirm_block_all_outgoing_calls_title);
+                    builder.setMessage(R.string.confirm_block_all_outgoing_calls);
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(R.string.yes_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            ((SwitchPreference) preference).setChecked(true);
+                        }
+                    });
+
+                    builder.setNegativeButton(R.string.no_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            ((SwitchPreference) preference).setChecked(false);
+                        }
+                    });
+
+                    builder.show();
+                }
+
+                return true;
+            }
+        });
 
         incomigCallCheckBoxPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
