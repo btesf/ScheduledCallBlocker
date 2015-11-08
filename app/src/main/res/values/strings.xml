@@ -104,4 +104,10 @@
 
     <string name="yes_text">Yes</string>
     <string name="no_text">No</string>
+
+    <!-- preference keys -->
+    <string name="disable_incoming_block_notification_pref_key">disable_incoming_block_notification_pref_key</string>
+    <string name="disable_outgoing_block_notification_pref_key">disable_outgoing_block_notification_pref_key</string>
+    <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
+    <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
 </resources>

@@ -12,6 +12,7 @@ import android.util.Log;
 public class ClearSettingPreference extends DialogPreference implements DialogInterface {
 
     private Integer clearValue = null;
+    private ContactManager contactManager;
 
     public ClearSettingPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -24,6 +25,8 @@ public class ClearSettingPreference extends DialogPreference implements DialogIn
                 break;
             }
         }
+
+        contactManager = ContactManager.getInstance(getContext());
     }
 
     @Override
@@ -39,15 +42,19 @@ public class ClearSettingPreference extends DialogPreference implements DialogIn
 
                         case 1: //clear all 'always block' incoming
 
+                            contactManager.unblockBlockedNumbersByType(BlockType.INCOMING);
                             break;
                         case 2: //clear all scheduled incoming
 
+                            contactManager.unblockScheduledListByType(BlockType.INCOMING);
                             break;
                         case 3: //clear all 'always block' outgoing
 
+                            contactManager.unblockBlockedNumbersByType(BlockType.OUTGOING);
                             break;
                         case 4: //clear all scheduled outgoing
 
+                            contactManager.unblockScheduledListByType(BlockType.OUTGOING);
                             break;
                         default:
                     }

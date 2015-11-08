@@ -262,6 +262,53 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return new ContactCursor(wrapped);
     }
 
+    public void unblockListByType(Integer blockType){
+
+        ContentValues values = new ContentValues();
+
+        switch(blockType){
+
+            case BlockType.INCOMING:
+
+                values.put(INCOMING_CALL_BLOCKED, BlockState.DONT_BLOCK);
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, INCOMING_CALL_BLOCKED + " <> ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK)})  ;
+                break;
+            case BlockType.OUTGOING:
+
+                values.put(OUTGOING_CALL_BLOCKED, BlockState.DONT_BLOCK);
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, OUTGOING_CALL_BLOCKED + " <> ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK)});
+                break;
+            default:
+            //error
+        }
+    }
+
+    public void unblockScheduledListByType(Integer blockType){
+
+        ContentValues values = new ContentValues();
+
+        switch(blockType){
+
+            case BlockType.INCOMING:
+
+                values.put(INCOMING_CALL_BLOCKED, BlockState.DONT_BLOCK);
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, INCOMING_CALL_BLOCKED + " <> ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK)});
+                getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{String.valueOf(BlockType.INCOMING)});
+
+                break;
+            case BlockType.OUTGOING:
+
+                values.put(OUTGOING_CALL_BLOCKED, BlockState.DONT_BLOCK);
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, OUTGOING_CALL_BLOCKED + " <> ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK)});
+                getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{String.valueOf(BlockType.OUTGOING)});
+
+                break;
+            default:
+                //error
+        }
+
+    }
+
     public static class ContactCursor extends CursorWrapper{
 
         public ContactCursor(Cursor cursor) {

@@ -234,6 +234,16 @@ public class ContactManager {
         return countryCodeValue;
     }
 
+    public void unblockBlockedNumbersByType(Integer blockType){
+
+            mDataHelper.unblockListByType(blockType);
+    }
+
+    public void unblockScheduledListByType(Integer blockType){
+
+        mDataHelper.unblockScheduledListByType(blockType);
+    }
+
     public Map<Integer,Schedule> queryContactSchedule(long contactId, int blockType){
 
         return mDataHelper.queryContactSchedule(contactId, blockType);

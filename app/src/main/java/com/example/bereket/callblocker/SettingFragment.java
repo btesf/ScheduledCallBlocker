@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -27,11 +28,12 @@ public class SettingFragment extends PreferenceFragment {
         //attach preference xml to this preference
         addPreferencesFromResource(R.xml.preference);
 
+        Resources resources = getResources();
         //get the incoming block disable/enable checkbox key
-        Preference incomigCallCheckBoxPreference = findPreference("disable_incoming_block_notification_pref_key");
-        Preference outgoigCallCheckBoxPreference = findPreference("disable_outgoing_block_notification_pref_key");
-        Preference blockAllIncomingCallSwitchPreference = findPreference("block_all_incoming_numbers_pref_key");
-        Preference blockAllOutgoingCallSwitchPreference = findPreference("block_all_outgoing_numbers_pref_key");
+        Preference incomigCallCheckBoxPreference = findPreference(resources.getString(R.string.disable_incoming_block_notification_pref_key));
+        Preference outgoigCallCheckBoxPreference = findPreference(resources.getString(R.string.disable_outgoing_block_notification_pref_key));
+        Preference blockAllIncomingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_incoming_numbers_pref_key));
+        Preference blockAllOutgoingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_outgoing_numbers_pref_key));
 
      /* preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
