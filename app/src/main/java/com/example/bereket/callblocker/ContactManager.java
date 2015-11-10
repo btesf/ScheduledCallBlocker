@@ -10,6 +10,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +64,7 @@ public class ContactManager {
         contact.setIncomingBlockedCount(0);
         contact.setIncomingBlockedState(BlockState.DONT_BLOCK);
         contact.setIsNumberStandardized(false);
+        contact.setIsContactVisible(ContactVisibilityState.VISIBLE);
 
         return contact;
     }
@@ -73,6 +75,7 @@ public class ContactManager {
         newContact.setIncomingBlockedState(oldContact.getIncomingBlockedState());
         newContact.setOutgoingBlockedCount(oldContact.getOutgoingBlockedCount());
         newContact.setOutGoingBlockedState(oldContact.getOutGoingBlockedState());
+        newContact.setIsContactVisible(oldContact.isContactVisible());
     }
 
     public void insertNewOrUpdateExistingContact(Long contactId, String displayNumber, String contactName){
@@ -371,6 +374,11 @@ public class ContactManager {
         final String numberFormatRegEx = "[+]?[0-9]{6,15}";
 
         return number.matches(numberFormatRegEx);
+    }
+
+    public Long getArbitraryContactId(){
+
+        return (new Date()).getTime();
     }
 
     private void setCountryCodePreference(String countryCodePreference){

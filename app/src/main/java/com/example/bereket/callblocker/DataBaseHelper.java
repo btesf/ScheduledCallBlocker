@@ -33,6 +33,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static String NO_OF_TIMES_OUTGOING_BLOCKED = "BlockedOutgoingCalls";
     public static String NO_OF_TIMES_INCOMING_BLOCKED = "BlockedIncomingCalls";
     public static String IS_NUMBER_STANDARDIZED = "IsNumberStandardized";
+    public static String IS_CONTACT_VISIBLE = "IsContactVisible";
 
     //block type table and columns constants
     private static String BLOCK_STATE_TABLE = "BlockState";
@@ -102,6 +103,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 IS_NUMBER_STANDARDIZED + " boolean, " +
                 NO_OF_TIMES_OUTGOING_BLOCKED + " int default 0, " +
                 NO_OF_TIMES_INCOMING_BLOCKED + " int default 0," +
+                IS_CONTACT_VISIBLE + " boolean default 1," +
                 " FOREIGN KEY (" + OUTGOING_CALL_BLOCKED + ") REFERENCES " + BLOCK_STATE_TABLE + "(" + BLOCK_STATE_ID + "), "  +
                 " FOREIGN KEY (" + INCOMING_CALL_BLOCKED + ") REFERENCES " + BLOCK_STATE_TABLE + "(" + BLOCK_STATE_ID + ")"  +
                 ")";
@@ -219,6 +221,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());// = "BlockedOutgoingCalls";
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());// = "BlockedIncomingCalls";
         cv.put(IS_NUMBER_STANDARDIZED, contact.isIsNumberStandardized());// = "IsNumberStandardized";
+        cv.put(IS_CONTACT_VISIBLE, contact.isContactVisible()); // = "IsContactVisible"
 
         long result = getWritableDatabase().insert(BLOCKED_LIST_TABLE, null, cv);
 
@@ -243,6 +246,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(INCOMING_CALL_BLOCKED, contact.getIncomingBlockedState());
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());
+        cv.put(IS_CONTACT_VISIBLE, contact.isContactVisible());
 
         int rows = getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{String.valueOf(contact.getId())});
 
@@ -257,8 +261,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public ContactCursor queryContacts(){
-        //Equivalent to "select * from run order by start_date asc"
-        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME + " asc");
+        //Equivalent to "select * from BlockList where IsContactVisible = 1 order by start_date asc"
+        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, IS_CONTACT_VISIBLE + " = ? ", new String[]{"1"}, null, null, NAME + " asc");
         return new ContactCursor(wrapped);
     }
 
@@ -329,6 +333,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             int incomingBlockedState = getInt(getColumnIndex(INCOMING_CALL_BLOCKED));
             int incomingBlockedCount = getInt(getColumnIndex(NO_OF_TIMES_INCOMING_BLOCKED));
             int outgoingBlockedCount = getInt(getColumnIndex(NO_OF_TIMES_OUTGOING_BLOCKED));
+            boolean isContactVisible = getInt(getColumnIndex(IS_CONTACT_VISIBLE)) == 1 ? true : false;
 
             contact.setId(contactId);
             contact.setPhoneNumber(phoneNumber);
@@ -339,6 +344,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             contact.setOutGoingBlockedState(outgoingBlockedState);
             contact.setIncomingBlockedCount(incomingBlockedCount);
             contact.setOutgoingBlockedCount(outgoingBlockedCount);
+            contact.setIsContactVisible(isContactVisible);
 
             return contact;
         }
