@@ -35,59 +35,55 @@ public class IncomingCallReceiver extends BroadcastReceiver {
         private Context context;
         private ScheduleManager mScheduleManager;
         private LogManager mLogManager;
+        private ContactManager mContactManager;
 
         public PhoneCallStateListener(Context context){
             this.context = context;
             mScheduleManager = ScheduleManager.getInstance(context);
             mLogManager = LogManager.getInstance(context);
+            mContactManager = ContactManager.getInstance(context);
         }
 
 
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
 
-            ContactManager contactManager = ContactManager.getInstance(context);
             //Determine the country code from current network (instead of system setting)
-            String countryCodeValue = contactManager.getCountryCodeFromNetwork();
+            String countryCodeValue = mContactManager.getCountryCodeFromNetwork();
             incomingNumber = ContactManager.standardizePhoneNumber(incomingNumber, countryCodeValue);
             //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
-            if(contactManager.nonStandardizedPreferenceEnabled()){
+            if(mContactManager.nonStandardizedPreferenceEnabled()){
 
-                contactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
             }
 
             switch (state) {
 
                 case TelephonyManager.CALL_STATE_RINGING:
 
-                    Contact blockedContact = contactManager.getContactByStandardizedPhoneNumber(incomingNumber);
+                    //check if a global block setting is set - if so stop
+                    if(mContactManager.globalBlockIncomingBlockPreferenceEnabled()){
 
-                    if(blockedContact == null){
-
-                        break;
+                        blockCall();
+                        sendNotification(incomingNumber);
+                        //TODO: figure out if non-contact number should be blocked or not - if yes, log method has to be re-written to support
                     }
+                    else{
 
-                    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                    //Turn ON the mute
-                    audioManager.setStreamMute(AudioManager.STREAM_RING, true);
-                    TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-                    try {
-                        Class clazz = Class.forName(telephonyManager.getClass().getName());
-                        Method method = clazz.getDeclaredMethod("getITelephony");
-                        method.setAccessible(true);
-                        ITelephony telephonyService = (ITelephony) method.invoke(telephonyManager);
+                        Contact blockedContact = mContactManager.getContactByStandardizedPhoneNumber(incomingNumber);
+
+                        if(blockedContact == null){
+
+                            break;
+                        }
 
                         if(incomingNumber.equals(blockedContact.getPhoneNumber())) {
 
                             boolean callBlocked = false;
                             //if outgoing call is blocked proceed with blocking
                             if (blockedContact.getIncomingBlockedState() == BlockState.ALWAYS_BLOCK) {
-                                //telephonyService.silenceRinger();//Security exception problem
-                                telephonyService = (ITelephony) method.invoke(telephonyManager);
-                                telephonyService.silenceRinger();
-                                telephonyService.endCall();
-                                sendNotification(blockedContact.getDisplayNumber());
-                                callBlocked = true;
+
+                                callBlocked = blockCall();
                             }
                             else if(blockedContact.getIncomingBlockedState() == BlockState.SCHEDULED_BLOCK){
                                 //get all the scheduled calls for this number
@@ -97,24 +93,19 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                                 //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
                                 cal = TimeHelper.setCalendarToBenchmarkTime(cal);
                                 if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.INCOMING, weekDay, cal.getTime())){
-                                    telephonyService = (ITelephony) method.invoke(telephonyManager);
-                                    telephonyService.silenceRinger();
-                                    telephonyService.endCall();
-                                    sendNotification(blockedContact.getDisplayNumber());
-                                    callBlocked = true;
+
+                                    callBlocked = blockCall();
                                 }
                             }
 
                             if(callBlocked){
+                                sendNotification(blockedContact.getDisplayNumber());
                                 //TODO: remove db call from here and run it under different service
                                 mLogManager.log(blockedContact, BlockType.INCOMING);
                             }
                         }
-                    } catch (Exception e) {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
                     }
-                    //Turn OFF the mute
-                    audioManager.setStreamMute(AudioManager.STREAM_RING, false);
+
                     break;
 
                 case PhoneStateListener.LISTEN_CALL_STATE:
@@ -126,20 +117,52 @@ public class IncomingCallReceiver extends BroadcastReceiver {
         }
 
         private void sendNotification(String phoneNumber){
-            Intent i  = new Intent(context, CallBlockerActivity.class);
-            PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
-            Notification notification = new NotificationCompat.Builder(context)
-                    .setTicker("Call blocker")
-                    .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                    .setContentTitle("New incoming call intercepted")
-                    .setContentText(phoneNumber + " is intercepted")
-                    .setContentIntent(pi)
-                    .setAutoCancel(true)
-                    .build();
 
-            NotificationManager notificationManager = (NotificationManager)
-                    context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(0, notification);
+            if(!mContactManager.disableIncomingBlockNotificationPreferenceEnabled()){
+
+                Intent i  = new Intent(context, CallBlockerActivity.class);
+                PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
+                Notification notification = new NotificationCompat.Builder(context)
+                        .setTicker("Call blocker")
+                        .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                        .setContentTitle("New incoming call intercepted")
+                        .setContentText(phoneNumber + " is intercepted")
+                        .setContentIntent(pi)
+                        .setAutoCancel(true)
+                        .build();
+
+                NotificationManager notificationManager = (NotificationManager)
+                        context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(0, notification);
+            }
+        }
+
+        public boolean blockCall(){
+
+            boolean callBlocked = false;
+
+            AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            //Turn ON the mute
+            audioManager.setStreamMute(AudioManager.STREAM_RING, true);
+            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+            try {
+
+                Class clazz = Class.forName(telephonyManager.getClass().getName());
+                Method method = clazz.getDeclaredMethod("getITelephony");
+                method.setAccessible(true);
+                ITelephony telephonyService = (ITelephony) method.invoke(telephonyManager);
+                telephonyService.silenceRinger();
+                telephonyService.endCall();
+                callBlocked = true;
+
+            } catch (Exception e) {
+                Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+            }
+            //Turn OFF the mute
+            audioManager.setStreamMute(AudioManager.STREAM_RING, false);
+
+            return callBlocked;
         }
     }
 }

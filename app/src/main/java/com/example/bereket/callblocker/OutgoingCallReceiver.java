@@ -18,6 +18,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
     private Context mContext;
     private ScheduleManager mScheduleManager;
     private LogManager mLogManager;
+    private ContactManager mContactManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -25,76 +26,91 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
         mContext = context;
         mScheduleManager = ScheduleManager.getInstance(mContext);
         mLogManager = LogManager.getInstance(mContext);
-        //Determine the country code from current network (instead of system setting)
-        ContactManager contactManager = ContactManager.getInstance(mContext);
+        mContactManager = ContactManager.getInstance(mContext);
 
-        String countryCodeValue = contactManager.getCountryCodeFromNetwork();
+        //Determine the country code from current network (instead of system setting)
+        String countryCodeValue = mContactManager.getCountryCodeFromNetwork();
         //if the phone has no network, (where we cannot determine countryCodeValue - will be null), we don't need to process any interception
         if(countryCodeValue != null && !countryCodeValue.isEmpty()){
 
             String phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             phoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCodeValue);
-            //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
-            if(contactManager.nonStandardizedPreferenceEnabled()){
 
-                contactManager.standardizeNonStandardContactPhones(countryCodeValue);
-            }
+            if(mContactManager.globalBlockOutgoingBlockPreferenceEnabled()){
 
-            Contact blockedContact = contactManager.getContactByStandardizedPhoneNumber(phoneNumber);
-
-            if(blockedContact == null){
-
-                return;
-            }
-
-            boolean callBlocked = false;
-            //if outgoing call is blocked proceed with blocking
-            if(blockedContact.getOutGoingBlockedState() == BlockState.ALWAYS_BLOCK){
                 setResultData(null);
-                //not recommended to abort broadcast
-                //abortBroadcast();
-                sendNotification(blockedContact.getDisplayNumber());
-                callBlocked = true;
+                sendNotification(phoneNumber);
+                //TODO: log numbers which are not in contact list. You may need to create new contact and save them before doing so
             }
-            else if(blockedContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
-                //get all the scheduled calls for this number
-                Calendar cal = Calendar.getInstance();
-                //get weekDay of today
-                int weekDay = TimeHelper.convertJavaDayOfWeekWithCallBlockerType(cal.get(Calendar.DAY_OF_WEEK));
-                //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
-                cal = TimeHelper.setCalendarToBenchmarkTime(cal);
+            else{
 
-                if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.OUTGOING, weekDay, cal.getTime())){
+                //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
+                if(mContactManager.nonStandardizedPreferenceEnabled()){
+
+                    mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                }
+
+                Contact blockedContact = mContactManager.getContactByStandardizedPhoneNumber(phoneNumber);
+
+                if(blockedContact == null){
+
+                    return;
+                }
+
+                boolean callBlocked = false;
+                //if outgoing call is blocked proceed with blocking
+                if(blockedContact.getOutGoingBlockedState() == BlockState.ALWAYS_BLOCK){
                     setResultData(null);
                     //not recommended to abort broadcast
                     //abortBroadcast();
-                    sendNotification(blockedContact.getDisplayNumber());
+
                     callBlocked = true;
                 }
-            }
+                else if(blockedContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
+                    //get all the scheduled calls for this number
+                    Calendar cal = Calendar.getInstance();
+                    //get weekDay of today
+                    int weekDay = TimeHelper.convertJavaDayOfWeekWithCallBlockerType(cal.get(Calendar.DAY_OF_WEEK));
+                    //get a benchmarkCalendar that sets the month and year part to a standard/benchmark date so that only time search can happen
+                    cal = TimeHelper.setCalendarToBenchmarkTime(cal);
 
-            if(callBlocked){
-                //TODO: remove db call from here and run it under different service
-                mLogManager.log(blockedContact, BlockType.INCOMING);
+                    if(mScheduleManager.timeExistsInSchedule(blockedContact.getId(),BlockType.OUTGOING, weekDay, cal.getTime())){
+                        setResultData(null);
+                        //not recommended to abort broadcast
+                        //abortBroadcast();
+                        callBlocked = true;
+                    }
+                }
+
+                if(callBlocked){
+                    sendNotification(blockedContact.getDisplayNumber());
+                    //TODO: remove db call from here and run it under different service
+                    mLogManager.log(blockedContact, BlockType.INCOMING);
+                }
+
             }
         }
         //else { /*  if country code value is null, it means there is no network (no sim is inserted/phone is in airplane mode)*/}
     }
 
-    private void sendNotification(String phoneNumber){
-        Intent i  = new Intent(mContext, CallBlockerActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);
-        Notification notification = new NotificationCompat.Builder(mContext)
-                .setTicker("New outgoing call")
-                .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                .setContentTitle("New outgoing call intercepted")
-                .setContentText(phoneNumber + " is intercepted")
-                .setContentIntent(pi)
-                .setAutoCancel(true)
-                .build();
+    private void sendNotification(String phoneNumber) {
 
-        NotificationManager notificationManager = (NotificationManager)
-                mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notification);
+        if (!mContactManager.disableOutgoingBlockNotificationPreferenceEnabled()) {
+
+            Intent i = new Intent(mContext, CallBlockerActivity.class);
+            PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);
+            Notification notification = new NotificationCompat.Builder(mContext)
+                    .setTicker("New outgoing call")
+                    .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                    .setContentTitle("New outgoing call intercepted")
+                    .setContentText(phoneNumber + " is intercepted")
+                    .setContentIntent(pi)
+                    .setAutoCancel(true)
+                    .build();
+
+            NotificationManager notificationManager = (NotificationManager)
+                    mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(0, notification);
+        }
     }
 }

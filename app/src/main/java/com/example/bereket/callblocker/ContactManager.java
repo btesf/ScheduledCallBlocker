@@ -346,6 +346,26 @@ public class ContactManager {
         PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).edit().putBoolean(NON_STANDARDIZED_NUMBER_EXIST, exists).commit();
     }
 
+    public boolean globalBlockIncomingBlockPreferenceEnabled(){
+
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.block_all_incoming_numbers_pref_key), false);
+    }
+
+    public boolean globalBlockOutgoingBlockPreferenceEnabled(){
+
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.block_all_outgoing_numbers_pref_key), false);
+    }
+
+    public boolean disableIncomingBlockNotificationPreferenceEnabled(){
+
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.disable_incoming_block_notification_pref_key), false);
+    }
+
+    public boolean disableOutgoingBlockNotificationPreferenceEnabled(){
+
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.disable_outgoing_block_notification_pref_key), false);
+    }
+
     public static boolean numberHasProperFormat(String number){
 
         final String numberFormatRegEx = "[+]?[0-9]{6,15}";
