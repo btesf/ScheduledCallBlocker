@@ -235,6 +235,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return returnValue > 0 ? true : false;
     }
 
+    public boolean deleteHiddenContacts(){
+
+        int returnValue = getWritableDatabase().delete(BLOCKED_LIST_TABLE, IS_CONTACT_VISIBLE + " = ? ", new String[]{String.valueOf("0")});
+
+        return returnValue > 0 ? true : false;
+    }
+
     public boolean updateContact(Contact contact){
 
         ContentValues cv = new ContentValues();

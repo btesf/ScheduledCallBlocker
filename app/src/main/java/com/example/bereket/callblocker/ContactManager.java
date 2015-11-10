@@ -75,7 +75,7 @@ public class ContactManager {
         newContact.setIncomingBlockedState(oldContact.getIncomingBlockedState());
         newContact.setOutgoingBlockedCount(oldContact.getOutgoingBlockedCount());
         newContact.setOutGoingBlockedState(oldContact.getOutGoingBlockedState());
-        newContact.setIsContactVisible(oldContact.isContactVisible());
+        //don't copy visibility state (in case of hidden contacts saved for log purpose) - because copying precedes update. We want the contact to be visible after a user added it explicitly
     }
 
     public void insertNewOrUpdateExistingContact(Long contactId, String displayNumber, String contactName){
@@ -108,6 +108,7 @@ public class ContactManager {
         newContact.setDisplayNumber(displayNumber);
         newContact.setContactName(contactName);
         newContact.setIsNumberStandardized(isNumberStandardized);
+        newContact.setIsContactVisible(ContactVisibilityState.VISIBLE); //
 
         //if country code cannot be decided just insert the number
         if(isNumberStandardized){
@@ -120,6 +121,8 @@ public class ContactManager {
             if(oldContact == null){// if number doesn't exist - or didn't match for the reason of one of the numbers is non-standardized
 
                 mDataHelper.insertContact(newContact);
+                //TODO: update this toast below
+                Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
             }
             else{
 
@@ -138,8 +141,12 @@ public class ContactManager {
                         //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                         mDataHelper.updateContactId(oldContact.getId(), newContact.getId());
                         updateContact(newContact);
-                        //TODO remove the line below - it is temporary
-                        Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
+                        //TODO remove the toast line and conditions below - it is temporary
+                        //if the contact is saved on log (while global block setting is set), we don't want to show an update toast  - because the user doesn't know the contact was already saved
+                        if(oldContact.isContactVisible()) {
+
+                            Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     else {
                         //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
@@ -179,8 +186,12 @@ public class ContactManager {
                     //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                     mDataHelper.updateContactId(contact.getId(), newContact.getId());
                     updateContact(newContact);
-                    //TODO remove the line below - it is temporary
-                    Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
+                    //TODO remove the toast line and conditions below - it is temporary
+                    //if the contact is saved on log (while global block setting is set), it is hidden contact, so we don't want to show an update toast - because the user doesn't know the contact was already saved
+                    if(contact.isContactVisible()) {
+
+                        Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else {
                     //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
@@ -190,6 +201,7 @@ public class ContactManager {
             else{
                 //TODO: better to set number standardized preference to true and update existing contact (if current contact id is less than the existing
                 mDataHelper.insertContact(newContact);
+                Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show(); //TODO is there a better message here?
             }
         }
     }

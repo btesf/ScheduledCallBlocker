@@ -43,6 +43,9 @@ public class LogManager {
         return mDatabaseHelper.insertLog(contactId, blockType);
     }
 
+    /*
+    this method inserts log record for  block, as well as increments the contact blocked call count.
+     */
     public boolean log(Contact contact, int blockType){
 
         int count;
@@ -60,6 +63,8 @@ public class LogManager {
     }
 
     public boolean deleteLogs(){
+       //the line below may return false if there are no hidden contacts (count will be zero and as a result return false)
+       mDatabaseHelper.deleteHiddenContacts();
 
        return mDatabaseHelper.deleteLogs();
     }
