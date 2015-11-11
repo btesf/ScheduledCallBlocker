@@ -39,8 +39,9 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
             if(mContactManager.globalBlockOutgoingBlockPreferenceEnabled()){
 
                 setResultData(null);
+                //TODO: remove db call and notification from here and run it under different service
                 sendNotification(phoneNumber);
-                //TODO: log numbers which are not in contact list. You may need to create new contact and save them before doing so
+                mLogManager.log(phoneNumber, BlockType.OUTGOING);
             }
             else{
 
@@ -83,8 +84,8 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                 }
 
                 if(callBlocked){
+                    //TODO: remove db call and notification from here and run it under different service
                     sendNotification(blockedContact.getDisplayNumber());
-                    //TODO: remove db call from here and run it under different service
                     mLogManager.log(blockedContact, BlockType.INCOMING);
                 }
 

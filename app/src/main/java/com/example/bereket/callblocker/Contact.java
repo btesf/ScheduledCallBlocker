@@ -16,7 +16,6 @@ public class Contact implements Serializable {
     private int mIncomingBlockedState;
     private int mIncomingBlockedCount;
     private int mOutgoingBlockedCount;
-
     private boolean mContactVisible; //used for new contacts to be logged - those which the user doesn't included them explicitly.
 
     public long getId(){

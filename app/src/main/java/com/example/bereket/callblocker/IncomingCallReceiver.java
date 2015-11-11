@@ -65,8 +65,9 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                     if(mContactManager.globalBlockIncomingBlockPreferenceEnabled()){
 
                         blockCall();
+                        //TODO: remove db call and notification from here and run it under different service
                         sendNotification(incomingNumber);
-                        //TODO: figure out if non-contact number should be blocked or not - if yes, log method has to be re-written to support
+                        mLogManager.log(incomingNumber, BlockType.INCOMING);
                     }
                     else{
 
@@ -99,8 +100,8 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                             }
 
                             if(callBlocked){
+                                //TODO: remove db call and notification from here and run it under different service
                                 sendNotification(blockedContact.getDisplayNumber());
-                                //TODO: remove db call from here and run it under different service
                                 mLogManager.log(blockedContact, BlockType.INCOMING);
                             }
                         }

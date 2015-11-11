@@ -10,11 +10,13 @@ public class LogManager {
 
     private Context mContext;
     private DataBaseHelper mDatabaseHelper;
+    private ContactManager mContactManager;
     private static LogManager mLogManager;
 
     private LogManager(Context context){
 
         mContext = context;
+        mContactManager = ContactManager.getInstance(context);
         mDatabaseHelper = DataBaseHelper.getInstance(context);
     }
 
@@ -59,7 +61,42 @@ public class LogManager {
             contact.setOutgoingBlockedCount(++count);//increment count by 1
         }
 
-        return insertLog(contact.getId(), blockType) && mDatabaseHelper.updateContact(contact);
+        return insertLog(contact.getId(), blockType) && mContactManager.updateContact(contact);
+    }
+
+    public boolean log(String phoneNumber, int blockType){
+        //try to get number from list
+        Contact blockedContact = mContactManager.getContactByStandardizedPhoneNumber(phoneNumber);
+        //if contact is not found, insert a hidden contact - which won't be visible on contacts list - will serve for log purposes only
+        if(blockedContact == null){
+            //non-block list contact - insert hidden contact
+            blockedContact = mContactManager.getEmptyContact();
+
+            blockedContact.setId(mContactManager.getArbitraryContactId());
+            blockedContact.setPhoneNumber(phoneNumber);
+            blockedContact.setDisplayNumber(phoneNumber);
+            blockedContact.setIsContactVisible(false); //this will be invisible contact log
+            blockedContact.setIsNumberStandardized(true);
+
+            mContactManager.insertContact(blockedContact);
+        }
+        else{
+
+            int count;
+
+            if(blockType == BlockType.INCOMING){
+                count = blockedContact.getIncomingBlockedCount();
+                blockedContact.setIncomingBlockedCount(++count);//increment count by 1
+            }
+            else{ // OUTGOING
+                count = blockedContact.getOutgoingBlockedCount();
+                blockedContact.setOutgoingBlockedCount(++count);//increment count by 1
+            }
+            //update existing contact
+            mContactManager.updateContact(blockedContact);
+        }
+
+        return insertLog(blockedContact.getId(), blockType);
     }
 
     public boolean deleteLogs(){
