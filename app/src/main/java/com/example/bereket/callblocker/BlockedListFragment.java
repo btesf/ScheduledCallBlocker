@@ -297,15 +297,16 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (resultCode != Activity.RESULT_OK) return;
 
         if (requestCode == REQUEST_NEW_CONTACT) {
-            Uri contactUri = data.getData();
 
+            Uri contactUri = data.getData();
             ContentResolver cr = getActivity().getContentResolver();
 
             //specify which fields you want your query to return values for
-            String[] queryFields = new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.HAS_PHONE_NUMBER};
+            String[] queryFields = new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY/*DISPLAY_NAME*/, ContactsContract.Contacts.HAS_PHONE_NUMBER};
             //perform your query - the contactUri is like a "where" clause here
             Cursor c = cr.query(contactUri, queryFields, null, null, null, null);
             //double check that you actually got results
@@ -317,7 +318,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             c.moveToFirst();
 
             long id = c.getLong(c.getColumnIndex(ContactsContract.Contacts._ID));
-            String contactName = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            String contactName = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));//DISPLAY_NAME));
             String phoneNumber = null;
 
             if (Integer.parseInt(c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
@@ -345,7 +346,8 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 }*/
                 pCur.close();
             }
-
+            //close cursor
+            c.close();
             //check if phone number is empty
             if(phoneNumber == null){
                 Toast.makeText(getActivity().getApplicationContext(), R.string.phoneNumberIsEmpty, Toast.LENGTH_SHORT);

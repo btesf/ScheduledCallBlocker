@@ -296,7 +296,7 @@ public class ContactManager {
             try {
                 Phonenumber.PhoneNumber numberProto = phoneUtil.parse(formattedPhoneNumber, countryCode.toUpperCase());
                 //Since you know the country you can format it as follows:
-                formattedPhoneNumber = phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.E164 );
+                formattedPhoneNumber = phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.E164);
             } catch (NumberParseException e) {
                 System.err.println("NumberParseException was thrown: " + e.toString());
             }

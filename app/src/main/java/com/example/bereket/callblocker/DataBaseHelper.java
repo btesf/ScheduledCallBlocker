@@ -61,7 +61,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static String CALL_LOG_BLOCK_TYPE = "blockType";
     private static String CALL_LOG_TIME = "time";
 
-    private static String NO_NAME_CONTACT = "No name";
+    //private static String NO_NAME_CONTACT = "No name";
 
     private static DataBaseHelper mDatabaseHelper = null;
 
@@ -213,7 +213,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
 
         cv.put(ID, contact.getId());
-        cv.put(NAME, contact.getContactName() == null ? NO_NAME_CONTACT : contact.getContactName());// = "name";
+        cv.put(NAME, contact.getContactName() == null ? contact.getDisplayNumber() : contact.getContactName());// = "name";
         cv.put(PHONE_NUMBER, contact.getPhoneNumber());// = "PhoneNumber";
         cv.put(DISPLAY_NUMBER, contact.getDisplayNumber());// = "DisplayNumber";
         cv.put(OUTGOING_CALL_BLOCKED, contact.getOutGoingBlockedState());// = "OutgoingCall";
