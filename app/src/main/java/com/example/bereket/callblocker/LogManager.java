@@ -64,7 +64,13 @@ public class LogManager {
         return insertLog(contact.getId(), blockType) && mContactManager.updateContact(contact);
     }
 
-    public boolean log(String phoneNumber, int blockType){
+    public boolean log(String phoneNumber, int blockType, String countryCodeValue){
+
+        //in case of 'block all' block, standardizing un-standardized numbers won't happen. Do it here before checking in the blocked list
+        if(mContactManager.nonStandardizedPreferenceEnabled()){
+
+            mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+        }
         //try to get number from list
         Contact blockedContact = mContactManager.getContactByStandardizedPhoneNumber(phoneNumber);
         //if contact is not found, insert a hidden contact - which won't be visible on contacts list - will serve for log purposes only
@@ -72,11 +78,36 @@ public class LogManager {
             //non-block list contact - insert hidden contact
             blockedContact = mContactManager.getEmptyContact();
 
-            blockedContact.setId(mContactManager.getArbitraryContactId());
-            blockedContact.setPhoneNumber(phoneNumber);
-            blockedContact.setDisplayNumber(phoneNumber);
             blockedContact.setIsContactVisible(false); //this will be invisible contact log
             blockedContact.setIsNumberStandardized(true);
+            /*
+            Contact contactFromPhoneContact = mContactManager.getContactFromPhoneBook(phoneNumber);
+
+            if(contactFromPhoneContact == null){
+
+                blockedContact.setId(mContactManager.getArbitraryContactId());
+                blockedContact.setDisplayNumber(phoneNumber);
+            }
+            else{
+
+                blockedContact.setId(mcontactFromPhoneContact.getId());
+                blockedContact.setDisplayNumber(contactFromPhoneContact.getPhoneNumber());
+                blockedContact.setContactName(contactFromPhoneContact.getName()); //set the name from phone contact
+            }
+             */
+            blockedContact.setId(mContactManager.getArbitraryContactId());//remove it from here and put it in the if block commented out above
+            blockedContact.setDisplayNumber(phoneNumber);//remove it from here and put it in the if block commented out above
+            //same for both scenarios (whether the contact is found in the phone contact or not)
+            blockedContact.setPhoneNumber(phoneNumber);
+
+            if(blockType == BlockType.INCOMING){
+
+                blockedContact.setIncomingBlockedCount(1);//set the first incoming count
+            }
+            else{ // OUTGOING
+
+                blockedContact.setOutgoingBlockedCount(1);//set the first outgoing count
+            }
 
             mContactManager.insertContact(blockedContact);
         }

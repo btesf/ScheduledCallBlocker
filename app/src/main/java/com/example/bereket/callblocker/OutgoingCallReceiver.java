@@ -41,7 +41,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                 setResultData(null);
                 //TODO: remove db call and notification from here and run it under different service
                 sendNotification(phoneNumber);
-                mLogManager.log(phoneNumber, BlockType.OUTGOING);
+                mLogManager.log(phoneNumber, BlockType.OUTGOING, countryCodeValue);
             }
             else{
 

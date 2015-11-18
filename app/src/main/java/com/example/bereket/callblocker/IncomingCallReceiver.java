@@ -48,28 +48,28 @@ public class IncomingCallReceiver extends BroadcastReceiver {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
 
-            //Determine the country code from current network (instead of system setting)
-            String countryCodeValue = mContactManager.getCountryCodeFromNetwork();
-            incomingNumber = ContactManager.standardizePhoneNumber(incomingNumber, countryCodeValue);
-            //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
-            if(mContactManager.nonStandardizedPreferenceEnabled()){
-
-                mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
-            }
-
             switch (state) {
 
                 case TelephonyManager.CALL_STATE_RINGING:
 
-                    //check if a global block setting is set - if so stop
+                    //Determine the country code from current network (instead of system setting)
+                    String countryCodeValue = mContactManager.getCountryCodeFromNetwork();
+                    incomingNumber = ContactManager.standardizePhoneNumber(incomingNumber, countryCodeValue);
+
+                    //check if a global block setting is set - if so block instantly
                     if(mContactManager.globalBlockIncomingBlockPreferenceEnabled()){
 
                         blockCall();
                         //TODO: remove db call and notification from here and run it under different service
                         sendNotification(incomingNumber);
-                        mLogManager.log(incomingNumber, BlockType.INCOMING);
+                        mLogManager.log(incomingNumber, BlockType.INCOMING, countryCodeValue);
                     }
                     else{
+                        //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
+                        if(mContactManager.nonStandardizedPreferenceEnabled()){
+
+                            mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                        }
 
                         Contact blockedContact = mContactManager.getContactByStandardizedPhoneNumber(incomingNumber);
 
