@@ -80,23 +80,20 @@ public class LogManager {
 
             blockedContact.setIsContactVisible(false); //this will be invisible contact log
             blockedContact.setIsNumberStandardized(true);
-            /*
-            Contact contactFromPhoneContact = mContactManager.getContactFromPhoneBook(phoneNumber);
 
-            if(contactFromPhoneContact == null){
+            Contact phoneBookContact = mContactManager.getContactFromPhoneBook(phoneNumber, countryCodeValue);
+            //if phone book contact is not null, copy all important details from it and put it to the new contact
+            if(phoneBookContact != null){
+
+                blockedContact.setId(phoneBookContact.getId());
+                blockedContact.setDisplayNumber(phoneBookContact.getPhoneNumber());
+                blockedContact.setContactName(phoneBookContact.getContactName()); //set the name from phone contact
+            }
+            else{
 
                 blockedContact.setId(mContactManager.getArbitraryContactId());
                 blockedContact.setDisplayNumber(phoneNumber);
             }
-            else{
-
-                blockedContact.setId(mcontactFromPhoneContact.getId());
-                blockedContact.setDisplayNumber(contactFromPhoneContact.getPhoneNumber());
-                blockedContact.setContactName(contactFromPhoneContact.getName()); //set the name from phone contact
-            }
-             */
-            blockedContact.setId(mContactManager.getArbitraryContactId());//remove it from here and put it in the if block commented out above
-            blockedContact.setDisplayNumber(phoneNumber);//remove it from here and put it in the if block commented out above
             //same for both scenarios (whether the contact is found in the phone contact or not)
             blockedContact.setPhoneNumber(phoneNumber);
 

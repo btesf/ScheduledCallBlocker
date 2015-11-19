@@ -17,13 +17,13 @@ public class ContactsProvider {
     private ContentResolver contentResolver;
     private Context mContext;
     private static ContactsProvider mContactsProvider = null;
-    private ContactManager mContactManager;
+    private DataBaseHelper mDatabaseHelper;
 
     private ContactsProvider(Context context){
 
         mContext = context;
         contentResolver = mContext.getContentResolver();
-        mContactManager = ContactManager.getInstance(context);
+        mDatabaseHelper = DataBaseHelper.getInstance(context);
     }
 
     public static ContactsProvider getInstatnce(Context context){
@@ -36,7 +36,10 @@ public class ContactsProvider {
         return mContactsProvider;
     }
 
-    public List<Contact> getAllContactsFromPhone(){
+    /**
+     * if country code is provided, the numbers will be standardized with it before being returned, otherwise
+     */
+    public List<Contact> getAllContactsFromPhone(String countryCode){
 
         List<Contact> contactList = new ArrayList<>();
         String[] projection = new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY/*DISPLAY_NAME*/, ContactsContract.Contacts.HAS_PHONE_NUMBER};
@@ -66,11 +69,11 @@ public class ContactsProvider {
                     //check if phone number is not empty, create new contact and put it in list
                     if(phoneNumber != null){
 
-                        Contact contact = mContactManager.getEmptyContact();
+                        Contact contact = mDatabaseHelper.getEmptyContact();
 
                         contact.setId(contactId);
                         contact.setDisplayNumber(phoneNumber);
-                        contact.setPhoneNumber(ContactManager.standardizePhoneNumber(phoneNumber, mContactManager.getCountryCodeFromNetwork()));
+                        contact.setPhoneNumber(ContactManager.standardizePhoneNumber(phoneNumber, countryCode));
                         contact.setContactName(contactName);
 
                         contactList.add(contact);

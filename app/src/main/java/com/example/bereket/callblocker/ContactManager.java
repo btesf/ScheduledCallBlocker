@@ -57,16 +57,7 @@ public class ContactManager {
 
     public Contact getEmptyContact(){
 
-        Contact contact = new Contact();
-
-        contact.setOutgoingBlockedCount(0);
-        contact.setOutGoingBlockedState(BlockState.DONT_BLOCK);
-        contact.setIncomingBlockedCount(0);
-        contact.setIncomingBlockedState(BlockState.DONT_BLOCK);
-        contact.setIsNumberStandardized(false);
-        contact.setIsContactVisible(ContactVisibilityState.VISIBLE);
-
-        return contact;
+        return mDataHelper.getEmptyContact();
     }
 
     public void copyContactDetails(Contact oldContact, Contact newContact){
@@ -119,6 +110,17 @@ public class ContactManager {
             Contact oldContact = getContactByPhoneNumber(displayNumber);
 
             if(oldContact == null){// if number doesn't exist - or didn't match for the reason of one of the numbers is non-standardized
+                //find a contact from phone book
+                //TODO: a lot of optimization is needed here, the app is too slow at this point - very slow
+                Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
+                //if phone book contact is not null, copy all important details from it and put it to the new contact
+                if(phoneBookContact != null){
+
+                    newContact.setId(phoneBookContact.getId());
+                    newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
+                    newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
+                    newContact.setContactName(phoneBookContact.getContactName());
+                }
 
                 mDataHelper.insertContact(newContact);
                 //TODO: update this toast below
@@ -199,6 +201,17 @@ public class ContactManager {
                 }
             }
             else{
+                //find a contact from phone book
+                Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
+                //if phone book contact is not null, copy all important details from it and put it to the new contact
+                if(phoneBookContact != null){
+
+                    newContact.setId(phoneBookContact.getId());
+                    newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
+                    newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
+                    newContact.setContactName(phoneBookContact.getContactName());
+                }
+
                 //TODO: better to set number standardized preference to true and update existing contact (if current contact id is less than the existing
                 mDataHelper.insertContact(newContact);
                 Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show(); //TODO is there a better message here?
@@ -206,6 +219,28 @@ public class ContactManager {
         }
     }
 
+
+    public Contact getContactFromPhoneBook(String phoneNumber, String countryCode){
+        //if country code is not set (not determined from the network) try to get it from saved preference
+        if(countryCode == null) {
+
+            countryCode = isCountryCodePreferenceSet() ? getCountryCodePreference() : TEMPORARY_COUNTRY_CODE_VALUE;
+        }
+
+        String standardizedPhoneNumber = standardizePhoneNumber(phoneNumber, countryCode);
+        ContactsProvider contactsProvider = ContactsProvider.getInstatnce(mContext);
+        List<Contact> contactsFromPhoneBook = contactsProvider.getAllContactsFromPhone(countryCode);
+
+        for(Contact contact : contactsFromPhoneBook){
+
+            if(contact.getPhoneNumber().equals(standardizedPhoneNumber)){
+
+                return contact;
+            }
+        }
+
+        return null;
+    }
 
     public boolean updateContact(Contact contact){
 

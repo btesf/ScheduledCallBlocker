@@ -195,6 +195,20 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public Contact getEmptyContact(){
+
+        Contact contact = new Contact();
+
+        contact.setOutgoingBlockedCount(0);
+        contact.setOutGoingBlockedState(BlockState.DONT_BLOCK);
+        contact.setIncomingBlockedCount(0);
+        contact.setIncomingBlockedState(BlockState.DONT_BLOCK);
+        contact.setIsNumberStandardized(false);
+        contact.setIsContactVisible(ContactVisibilityState.VISIBLE);
+
+        return contact;
+    }
+
     public ContactCursor getNonStandardizedPhoneContacts(){
 
         Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, IS_NUMBER_STANDARDIZED + " = ? ", new String[]{"0"}, null, null, null);
