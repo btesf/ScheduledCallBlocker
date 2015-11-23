@@ -403,6 +403,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return getWritableDatabase().delete(CALL_LOG_TABLE, null, null) == 0 ? false : true;
     }
 
+    public void deleteOldLogs(){
+
+        getWritableDatabase().execSQL("CREATE TEMP TABLE Top300Logs AS SELECT " + CALL_LOG_ID + " FROM " + CALL_LOG_TABLE + " ORDER BY " + CALL_LOG_ID + " DESC LIMIT 300");
+        getWritableDatabase().execSQL("DELETE FROM " + CALL_LOG_TABLE + " WHERE " + CALL_LOG_ID + " NOT IN (SELECT " + CALL_LOG_ID + " FROM Top300Logs )");
+        getWritableDatabase().execSQL("DROP TABLE Top300Logs");
+    }
 
     public static class LogCursor extends CursorWrapper{
 

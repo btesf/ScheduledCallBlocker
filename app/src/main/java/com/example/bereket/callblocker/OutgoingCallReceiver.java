@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by bereket on 7/18/15.
@@ -111,7 +112,10 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
 
             NotificationManager notificationManager = (NotificationManager)
                     mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(0, notification);
+            //prepare unique id for the notification based on time
+            String timeValue = String.valueOf(new Date().getTime());
+            timeValue = timeValue.substring(timeValue.length() - 6);
+            notificationManager.notify(Integer.valueOf(timeValue), notification);
         }
     }
 }

@@ -10,12 +10,14 @@ import android.media.AudioManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
 
 import java.lang.reflect.Method;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by bereket on 8/17/15.
@@ -134,7 +136,10 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
                 NotificationManager notificationManager = (NotificationManager)
                         context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(0, notification);
+                //prepare unique id for the notification based on time
+                String timeValue = String.valueOf(new Date().getTime());
+                timeValue = timeValue.substring(timeValue.length() - 6);
+                notificationManager.notify(Integer.valueOf(timeValue), notification);
             }
         }
 

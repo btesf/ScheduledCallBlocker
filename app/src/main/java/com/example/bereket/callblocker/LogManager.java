@@ -124,6 +124,9 @@ public class LogManager {
             mContactManager.updateContact(blockedContact);
         }
 
+        //delete old logs first
+        deleteOldLogs();
+
         return insertLog(blockedContact.getId(), blockType);
     }
 
@@ -132,6 +135,11 @@ public class LogManager {
        mDatabaseHelper.deleteHiddenContacts();
 
        return mDatabaseHelper.deleteLogs();
+    }
+
+    private void deleteOldLogs(){
+
+        mDatabaseHelper.deleteOldLogs();
     }
 
 }
