@@ -27,8 +27,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Date;
-
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -354,7 +352,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             }
             else{
 
-                mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName);
+                mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName, false);
             }
         }
         else if(requestCode == ADD_CONTACT_MANUALLY){
@@ -363,7 +361,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 //do something about it
                 String phoneNumber = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
 
-                mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(),  phoneNumber, null);
+                mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(),  phoneNumber, null, true);
             }
         }
     }

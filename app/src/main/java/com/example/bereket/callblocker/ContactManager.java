@@ -3,6 +3,7 @@ package com.example.bereket.callblocker;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -69,7 +70,7 @@ public class ContactManager {
         //don't copy visibility state (in case of hidden contacts saved for log purpose) - because copying precedes update. We want the contact to be visible after a user added it explicitly
     }
 
-    public void insertNewOrUpdateExistingContact(Long contactId, String displayNumber, String contactName){
+    public void insertNewOrUpdateExistingContact(Long contactId, String displayNumber, String contactName, boolean isManual){
         /* check if number exists in contact. If exists then check if the two numbers are inserted differently (i.e one manually, the other from contact).
           That can be identified by comparing the two ids. Both ids will be the same if inserted from contact. If so just call the insertContact... method and
           it will update any newly modified contact details without changing contact id.
@@ -110,16 +111,19 @@ public class ContactManager {
             Contact oldContact = getContactByPhoneNumber(displayNumber);
 
             if(oldContact == null){// if number doesn't exist - or didn't match for the reason of one of the numbers is non-standardized
-                //find a contact from phone book
-                //TODO: a lot of optimization is needed here, the app is too slow at this point - very slow
-                Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
-                //if phone book contact is not null, copy all important details from it and put it to the new contact
-                if(phoneBookContact != null){
+                //if manually added, find the contact from phone book and add it
+                if(isManual){
+                    //find a contact from phone book
+                    //TODO: a lot of optimization is needed here, the app is too slow at this point - very slow
+                    Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
+                    //if phone book contact is not null, copy all important details from it and put it to the new contact
+                    if(phoneBookContact != null){
 
-                    newContact.setId(phoneBookContact.getId());
-                    newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
-                    newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
-                    newContact.setContactName(phoneBookContact.getContactName());
+                        newContact.setId(phoneBookContact.getId());
+                        newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
+                        newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
+                        newContact.setContactName(phoneBookContact.getContactName());
+                    }
                 }
 
                 mDataHelper.insertContact(newContact);
@@ -201,15 +205,18 @@ public class ContactManager {
                 }
             }
             else{
-                //find a contact from phone book
-                Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
-                //if phone book contact is not null, copy all important details from it and put it to the new contact
-                if(phoneBookContact != null){
+                //if manually added, find the contact from phone book and add it
+                if(isManual){
+                    //find a contact from phone book
+                    Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
+                    //if phone book contact is not null, copy all important details from it and put it to the new contact
+                    if(phoneBookContact != null){
 
-                    newContact.setId(phoneBookContact.getId());
-                    newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
-                    newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
-                    newContact.setContactName(phoneBookContact.getContactName());
+                        newContact.setId(phoneBookContact.getId());
+                        newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
+                        newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
+                        newContact.setContactName(phoneBookContact.getContactName());
+                    }
                 }
 
                 //TODO: better to set number standardized preference to true and update existing contact (if current contact id is less than the existing
@@ -323,7 +330,7 @@ public class ContactManager {
     public static String standardizePhoneNumber(String nonStandardPhone, String countryCode){
 
         String formattedPhoneNumber =  PhoneNumberUtil.normalizeDigitsOnly(nonStandardPhone);
-
+        Log.d("bere.bere.bere", "Formatted phone number" + formattedPhoneNumber + ", nonStandard phone " + nonStandardPhone);
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         //if country code is not null, standardize the number into E164 format
         if(countryCode != null && !countryCode.isEmpty()){
@@ -333,6 +340,7 @@ public class ContactManager {
                 //Since you know the country you can format it as follows:
                 formattedPhoneNumber = phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.E164);
             } catch (NumberParseException e) {
+                Log.d("bere.bere.bere", "Formatted phone number" + formattedPhoneNumber + ", nonStandard phone " + nonStandardPhone);
                 System.err.println("NumberParseException was thrown: " + e.toString());
             }
         }

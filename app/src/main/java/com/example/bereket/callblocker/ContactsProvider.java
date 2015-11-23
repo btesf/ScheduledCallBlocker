@@ -85,6 +85,8 @@ public class ContactsProvider {
 
         } catch(Exception e){
 
+        }
+        finally {
             cursor.close();
         }
 
