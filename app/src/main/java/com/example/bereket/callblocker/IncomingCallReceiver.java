@@ -10,14 +10,12 @@ import android.media.AudioManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
 
 import java.lang.reflect.Method;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by bereket on 8/17/15.
@@ -123,13 +121,16 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
             if(!mContactManager.disableIncomingBlockNotificationPreferenceEnabled()){
 
-                Intent i  = new Intent(context, CallBlockerActivity.class);
+                BlockedCallCounter blockedCallCounter = new BlockedCallCounter(context);
+                int blockCount = blockedCallCounter.incrementAndGetBlockCount(BlockType.INCOMING);
+//TODO put string values in xml file
+                Intent i  = new Intent(context, LogActivity.class);
                 PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
                 Notification notification = new NotificationCompat.Builder(context)
                         .setTicker("Call blocker")
                         .setSmallIcon(android.R.drawable.ic_menu_report_image)
                         .setContentTitle("New incoming call intercepted")
-                        .setContentText(phoneNumber + " is intercepted")
+                        .setContentText(blockCount + " incoming " + (blockCount == 1 ? "call is " : "calls are ") + "blocked since you last checked")
                         .setContentIntent(pi)
                         .setAutoCancel(true)
                         .build();
@@ -137,9 +138,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                 NotificationManager notificationManager = (NotificationManager)
                         context.getSystemService(Context.NOTIFICATION_SERVICE);
                 //prepare unique id for the notification based on time
-                String timeValue = String.valueOf(new Date().getTime());
-                timeValue = timeValue.substring(timeValue.length() - 6);
-                notificationManager.notify(Integer.valueOf(timeValue), notification);
+                notificationManager.notify(BlockType.INCOMING, notification);
             }
         }
 

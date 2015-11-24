@@ -4,13 +4,10 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -73,6 +70,10 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
         mLogManager = LogManager.getInstance(getActivity());
         setHasOptionsMenu(true);
         getLoaderManager().initLoader(LOG_LIST_LOADER, null, this);
+        //reset BlockCallCounter variables if the log is displayed
+
+        BlockedCallCounter blockedCallCounter = new BlockedCallCounter(getActivity());
+        blockedCallCounter.resetCounter();
     }
 
     @Override
@@ -144,12 +145,9 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
         switch (item.getItemId()) {
             case R.id.menu_item_delete_log:
 
-                boolean logsDeleted = mLogManager.deleteLogs();
+                mLogManager.deleteLogs();
+                getLoaderManager().restartLoader(0, null, LogFragment.this);
 
-                if(logsDeleted){
-
-                    getLoaderManager().restartLoader(0, null, LogFragment.this);
-                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

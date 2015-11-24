@@ -2,6 +2,7 @@ package com.example.bereket.callblocker;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 
 /**
  * Created by bereket on 10/6/15.
@@ -130,16 +131,15 @@ public class LogManager {
         return insertLog(blockedContact.getId(), blockType);
     }
 
-    public boolean deleteLogs(){
+    public void deleteLogs(){
        //the line below may return false if there are no hidden contacts (count will be zero and as a result return false)
        mDatabaseHelper.deleteHiddenContacts();
 
-       return mDatabaseHelper.deleteLogs();
+       mDatabaseHelper.deleteLogs();
     }
 
     private void deleteOldLogs(){
 
         mDatabaseHelper.deleteOldLogs();
     }
-
 }

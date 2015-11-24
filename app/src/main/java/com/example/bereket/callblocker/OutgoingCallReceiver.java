@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by bereket on 7/18/15.
@@ -99,23 +98,25 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
 
         if (!mContactManager.disableOutgoingBlockNotificationPreferenceEnabled()) {
 
-            Intent i = new Intent(mContext, CallBlockerActivity.class);
+            BlockedCallCounter blockedCallCounter = new BlockedCallCounter(mContext);
+            int blockCount = blockedCallCounter.incrementAndGetBlockCount(BlockType.OUTGOING);
+//TODO put string values in xml file
+            Intent i = new Intent(mContext, LogActivity.class);
             PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);
             Notification notification = new NotificationCompat.Builder(mContext)
                     .setTicker("New outgoing call")
                     .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                    .setContentTitle("New outgoing call intercepted")
-                    .setContentText(phoneNumber + " is intercepted")
+                    .setContentTitle("New outgoing call blocked")
+                    .setContentText(blockCount + " outgoing " + (blockCount == 1 ? "call is " : "calls are ") + "blocked since you last checked")
                     .setContentIntent(pi)
                     .setAutoCancel(true)
                     .build();
 
             NotificationManager notificationManager = (NotificationManager)
                     mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            //prepare unique id for the notification based on time
-            String timeValue = String.valueOf(new Date().getTime());
-            timeValue = timeValue.substring(timeValue.length() - 6);
-            notificationManager.notify(Integer.valueOf(timeValue), notification);
+
+
+            notificationManager.notify(BlockType.OUTGOING, notification);
         }
     }
 }

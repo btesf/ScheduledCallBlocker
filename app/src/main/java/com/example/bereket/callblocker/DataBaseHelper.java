@@ -398,9 +398,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     //TODO : don't return any feedback after deleting? not good DB transaction management practice
-    public boolean deleteLogs(){
+    public void deleteLogs(){
 
-        return getWritableDatabase().delete(CALL_LOG_TABLE, null, null) == 0 ? false : true;
+        getWritableDatabase().delete(CALL_LOG_TABLE, null, null);
     }
 
     public void deleteOldLogs(){
