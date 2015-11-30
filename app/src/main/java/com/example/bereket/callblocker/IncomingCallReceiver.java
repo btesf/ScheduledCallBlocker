@@ -60,9 +60,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                     if(mContactManager.globalBlockIncomingBlockPreferenceEnabled()){
 
                         blockCall();
-                        //TODO: remove db call and notification from here and run it under different service
-                        sendNotification(incomingNumber);
-                        mLogManager.log(incomingNumber, BlockType.INCOMING, countryCodeValue);
+                        LoggerAndNotificationService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
                     }
                     else{
                         //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
@@ -100,9 +98,8 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                             }
 
                             if(callBlocked){
-                                //TODO: remove db call and notification from here and run it under different service
-                                sendNotification(blockedContact.getDisplayNumber());
-                                mLogManager.log(blockedContact, BlockType.INCOMING);
+
+                                LoggerAndNotificationService.startActionLoggerAndNotification(context, blockedContact, BlockType.INCOMING);
                             }
                         }
                     }
@@ -117,30 +114,6 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             super.onCallStateChanged(state, incomingNumber);
         }
 
-        private void sendNotification(String phoneNumber){
-
-            if(!mContactManager.disableIncomingBlockNotificationPreferenceEnabled()){
-
-                BlockedCallCounter blockedCallCounter = new BlockedCallCounter(context);
-                int blockCount = blockedCallCounter.incrementAndGetBlockCount(BlockType.INCOMING);
-//TODO put string values in xml file
-                Intent i  = new Intent(context, LogActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(context, 0, i, 0);
-                Notification notification = new NotificationCompat.Builder(context)
-                        .setTicker("Call blocker")
-                        .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                        .setContentTitle("New incoming call intercepted")
-                        .setContentText(blockCount + " incoming " + (blockCount == 1 ? "call is " : "calls are ") + "blocked since you last checked")
-                        .setContentIntent(pi)
-                        .setAutoCancel(true)
-                        .build();
-
-                NotificationManager notificationManager = (NotificationManager)
-                        context.getSystemService(Context.NOTIFICATION_SERVICE);
-                //prepare unique id for the notification based on time
-                notificationManager.notify(BlockType.INCOMING, notification);
-            }
-        }
 
         public boolean blockCall(){
 

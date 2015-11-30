@@ -330,7 +330,7 @@ public class ContactManager {
     public static String standardizePhoneNumber(String nonStandardPhone, String countryCode){
 
         String formattedPhoneNumber =  PhoneNumberUtil.normalizeDigitsOnly(nonStandardPhone);
-        Log.d("bere.bere.bere", "Formatted phone number" + formattedPhoneNumber + ", nonStandard phone " + nonStandardPhone);
+
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         //if country code is not null, standardize the number into E164 format
         if(countryCode != null && !countryCode.isEmpty()){
@@ -340,6 +340,7 @@ public class ContactManager {
                 //Since you know the country you can format it as follows:
                 formattedPhoneNumber = phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.E164);
             } catch (NumberParseException e) {
+                //TODO: remove this exception message
                 Log.d("bere.bere.bere", "Formatted phone number" + formattedPhoneNumber + ", nonStandard phone " + nonStandardPhone);
                 System.err.println("NumberParseException was thrown: " + e.toString());
             }

@@ -39,9 +39,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
             if(mContactManager.globalBlockOutgoingBlockPreferenceEnabled()){
 
                 setResultData(null);
-                //TODO: remove db call and notification from here and run it under different service
-                sendNotification(phoneNumber);
-                mLogManager.log(phoneNumber, BlockType.OUTGOING, countryCodeValue);
+                LoggerAndNotificationService.startActionLoggerAndNotification(context, phoneNumber, BlockType.OUTGOING, countryCodeValue);
             }
             else{
 
@@ -84,39 +82,12 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                 }
 
                 if(callBlocked){
-                    //TODO: remove db call and notification from here and run it under different service
-                    sendNotification(blockedContact.getDisplayNumber());
-                    mLogManager.log(blockedContact, BlockType.INCOMING);
+
+                    LoggerAndNotificationService.startActionLoggerAndNotification(context, blockedContact, BlockType.OUTGOING);
                 }
 
             }
         }
         //else { /*  if country code value is null, it means there is no network (no sim is inserted/phone is in airplane mode)*/}
-    }
-
-    private void sendNotification(String phoneNumber) {
-
-        if (!mContactManager.disableOutgoingBlockNotificationPreferenceEnabled()) {
-
-            BlockedCallCounter blockedCallCounter = new BlockedCallCounter(mContext);
-            int blockCount = blockedCallCounter.incrementAndGetBlockCount(BlockType.OUTGOING);
-//TODO put string values in xml file
-            Intent i = new Intent(mContext, LogActivity.class);
-            PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);
-            Notification notification = new NotificationCompat.Builder(mContext)
-                    .setTicker("New outgoing call")
-                    .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                    .setContentTitle("New outgoing call blocked")
-                    .setContentText(blockCount + " outgoing " + (blockCount == 1 ? "call is " : "calls are ") + "blocked since you last checked")
-                    .setContentIntent(pi)
-                    .setAutoCancel(true)
-                    .build();
-
-            NotificationManager notificationManager = (NotificationManager)
-                    mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-            notificationManager.notify(BlockType.OUTGOING, notification);
-        }
     }
 }

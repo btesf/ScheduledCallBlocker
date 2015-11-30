@@ -55,6 +55,11 @@
             android:name=".SettingActivity"
             android:label="@string/title_activity_preference" >
         </activity>
+
+        <service
+            android:name=".LoggerAndNotificationService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
