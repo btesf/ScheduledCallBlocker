@@ -7,7 +7,9 @@ import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by bereket on 11/15/15.
@@ -39,9 +41,9 @@ public class ContactsProvider {
     /**
      * if country code is provided, the numbers will be standardized with it before being returned, otherwise
      */
-    public List<Contact> getAllContactsFromPhone(String countryCode){
+    public Map<String, Contact> getAllContactsFromPhone(String countryCode){
 
-        List<Contact> contactList = new ArrayList<>();
+        Map<String, Contact> contactMap = new HashMap<>();
         String[] projection = new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY/*DISPLAY_NAME*/, ContactsContract.Contacts.HAS_PHONE_NUMBER};
         String selection = null;
         Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, projection, selection, null, null);
@@ -73,10 +75,11 @@ public class ContactsProvider {
 
                         contact.setId(contactId);
                         contact.setDisplayNumber(phoneNumber);
-                        contact.setPhoneNumber(ContactManager.standardizePhoneNumber(phoneNumber, countryCode));
+                        String standardizedPhoneNumber = ContactManager.standardizePhoneNumber(phoneNumber, countryCode);
+                        contact.setPhoneNumber(standardizedPhoneNumber);
                         contact.setContactName(contactName);
 
-                        contactList.add(contact);
+                        contactMap.put(standardizedPhoneNumber, contact);
                     }
 
                     pCur.close();
@@ -90,6 +93,6 @@ public class ContactsProvider {
             cursor.close();
         }
 
-        return contactList;
+        return contactMap;
     }
 }

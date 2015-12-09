@@ -236,17 +236,9 @@ public class ContactManager {
 
         String standardizedPhoneNumber = standardizePhoneNumber(phoneNumber, countryCode);
         ContactsProvider contactsProvider = ContactsProvider.getInstatnce(mContext);
-        List<Contact> contactsFromPhoneBook = contactsProvider.getAllContactsFromPhone(countryCode);
+        Map<String, Contact> contactsFromPhoneBook = contactsProvider.getAllContactsFromPhone(countryCode);
 
-        for(Contact contact : contactsFromPhoneBook){
-
-            if(contact.getPhoneNumber().equals(standardizedPhoneNumber)){
-
-                return contact;
-            }
-        }
-
-        return null;
+        return contactsFromPhoneBook.get(standardizedPhoneNumber);
     }
 
     public boolean updateContact(Contact contact){
