@@ -51,9 +51,9 @@ public class ContactManager {
         return mDataHelper.queryContacts();
     }
 
-    public void insertContact(Contact contact){
+    public long insertContact(Contact contact){
 
-        mDataHelper.insertContact(contact);
+       return mDataHelper.insertContact(contact);
     }
 
     public Contact getEmptyContact(){
@@ -111,24 +111,16 @@ public class ContactManager {
             Contact oldContact = getContactByPhoneNumber(displayNumber);
 
             if(oldContact == null){// if number doesn't exist - or didn't match for the reason of one of the numbers is non-standardized
-                //if manually added, find the contact from phone book and add it
-                if(isManual){
-                    //find a contact from phone book
-                    //TODO: a lot of optimization is needed here, the app is too slow at this point - very slow
-                    Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
-                    //if phone book contact is not null, copy all important details from it and put it to the new contact
-                    if(phoneBookContact != null){
 
-                        newContact.setId(phoneBookContact.getId());
-                        newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
-                        newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
-                        newContact.setContactName(phoneBookContact.getContactName());
-                    }
-                }
+                long insertedContactId = mDataHelper.insertContact(newContact);
 
-                mDataHelper.insertContact(newContact);
                 //TODO: update this toast below
                 Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+
+                if(isManual) {
+                    //call a background service to replace the number from phone book if exists
+                    SaveFromPhoneBookService.startActionSaveFromPhoneBook(mContext, insertedContactId, countryCodeValue, displayNumber, isNumberStandardized);
+                }
             }
             else{
 
@@ -145,8 +137,7 @@ public class ContactManager {
                     //i.e - if the new contact comes from contact list, it will be less than the new one - we want to update this time.
                     if(oldContact.getId() > newContact.getId()){
                         //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
-                        mDataHelper.updateContactId(oldContact.getId(), newContact.getId());
-                        updateContact(newContact);
+                        updateOldContactWithNewContactWithId(oldContact, newContact);
                         //TODO remove the toast line and conditions below - it is temporary
                         //if the contact is saved on log (while global block setting is set), we don't want to show an update toast  - because the user doesn't know the contact was already saved
                         if(oldContact.isContactVisible()) {
@@ -190,8 +181,7 @@ public class ContactManager {
                 if(newContact.getId() <= contact.getId()){
                     copyContactDetails(contact, newContact);
                     //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
-                    mDataHelper.updateContactId(contact.getId(), newContact.getId());
-                    updateContact(newContact);
+                    updateOldContactWithNewContactWithId(contact, newContact);
                     //TODO remove the toast line and conditions below - it is temporary
                     //if the contact is saved on log (while global block setting is set), it is hidden contact, so we don't want to show an update toast - because the user doesn't know the contact was already saved
                     if(contact.isContactVisible()) {
@@ -205,23 +195,16 @@ public class ContactManager {
                 }
             }
             else{
-                //if manually added, find the contact from phone book and add it
-                if(isManual){
-                    //find a contact from phone book
-                    Contact phoneBookContact = getContactFromPhoneBook(displayNumber, countryCodeValue);
-                    //if phone book contact is not null, copy all important details from it and put it to the new contact
-                    if(phoneBookContact != null){
 
-                        newContact.setId(phoneBookContact.getId());
-                        newContact.setDisplayNumber(phoneBookContact.getDisplayNumber());
-                        newContact.setPhoneNumber(phoneBookContact.getPhoneNumber());
-                        newContact.setContactName(phoneBookContact.getContactName());
-                    }
-                }
+                long insertedContactId = mDataHelper.insertContact(newContact);
 
-                //TODO: better to set number standardized preference to true and update existing contact (if current contact id is less than the existing
-                mDataHelper.insertContact(newContact);
+                //TODO: update this toast below
                 Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show(); //TODO is there a better message here?
+
+                if(isManual) {
+                    //call a background service to replace the number from phone book if exists
+                    SaveFromPhoneBookService.startActionSaveFromPhoneBook(mContext, insertedContactId, countryCodeValue, displayNumber, isNumberStandardized);
+                }
             }
         }
     }
@@ -244,6 +227,16 @@ public class ContactManager {
     public boolean updateContact(Contact contact){
 
         return mDataHelper.updateContact(contact);
+    }
+
+    /**
+     * change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
+     */
+    public boolean updateOldContactWithNewContactWithId(Contact oldContact, Contact newContact) {
+
+        mDataHelper.updateContactId(oldContact.getId(), newContact.getId());
+
+        return updateContact(newContact);
     }
 
     public boolean deleteContact(Contact contact){

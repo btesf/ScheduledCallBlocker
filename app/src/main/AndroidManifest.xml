@@ -2,11 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bereket.callblocker" >
 
+    <!-- private permission to receive/and to send blocked list ui update broadcast that is sent from SaveFromPhoneBookService -->
+    <permission android:name="com.example.bereket.callblocker.PRIVATE" android:protectionLevel="signature" />
+
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Allow this application to use the privately declared permission - above-->
+    <uses-permission android:name="com.example.bereket.callblocker.PRIVATE" />
 
     <application
         android:allowBackup="true"
@@ -58,6 +63,10 @@
 
         <service
             android:name=".LoggerAndNotificationService"
+            android:exported="false" >
+        </service>
+        <service
+            android:name=".SaveFromPhoneBookService"
             android:exported="false" >
         </service>
     </application>

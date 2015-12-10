@@ -222,7 +222,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     //overloaded method
-    public boolean insertContact(Contact contact){
+    public long insertContact(Contact contact){
 
         ContentValues cv = new ContentValues();
 
@@ -237,9 +237,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(IS_NUMBER_STANDARDIZED, contact.isIsNumberStandardized());// = "IsNumberStandardized";
         cv.put(IS_CONTACT_VISIBLE, contact.isContactVisible()); // = "IsContactVisible"
 
-        long result = getWritableDatabase().insert(BLOCKED_LIST_TABLE, null, cv);
-
-        return result == -1 ? false : true;
+        return getWritableDatabase().insert(BLOCKED_LIST_TABLE, null, cv);
     }
 
     public boolean deleteContact(Contact contact){

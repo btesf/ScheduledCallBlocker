@@ -3,9 +3,11 @@ package com.example.bereket.callblocker;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -56,6 +58,14 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
     private OnFragmentInteractionListener mListener;
     private ContactManager mContactManager;
     private DataBaseHelper.ContactCursor mContactCursor;
+
+    private BroadcastReceiver mOnUpdateContactFromPhoneBook = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //refresh the loadermanager so that the UI gets refreshed
+            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, null, BlockedListFragment.this);
+        }
+    };
 
     // TODO: Rename and change types of parameters
     public static BlockedListFragment newInstance(String param1, String param2) {
@@ -121,19 +131,20 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 switch (item.getItemId()) {
                     case R.id.context_menu_delete_contact:
 
-                        ContactListAdaptor adapter = (ContactListAdaptor)getListAdapter();
+                        ContactListAdaptor adapter = (ContactListAdaptor) getListAdapter();
                         boolean isContactDeleted = false;
 
-                        for(int i=adapter.getCount()-1; i>=0; i--){
+                        for (int i = adapter.getCount() - 1; i >= 0; i--) {
 
-                            if(getListView().isItemChecked(i)){
-                                isContactDeleted = mContactManager.deleteContact(((DataBaseHelper.ContactCursor)adapter.getItem(i)).getContact());
+                            if (getListView().isItemChecked(i)) {
+                                isContactDeleted = mContactManager.deleteContact(((DataBaseHelper.ContactCursor) adapter.getItem(i)).getContact());
                             }
                         }
 
-                       if(isContactDeleted) getLoaderManager().restartLoader(0, null, BlockedListFragment.this);
+                        if (isContactDeleted)
+                            getLoaderManager().restartLoader(0, null, BlockedListFragment.this);
 
-                       return true;
+                        return true;
 
                     default:
                         return false;
@@ -150,9 +161,20 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        //unregister the broadcast listener that is released from SaveFromPhoneBookService
+        getActivity().unregisterReceiver(mOnUpdateContactFromPhoneBook);
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, null, this);
+        //register a receiver that gets notified when a blocked list contat is updated from phonebook
+        IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
+        //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
+        getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
     }
 
     @Override
@@ -171,7 +193,6 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
         super.onDetach();
         mListener = null;
     }
-
 
 /*    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
