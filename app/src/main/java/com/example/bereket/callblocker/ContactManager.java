@@ -219,9 +219,10 @@ public class ContactManager {
 
         String standardizedPhoneNumber = standardizePhoneNumber(phoneNumber, countryCode);
         ContactsProvider contactsProvider = ContactsProvider.getInstatnce(mContext);
-        Map<String, Contact> contactsFromPhoneBook = contactsProvider.getAllContactsFromPhone(countryCode);
-
-        return contactsFromPhoneBook.get(standardizedPhoneNumber);
+        //the lines below are commented b/c they are replaced with newer more optimized method
+        //Map<String, Contact> contactsFromPhoneBook = contactsProvider.getAllContactsFromPhone(countryCode);
+        //return contactsFromPhoneBook.get(standardizedPhoneNumber);
+        return contactsProvider.getContactFromPhoneBook(standardizedPhoneNumber, countryCode);
     }
 
     public boolean updateContact(Contact contact){
