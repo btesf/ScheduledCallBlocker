@@ -9,17 +9,21 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
  * Created by bereket on 11/7/15.
  */
-public class SettingFragment extends PreferenceFragment {
+public class SettingFragment extends PreferenceFragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +74,14 @@ public class SettingFragment extends PreferenceFragment {
                         }
                     });
 
+                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+
+                            ((SwitchPreference) preference).setChecked(false);
+                        }
+                    });
+
                     builder.show();
                 }
 
@@ -98,6 +110,14 @@ public class SettingFragment extends PreferenceFragment {
                     builder.setNegativeButton(R.string.no_text, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+
+                            ((SwitchPreference) preference).setChecked(false);
+                        }
+                    });
+
+                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
 
                             ((SwitchPreference) preference).setChecked(false);
                         }
@@ -137,6 +157,14 @@ public class SettingFragment extends PreferenceFragment {
                         }
                     });
 
+                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+
+                            ((CheckBoxPreference) preference).setChecked(false);
+                        }
+                    });
+
                     builder.show();
                 }
 
@@ -160,13 +188,21 @@ public class SettingFragment extends PreferenceFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                          ((CheckBoxPreference) preference).setChecked(true);
+                            ((CheckBoxPreference) preference).setChecked(true);
                         }
                     });
 
                     builder.setNegativeButton(R.string.no_text, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+
+                            ((CheckBoxPreference) preference).setChecked(false);
+                        }
+                    });
+
+                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
 
                             ((CheckBoxPreference) preference).setChecked(false);
                         }
@@ -184,5 +220,31 @@ public class SettingFragment extends PreferenceFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        super.onPreferenceTreeClick(preferenceScreen, preference);
+
+/*        if (preference != null) {
+            if (preference instanceof PreferenceScreen) {
+                //initializeActionBar((PreferenceScreen) preference);
+                Toast.makeText(getActivity(),"hihihihihi ", Toast.LENGTH_SHORT).show();
+                LinearLayout root = (LinearLayout)(getView());
+
+                Toolbar bar = (Toolbar) LayoutInflater.from(getActivity()).inflate(R.layout.settings_toolbar, root, false);
+                root.addView(bar, 0); // insert at top
+                bar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //finish();
+
+                    }
+                });
+
+            }
+        }*/
+
+        return false;
     }
 }

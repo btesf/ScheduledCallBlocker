@@ -82,12 +82,12 @@
         android:key="notification_settings_category"
         android:title="@string/notification_category_title_string"
         android:summary="@string/notification_category_summary_string">
-
-        <PreferenceScreen
+<!-- I disabled this part because the preference screen is not showing the action bar  - I tried many things, but didn't work -->
+<!-- <PreferenceScreen
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:key="notification_preferences_screen"
             android:title="@string/notification_settings_title"
-            android:summary="@string/notification_settings_summary">
+            android:summary="@string/notification_settings_summary">-->
 
             <CheckBoxPreference
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -103,6 +103,6 @@
                 android:summary="@string/disable_outgoing_block_notification_summary">
             </CheckBoxPreference>
 
-        </PreferenceScreen>
+<!-- </PreferenceScreen>-->
     </PreferenceCategory>
 </PreferenceScreen>

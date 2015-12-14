@@ -1,11 +1,12 @@
 package com.example.bereket.callblocker;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by bereket on 10/6/15.
  */
-public class LogRecord {
+public class LogRecord implements Serializable{
 
     private int mId;
     private String mContactId;

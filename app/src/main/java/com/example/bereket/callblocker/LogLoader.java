@@ -11,9 +11,16 @@ public class LogLoader extends AsyncTaskLoader<DataBaseHelper.LogCursor> {
 
     private DataBaseHelper.LogCursor mCursor;
     private LogManager logManager;
+    private Long mContactId = null;
 
     public LogLoader(Context context) {
         super(context);
+        logManager = LogManager.getInstance(context);
+    }
+
+    public LogLoader(Context context, long contactId) {
+        super(context);
+        mContactId = contactId;
         logManager = LogManager.getInstance(context);
     }
 
@@ -41,7 +48,19 @@ public class LogLoader extends AsyncTaskLoader<DataBaseHelper.LogCursor> {
     }
 
     private DataBaseHelper.LogCursor loadData(){
-        return logManager.queryAllLogs();
+
+        DataBaseHelper.LogCursor logCursor;
+
+        if(mContactId == null){ //query all logs
+
+            logCursor = logManager.queryAllLogs();
+        }
+        else{
+
+            logCursor = logManager.querySingleContactLog(mContactId);
+        }
+
+        return logCursor;
     }
 
     @Override

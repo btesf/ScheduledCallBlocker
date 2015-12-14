@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,6 +77,11 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
 
         BlockedCallCounter blockedCallCounter = new BlockedCallCounter(getActivity());
         blockedCallCounter.resetCounter();
+
+        //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
+        if (NavUtils.getParentActivityName(getActivity()) != null) {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -85,6 +93,23 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
         ListView listView = (ListView) v.findViewById(android.R.id.list);
 
         return v;
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        if (null != mListener) {
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            // mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+        }
+
+        LogRecord logRecord = ((DataBaseHelper.LogCursor)((getListAdapter()).getItem(position))).getLog();
+        Intent intent = new Intent(getActivity(), SingleContactLogActivity.class);
+
+        intent.putExtra(SingleContactLogFragment.ARG_PARAM1, logRecord);
+        startActivity(intent);
     }
 
     @Override
@@ -148,6 +173,12 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
                 mLogManager.deleteLogs();
                 getLoaderManager().restartLoader(0, null, LogFragment.this);
 
+                return true;
+            case android.R.id.home:
+                if (NavUtils.getParentActivityName(getActivity()) != null) {
+
+                    NavUtils.navigateUpFromSameTask(getActivity());
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

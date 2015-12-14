@@ -3,6 +3,7 @@ package com.example.bereket.callblocker;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
 
@@ -158,5 +159,25 @@ public class ContactsProvider {
         }
 
         return contact;
+    }
+
+    public boolean contactExists(Context context, String number) throws Exception {
+        Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+
+        String[] mPhoneNumberProjection = { ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.NUMBER,
+                ContactsContract.PhoneLookup.DISPLAY_NAME };
+
+        Cursor cur = context.getContentResolver().query(lookupUri, mPhoneNumberProjection, null, null, null);
+        try {
+            if (cur.moveToFirst()) {
+                // if contact are in contact list it will return true
+                return true;
+            }
+        } finally {
+            if (cur != null)
+                cur.close();
+        }
+        // if contact are not match that means contact are not added
+        return false;
     }
 }

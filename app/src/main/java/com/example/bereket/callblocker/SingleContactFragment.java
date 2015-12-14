@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -106,6 +109,11 @@ public class SingleContactFragment extends Fragment {
         mTimeHelper = TimeHelper.getInstance(getActivity());
         mScheduleManager = ScheduleManager.getInstance(getActivity());
         mContactManager = ContactManager.getInstance(getActivity());
+        setHasOptionsMenu(true);
+        //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
+        if (NavUtils.getParentActivityName(getActivity()) != null) {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -183,6 +191,20 @@ public class SingleContactFragment extends Fragment {
         updateUI(BlockType.OUTGOING);
 
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (NavUtils.getParentActivityName(getActivity()) != null) {
+
+                    NavUtils.navigateUpFromSameTask(getActivity());
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private class OutgoingRadioButtonsClickedListener implements View.OnClickListener{

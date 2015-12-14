@@ -240,6 +240,24 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return getWritableDatabase().insert(BLOCKED_LIST_TABLE, null, cv);
     }
 
+    public Contact getContactById(long id){
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(ID, id);
+
+        Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, ID + " = ? ", new String[]{String.valueOf(id)}, null,null, null);
+
+        if(cursor != null && cursor.getCount() > 0) {
+
+            cursor.moveToFirst();
+
+            return new ContactCursor(cursor).getContact();
+        }
+
+        return  null;
+    }
+
     public boolean deleteContact(Contact contact){
 
         int returnValue = getWritableDatabase().delete(BLOCKED_LIST_TABLE, ID + " = ? ", new String[]{String.valueOf(contact.getId())});
@@ -379,7 +397,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public LogCursor querySingleContactLog(long contactId){
 
         Cursor wrapped = getReadableDatabase().rawQuery("SELECT A.*, B." + NAME + " AS ContactName, B." + DISPLAY_NUMBER + " AS ContactNumber FROM " + CALL_LOG_TABLE +
-                " A, " + BLOCKED_LIST_TABLE + " B WHERE A." + CALL_LOG_CONTACT_ID + " = ? ORDER BY " + CALL_LOG_TIME + " DESC ", new String[]{String.valueOf(contactId)}); //   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
+                " A, " + BLOCKED_LIST_TABLE + " B WHERE A." + CALL_LOG_CONTACT_ID + " = B." + ID + " AND A." + CALL_LOG_CONTACT_ID + " = ? ORDER BY " + CALL_LOG_TIME + " DESC ", new String[]{String.valueOf(contactId)}); //   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
         return new LogCursor(wrapped);
     }
 
@@ -399,6 +417,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void deleteLogs(){
 
         getWritableDatabase().delete(CALL_LOG_TABLE, null, null);
+    }
+
+    public void deleteLogsForContact(long contactId){
+
+        getWritableDatabase().delete(CALL_LOG_TABLE, CALL_LOG_CONTACT_ID + " = ? ", new String[]{String.valueOf(contactId)});
     }
 
     public void deleteOldLogs(){

@@ -15,6 +15,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.ListFragment;
 import android.provider.ContactsContract;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -94,8 +97,15 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
         }
 
         mContactManager = ContactManager.getInstance(getActivity());
-        setHasOptionsMenu(true);
 
+        setHasOptionsMenu(true);
+        //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
+       // if (NavUtils.getParentActivityName(getActivity()) != null) {
+            ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+//            actionBar.setLogo(R.mipmap.ic_launcher);
+            actionBar.setDisplayUseLogoEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+       // }
         getLoaderManager().initLoader(CONTACTS_LIST_LOADER, null, this);
     }
 
@@ -242,7 +252,13 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             case R.id.menu_item_settings:
                 intent = new Intent(getActivity(), SettingActivity.class);
                 startActivityForResult(intent, CHANGE_PREFERENCE);
-            return true;
+                return true;
+            case android.R.id.home:
+                if (NavUtils.getParentActivityName(getActivity()) != null) {
+
+                    NavUtils.navigateUpFromSameTask(getActivity());
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

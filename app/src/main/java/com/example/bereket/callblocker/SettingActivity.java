@@ -19,13 +19,18 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 
 
 import java.util.List;
 
-public class SettingActivity extends PreferenceActivity{
+public class SettingActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         /*
@@ -33,6 +38,6 @@ public class SettingActivity extends PreferenceActivity{
         From that API on these methods are no longer supported and are transferred to PreferenceFragment
          */
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content,new SettingFragment()).commit();
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingFragment()).commit();
     }
 }

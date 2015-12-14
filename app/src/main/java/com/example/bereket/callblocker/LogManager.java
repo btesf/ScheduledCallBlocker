@@ -21,6 +21,8 @@ public class LogManager {
         mDatabaseHelper = DataBaseHelper.getInstance(context);
     }
 
+
+
     public static LogManager getInstance(Context context){
 
         if(mLogManager == null){
@@ -136,6 +138,11 @@ public class LogManager {
        mDatabaseHelper.deleteHiddenContacts();
 
        mDatabaseHelper.deleteLogs();
+    }
+
+    public void deleteLogForContact(long contactId){
+
+        mDatabaseHelper.deleteLogsForContact(contactId);
     }
 
     private void deleteOldLogs(){

@@ -41,6 +41,7 @@
     <string name="end_text">To:</string>
     <string name="show_log">logs</string>
     <string name="clear_log">clear log</string>
+    <string name="clear_contact_log">clear contact log </string>
     <string name="clearAllSchedulesText">clear all</string>
     <string name="newPhoneNumberString">Phone number</string>
     <string name="save_new_number">Save</string>
@@ -110,4 +111,5 @@
     <string name="disable_outgoing_block_notification_pref_key">disable_outgoing_block_notification_pref_key</string>
     <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
     <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
+    <string name="title_activity_single_contact_log">SingleContactLogActivity</string>
 </resources>

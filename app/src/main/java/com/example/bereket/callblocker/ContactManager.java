@@ -245,6 +245,11 @@ public class ContactManager {
         return mDataHelper.deleteContact(contact);
     }
 
+    public Contact getContactById(long id){
+
+        return mDataHelper.getContactById(id);
+    }
+
     public Contact getContactByStandardizedPhoneNumber(String phoneNumber){
 
         return mDataHelper.getContactByPhoneNumber(phoneNumber);
