@@ -97,15 +97,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
         }
 
         mContactManager = ContactManager.getInstance(getActivity());
-
         setHasOptionsMenu(true);
-        //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
-       // if (NavUtils.getParentActivityName(getActivity()) != null) {
-            ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-//            actionBar.setLogo(R.mipmap.ic_launcher);
-            actionBar.setDisplayUseLogoEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-       // }
         getLoaderManager().initLoader(CONTACTS_LIST_LOADER, null, this);
     }
 
@@ -115,6 +107,11 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
         View v = super.onCreateView(inflater, parent, savedInstanceState);
         ListView listView = (ListView) v.findViewById(android.R.id.list);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setLogo(R.mipmap.ic_launcher);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
 
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
