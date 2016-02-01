@@ -91,8 +91,12 @@ public class AddNewPhoneFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //if number is not of a proper format, show an error message
-                if(!mContactManager.numberHasProperFormat(newPhoneNumber.toString())){
+
+                if(newPhoneNumber ==null){
+
+                    Toast.makeText(getActivity(), R.string.nothing_to_save, Toast.LENGTH_SHORT).show();
+                }
+                else if(!mContactManager.numberHasProperFormat(newPhoneNumber.toString())){//if number is not of a proper format, show an error message
                     Toast.makeText(getActivity(), R.string.wrong_phone_number_format, Toast.LENGTH_SHORT).show();
                 }
                 else {

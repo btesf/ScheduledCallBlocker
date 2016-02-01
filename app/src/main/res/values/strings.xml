@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CallBlocker</string>
+    <string name="app_name">Scheduled Blocker</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="add_from_contact">Add from contact</string>
@@ -49,6 +49,7 @@
     <string name="cancel_new_number">Cancel</string>
     <string name="title_activity_add_new_phone">Add new phone</string>
     <string name="wrong_phone_number_format">Invalid phone number format</string>
+    <string name="nothing_to_save">Cannot save empty string</string>
     <string name="global_categories">General setting</string>
     <string name="global_call_block_settings">General call blocker settings</string>
     <string name="block_all_settings">Block all settings</string>

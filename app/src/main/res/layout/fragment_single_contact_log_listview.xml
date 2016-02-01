@@ -4,7 +4,8 @@ android:background="@drawable/background_activated"
 android:paddingTop="4dp"
 android:paddingBottom="4dp"
 android:paddingLeft="16dp"
-android:orientation="horizontal">
+android:orientation="horizontal"
+android:gravity="center_vertical">
         <TextView
             android:id="@+id/log_contact_date"
             android:layout_width="wrap_content"
