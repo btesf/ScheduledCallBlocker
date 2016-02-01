@@ -302,13 +302,15 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             TextView contactNameTextView = (TextView) view.findViewById(R.id.contact_name);
             TextView contactPhoneTextView = (TextView) view.findViewById(R.id.contact_phone_number);
 
+/*
             CheckBox outGoingCheckBox = (CheckBox) view.findViewById(R.id.outgoing_call_blocked_checkbox);
             CheckBox inComingCheckBox = (CheckBox) view.findViewById(R.id.incoming_call_blocked_checkbox);
+*/
 
-            contactNameTextView.setText(contact.getContactName() + "  (" + contact.getIncomingBlockedCount() + ", " +  contact.getOutgoingBlockedCount() + " )");
+            contactNameTextView.setText(contact.getContactName());
             contactPhoneTextView.setText(contact.getDisplayNumber());
-            outGoingCheckBox.setChecked(contact.getOutGoingBlockedState() == 1 ? true : false);
-            inComingCheckBox.setChecked(contact.getIncomingBlockedState() == 1 ? true : false);
+/*            outGoingCheckBox.setChecked(contact.getOutGoingBlockedState() == 1 ? true : false);
+            inComingCheckBox.setChecked(contact.getIncomingBlockedState() == 1 ? true : false);*/
         }
     }
     /**

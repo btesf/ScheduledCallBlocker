@@ -14,19 +14,17 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="80dp"
+            android:paddingLeft="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/contact_name_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                />
-
-            <TextView
-                android:id="@+id/contact_phone_number_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:textSize="24dp"
                 android:textStyle="bold"
                 />
         </LinearLayout>
@@ -34,12 +32,17 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="8dp"
             android:animateLayoutChanges="true">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="20sp"
                 android:text="@string/incoming_call_label_string"
                 android:id="@+id/textView" />
 
@@ -49,27 +52,35 @@
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/dontBlockString"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/dontBlockIncomingRadio"
                     android:longClickable="true"/>
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/alwaysBlockString"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/alwaysBlockIncomingRadio"/>
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/scheduledBlockString"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/scheduledIncomingRadio"/>
             </RadioGroup>
 
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/incomingScheduleTable">
+                android:id="@+id/incomingScheduleTable"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
                 <include layout="@layout/button_row" />
                 <include layout="@layout/button_row" />
                 <include layout="@layout/button_row" />
@@ -85,14 +96,19 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true">
+            android:animateLayoutChanges="true"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/outgoing_call_label_string"
-                android:id="@+id/textView2" />
+                android:id="@+id/textView2"
+                android:textSize="20sp" />
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -101,20 +117,26 @@
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:text="@string/dontBlockString"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/dontBlockOutgoingRadio"
                     android:longClickable="true"/>
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/alwaysBlockString"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/alwaysBlockOutgoingRadio" />
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/scheduledBlockString"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/scheduledOutgoingRadio"/>
 
             </RadioGroup>
@@ -123,7 +145,9 @@
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/outgoingScheduleTable">
+                android:id="@+id/outgoingScheduleTable"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
 
                 <include layout="@layout/button_row" />
                 <include layout="@layout/button_row" />

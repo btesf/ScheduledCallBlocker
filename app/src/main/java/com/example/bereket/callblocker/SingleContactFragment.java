@@ -112,7 +112,11 @@ public class SingleContactFragment extends Fragment {
         setHasOptionsMenu(true);
         //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
         if (NavUtils.getParentActivityName(getActivity()) != null) {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 
@@ -122,10 +126,7 @@ public class SingleContactFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_single_contact, container, false);
 
-        mPhoneNumberTextView = (TextView) view.findViewById(R.id.contact_phone_number_id);
         mContactNameTextView = (TextView) view.findViewById(R.id.contact_name_id);
-
-        mPhoneNumberTextView.setText(mContact.getPhoneNumber());
         mContactNameTextView.setText(mContact.getContactName());
 
         outgoingScheduleTable = (TableLayout)view.findViewById(R.id.outgoingScheduleTable);
@@ -362,7 +363,7 @@ public class SingleContactFragment extends Fragment {
 
             String startTime = mTimeHelper.getTimeWithSystemTimeFormat(schedule.getStartTime());
             String endTime = mTimeHelper.getTimeWithSystemTimeFormat(schedule.getEndTime());
-            button.setText(startTime + " - " + endTime);
+            button.setText(startTime + " – " + endTime);
         }
     }
 

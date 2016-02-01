@@ -42,7 +42,7 @@ public class TimeHelper {
 
         if(date == null){
 
-            return " -- : -- ";
+            return " – – : – –  ";
         }
 
         boolean is24HourFormat = DateFormat.is24HourFormat(mContext);

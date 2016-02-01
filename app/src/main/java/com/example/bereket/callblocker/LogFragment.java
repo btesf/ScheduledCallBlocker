@@ -80,7 +80,11 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
 
         //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
         if (NavUtils.getParentActivityName(getActivity()) != null) {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 

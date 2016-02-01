@@ -3,13 +3,11 @@ package com.example.bereket.callblocker;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.provider.ContactsContract;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -70,7 +68,11 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
         setHasOptionsMenu(true);
         //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
         if (NavUtils.getParentActivityName(getActivity()) != null) {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
         }
 
         getLoaderManager().initLoader(SINGLE_CONTACT_LOG_LIST_LOADER, null, this);
@@ -85,7 +87,7 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
         listView = (ListView) view.findViewById(R.id.log_list_view_id);
         contactNameTextView = (TextView) view.findViewById(R.id.contact_name_textview_id);
 
-        contactNameTextView.setText(mContact.getContactName() + "  -  " + mContact.getDisplayNumber());
+        contactNameTextView.setText(mContact.getContactName());
         return view;
     }
 
@@ -147,7 +149,7 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            return inflater.inflate(R.layout.fragment_log, viewGroup, false);
+            return inflater.inflate(R.layout.fragment_single_contact_log_listview, viewGroup, false);
         }
 
         @Override
@@ -156,10 +158,7 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
             LogRecord log = logCursor.getLog();
 
             //set up the start date text view
-            TextView logContactPhone = (TextView) view.findViewById(R.id.log_contact_phone);
             TextView logContactDate = (TextView) view.findViewById(R.id.log_contact_date);
-
-            logContactPhone.setText(log.getContactPhone());
             logContactDate.setText(log.getLogDate().toString());
         }
     }

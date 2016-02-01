@@ -6,6 +6,7 @@
     <string name="add_manually">Add manually</string>
     <string name="phoneNumberIsEmpty">Cannot add contact. Phone number is empty</string>
     <string name="title_activity_single_contact">Manage contact</string>
+    <string name="call_blocker_activity_name">Blocked calls log</string>
 
     <string name="preference_dialog_clear_type_key">ClearType</string>
 <!-- TODO: Remove or change this placeholder text -->
@@ -46,7 +47,7 @@
     <string name="newPhoneNumberString">Phone number</string>
     <string name="save_new_number">Save</string>
     <string name="cancel_new_number">Cancel</string>
-    <string name="title_activity_add_new_phone">AddNewPhoneActivity</string>
+    <string name="title_activity_add_new_phone">Add new phone</string>
     <string name="wrong_phone_number_format">Invalid phone number format</string>
     <string name="global_categories">General setting</string>
     <string name="global_call_block_settings">General call blocker settings</string>
@@ -71,7 +72,7 @@
     <string name="unblock_all_outgoing_block_numbers_summary">Un-blocks outgoing call blocked numbers</string>
     <string name="clear_all_outgoing_block_schedule_title">Un-block all scheduled block numbers</string>
     <string name="clear_all_outgoing_block_schedule_summary">Un-block all \\\'scheduled blocked\\\' numbers</string>
-    <string name="title_activity_preference">Call blocker settings</string>
+    <string name="title_activity_preference">Settings</string>
     <string name="settings_string">Settings</string>
     <string name="notification_settings_title">Notification settings</string>
     <string name="notification_settings_summary">Enable/Disable call block notifications</string>
@@ -111,5 +112,5 @@
     <string name="disable_outgoing_block_notification_pref_key">disable_outgoing_block_notification_pref_key</string>
     <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
     <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
-    <string name="title_activity_single_contact_log">SingleContactLogActivity</string>
+    <string name="title_activity_single_contact_log">Single contact log</string>
 </resources>

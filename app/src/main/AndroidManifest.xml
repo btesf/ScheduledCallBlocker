@@ -31,27 +31,10 @@
         </activity>
         <activity
             android:name=".LogActivity"
-            android:label="@string/app_name" >
+            android:label="@string/call_blocker_activity_name" >
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CallBlockerActivity"/>
         </activity>
-
-        <receiver android:name=".OutgoingCallReceiver" >
-            <intent-filter android:priority="0" >
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".IncomingCallReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".NetworkConnectionReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.SIM_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".SingleContactActivity"
             android:label="@string/title_activity_single_contact" >
@@ -70,6 +53,28 @@
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CallBlockerActivity"/>
         </activity>
+        <activity
+            android:name=".SingleContactLogActivity"
+            android:label="@string/title_activity_single_contact_log" >
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LogActivity"/>
+        </activity>
+
+        <receiver android:name=".OutgoingCallReceiver" >
+            <intent-filter android:priority="0" >
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".IncomingCallReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".NetworkConnectionReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.SIM_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".LoggerAndNotificationService"
@@ -80,12 +85,6 @@
             android:exported="false" >
         </service>
 
-        <activity
-            android:name=".SingleContactLogActivity"
-            android:label="@string/title_activity_single_contact_log" >
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LogActivity"/>
-        </activity>
     </application>
 
 </manifest>
