@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -157,9 +159,13 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
             TextView logContactNameTextView = (TextView) view.findViewById(R.id.log_contact_phone);
             TextView logDateTextView = (TextView) view.findViewById(R.id.log_contact_date);
 
+            ImageView logTypeImage = (ImageView) view.findViewById(R.id.block_type_icon);
+
             logContactNameTextView.setText(logRecord.getContactName());
             //TODO: format the stardard way. determine if the time format is 24/12 from the system and format the date accordingly
             logDateTextView.setText(new SimpleDateFormat("dd/MM/yyyy hh:mm a").format(logRecord.getLogDate()));
+
+            logTypeImage.setImageResource(logRecord.getBlockType() == BlockType.INCOMING ? R.drawable.incoming : R.drawable.outgoing);
         }
     }
 

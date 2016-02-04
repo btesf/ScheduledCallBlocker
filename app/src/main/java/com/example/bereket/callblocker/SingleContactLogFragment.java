@@ -17,8 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
 
 public class SingleContactLogFragment extends Fragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>{
 
@@ -88,6 +91,7 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
         contactNameTextView = (TextView) view.findViewById(R.id.contact_name_textview_id);
 
         contactNameTextView.setText(mContact.getContactName());
+
         return view;
     }
 
@@ -160,6 +164,10 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
             //set up the start date text view
             TextView logContactDate = (TextView) view.findViewById(R.id.log_contact_date);
             logContactDate.setText(log.getLogDate().toString());
+
+            ImageView logTypeImage = (ImageView) view.findViewById(R.id.block_type_icon);
+
+            logTypeImage.setImageResource(log.getBlockType() == BlockType.INCOMING ? R.drawable.incoming : R.drawable.outgoing);
         }
     }
     @Override

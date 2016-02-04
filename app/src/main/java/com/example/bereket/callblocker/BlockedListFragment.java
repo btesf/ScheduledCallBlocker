@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -302,15 +303,37 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             TextView contactNameTextView = (TextView) view.findViewById(R.id.contact_name);
             TextView contactPhoneTextView = (TextView) view.findViewById(R.id.contact_phone_number);
 
-/*
-            CheckBox outGoingCheckBox = (CheckBox) view.findViewById(R.id.outgoing_call_blocked_checkbox);
-            CheckBox inComingCheckBox = (CheckBox) view.findViewById(R.id.incoming_call_blocked_checkbox);
-*/
+            ImageView outGoingCallBlockStateImage = (ImageView) view.findViewById(R.id.outgoing_call_block_state_image);
+            ImageView incomingCallBlockStateImage = (ImageView) view.findViewById(R.id.incoming_call_block_state_image);
 
             contactNameTextView.setText(contact.getContactName());
             contactPhoneTextView.setText(contact.getDisplayNumber());
-/*            outGoingCheckBox.setChecked(contact.getOutGoingBlockedState() == 1 ? true : false);
-            inComingCheckBox.setChecked(contact.getIncomingBlockedState() == 1 ? true : false);*/
+
+            //set incoming block state image
+            switch(contact.getIncomingBlockedState()){
+
+                case BlockState.ALWAYS_BLOCK:
+
+                    incomingCallBlockStateImage.setImageResource(R.drawable.red_arrow);
+                    break;
+                case BlockState.SCHEDULED_BLOCK:
+
+                    incomingCallBlockStateImage.setImageResource(R.drawable.red);
+                    break;
+            }
+
+            //set outgoing block state image
+            switch(contact.getOutGoingBlockedState()){
+
+                case BlockState.ALWAYS_BLOCK:
+
+                    outGoingCallBlockStateImage.setImageResource(R.drawable.green_arrow);
+                    break;
+                case BlockState.SCHEDULED_BLOCK:
+
+                    outGoingCallBlockStateImage.setImageResource(R.drawable.green);
+                    break;
+            }
         }
     }
     /**
