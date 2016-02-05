@@ -454,8 +454,29 @@ public class SingleContactFragment extends Fragment {
     @Override
     public void onPause(){
         super.onPause();
-/*        if(mIsIncomingScheduleChanged) dataBaseHelper.updateSchedules(mIncomingSchedule);
-        if(mIsOutgoingScheduleChanged)  dataBaseHelper.updateSchedules(mOutgoingSchedule);*/
+
+        Map<Integer, Schedule> scheduleMap = null;
+
+        //if scheduled block is set but no schedule is set for that block type, change block type to 'don't block'
+        if(mContact.getIncomingBlockedState() == BlockState.SCHEDULED_BLOCK){
+
+            scheduleMap = mContactManager.queryContactSchedule(mContact.getId(), BlockType.INCOMING);
+            if(scheduleMap.keySet().size() == 0){
+
+                mContact.setIncomingBlockedState(BlockState.DONT_BLOCK);
+                mContactManager.updateContact(mContact);
+            }
+        }
+
+        if(mContact.getOutGoingBlockedState() == BlockState.SCHEDULED_BLOCK){
+
+            scheduleMap = mContactManager.queryContactSchedule(mContact.getId(), BlockType.OUTGOING);
+            if(scheduleMap.keySet().size() == 0){
+
+                mContact.setOutGoingBlockedState(BlockState.DONT_BLOCK);
+                mContactManager.updateContact(mContact);
+            }
+        }
     }
 
     @Override
