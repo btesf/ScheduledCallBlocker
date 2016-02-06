@@ -114,4 +114,8 @@
     <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
     <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
     <string name="title_activity_single_contact_log">Single contact log</string>
+    <string name="all_incoming_calls_are_blocked">All incoming calls are blocked</string>
+    <string name="all_outgoing_calls_are_blocked">All outgoing calls are blocked</string>
+    <string name="all_incoming_block_notification_blocked">Incoming block notification disabled</string>
+    <string name="all_outgoing_block_notification_blocked">Outgoing block notification disabled</string>
 </resources>

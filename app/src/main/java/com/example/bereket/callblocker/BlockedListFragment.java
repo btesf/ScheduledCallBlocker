@@ -218,13 +218,18 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
         }
 
         Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
+        startSingleContactActivity(contact);
+        //startActivity(intent);
+    }
+
+    //utility method to start single contact activity - it will be used two places
+    private void startSingleContactActivity(Contact contact){
+
         Intent intent = new Intent(getActivity(), SingleContactActivity.class);
         //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
         intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
         startActivityForResult(intent, SINGLE_CONTACT_ACTIVITY_RESULT);
-        //startActivity(intent);
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -386,21 +391,8 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                     new String[]{String.valueOf(id)}, null);
 
                 pCur.moveToFirst();
-
                 phoneNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-/*              int type = pCur.getInt(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-                switch (type) {
-                    case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
-                    // do something with the Home number here...
-                    break;
-                    case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
-                    // do something with the Mobile number here...
-                    break;
-                    case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
-                    // do something with the Work number here...
-                    break;
-                }*/
                 pCur.close();
             }
             //close cursor
@@ -412,6 +404,8 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
             else{
 
                 mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName, false);
+                Contact contact = mContactManager.getContactById(id);
+                startSingleContactActivity(contact);
             }
         }
         else if(requestCode == ADD_CONTACT_MANUALLY){
@@ -421,6 +415,8 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 String phoneNumber = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
 
                 mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(),  phoneNumber, null, true);
+                Contact contact = mContactManager.getContactByPhoneNumber(phoneNumber);
+                startSingleContactActivity(contact);
             }
         }
     }

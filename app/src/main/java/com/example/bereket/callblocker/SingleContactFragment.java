@@ -1,7 +1,10 @@
 package com.example.bereket.callblocker;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -75,6 +78,14 @@ public class SingleContactFragment extends Fragment {
         incomingCallWeekDayButtons = new ArrayList<>();
         outgoingCallWeekDayButtons = new ArrayList<>();
     }
+
+    private BroadcastReceiver mOnUpdateContactFromPhoneBook = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //implementation here
+
+        }
+    };
 
     /**
      * Use this factory method to create a new instance of
@@ -455,6 +466,9 @@ public class SingleContactFragment extends Fragment {
     public void onPause(){
         super.onPause();
 
+        //unregister the broadcast listener that is released from SaveFromPhoneBookService
+        getActivity().unregisterReceiver(mOnUpdateContactFromPhoneBook);
+
         Map<Integer, Schedule> scheduleMap = null;
 
         //if scheduled block is set but no schedule is set for that block type, change block type to 'don't block'
@@ -494,6 +508,16 @@ public class SingleContactFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //register a receiver that gets notified when a blocked list contat is updated from phonebook
+        IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
+        //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
+        getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
     }
 
     /**

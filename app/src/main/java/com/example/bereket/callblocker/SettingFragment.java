@@ -63,6 +63,7 @@ public class SettingFragment extends PreferenceFragment{
                         public void onClick(DialogInterface dialog, int which) {
 
                             ((SwitchPreference) preference).setChecked(true);
+                            Toast.makeText(getActivity(), R.string.all_incoming_calls_are_blocked, Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -104,6 +105,7 @@ public class SettingFragment extends PreferenceFragment{
                         public void onClick(DialogInterface dialog, int which) {
 
                             ((SwitchPreference) preference).setChecked(true);
+                            Toast.makeText(getActivity(), R.string.all_outgoing_calls_are_blocked, Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -146,6 +148,7 @@ public class SettingFragment extends PreferenceFragment{
                         public void onClick(DialogInterface dialog, int which) {
 
                             ((CheckBoxPreference) preference).setChecked(true);
+                            Toast.makeText(getActivity(), R.string.all_incoming_block_notification_blocked, Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -189,6 +192,7 @@ public class SettingFragment extends PreferenceFragment{
                         public void onClick(DialogInterface dialog, int which) {
 
                             ((CheckBoxPreference) preference).setChecked(true);
+                            Toast.makeText(getActivity(), R.string.all_outgoing_block_notification_blocked, Toast.LENGTH_SHORT).show();
                         }
                     });
 
