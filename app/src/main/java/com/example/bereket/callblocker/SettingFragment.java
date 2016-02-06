@@ -38,6 +38,7 @@ public class SettingFragment extends PreferenceFragment{
         Preference outgoigCallCheckBoxPreference = findPreference(resources.getString(R.string.disable_outgoing_block_notification_pref_key));
         Preference blockAllIncomingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_incoming_numbers_pref_key));
         Preference blockAllOutgoingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_outgoing_numbers_pref_key));
+        Preference enableVibrationOnInterceptionPreference = findPreference(resources.getString(R.string.enable_vibration_pref_key));
 
      /* preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override

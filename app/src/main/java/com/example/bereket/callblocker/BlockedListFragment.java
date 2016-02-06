@@ -218,16 +218,17 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
         }
 
         Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
-        startSingleContactActivity(contact);
+        startSingleContactActivity(contact, true);
         //startActivity(intent);
     }
 
     //utility method to start single contact activity - it will be used two places
-    private void startSingleContactActivity(Contact contact){
+    private void startSingleContactActivity(Contact contact, boolean isContactFromPhoneBook){
 
         Intent intent = new Intent(getActivity(), SingleContactActivity.class);
         //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
         intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
+        intent.putExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, isContactFromPhoneBook);
         startActivityForResult(intent, SINGLE_CONTACT_ACTIVITY_RESULT);
     }
 
@@ -405,7 +406,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
 
                 mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName, false);
                 Contact contact = mContactManager.getContactById(id);
-                startSingleContactActivity(contact);
+                startSingleContactActivity(contact, true);
             }
         }
         else if(requestCode == ADD_CONTACT_MANUALLY){
@@ -416,7 +417,7 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
 
                 mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(),  phoneNumber, null, true);
                 Contact contact = mContactManager.getContactByPhoneNumber(phoneNumber);
-                startSingleContactActivity(contact);
+                startSingleContactActivity(contact, false);
             }
         }
     }

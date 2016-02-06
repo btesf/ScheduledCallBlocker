@@ -416,6 +416,11 @@ public class ContactManager {
         return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.disable_outgoing_block_notification_pref_key), false);
     }
 
+    public boolean enableIncomingBlockVibrationPreferenceEnabled(){
+
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.enable_vibration_pref_key), true);
+    }
+
     public static boolean numberHasProperFormat(String number){
 
         final String numberFormatRegEx = "[+]?[0-9]{6,15}";

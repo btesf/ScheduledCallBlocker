@@ -31,6 +31,7 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
     private Contact mContact;
     private ContactManager mContactManager;
     private LogManager mLogManager;
+    private TimeHelper mTimeHelper;
 
     private TextView contactNameTextView;
     private ListView listView;
@@ -57,6 +58,7 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
 
         mContactManager = ContactManager.getInstance(getActivity());
         mLogManager = LogManager.getInstance(getActivity());
+        mTimeHelper = TimeHelper.getInstance(getActivity());
 
         if (getArguments() != null) {
 
@@ -163,7 +165,7 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
 
             //set up the start date text view
             TextView logContactDate = (TextView) view.findViewById(R.id.log_contact_date);
-            logContactDate.setText(log.getLogDate().toString());
+            logContactDate.setText(mTimeHelper.formattedLogDate(log.getLogDate()));
 
             ImageView logTypeImage = (ImageView) view.findViewById(R.id.block_type_icon);
 

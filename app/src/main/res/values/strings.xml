@@ -64,15 +64,15 @@
     <string name="outgoing_block_category_summary_string">Reset outgoing call settings</string>
     <string name="notification_category_title_string">Notification settings</string>
     <string name="notification_category_summary_string">Enable/disable call block notifications</string>
-    <string name="unblock_all_incoming_block_numbers_title">Un-block all \'always blocked\' numbers</string>
-    <string name="unblock_all_incoming_block_numbers_summary">Un-blocks incoming call blocked numbers</string>
-    <string name="clear_all_incoming_block_schedule_title">Un-block all scheduled block numbers</string>
-    <string name="clear_all_incoming_block_schedule_summary">Un-block all \\\'scheduled blocked\\\' numbers</string>
+    <string name="unblock_all_incoming_block_numbers_title">Unblock all \'always block\' numbers</string>
+    <string name="unblock_all_incoming_block_numbers_summary">Unblocks all \'always block\' numbers</string>
+    <string name="clear_all_incoming_block_schedule_title">Unblock all \'scheduled block\' numbers</string>
+    <string name="clear_all_incoming_block_schedule_summary">Unblocks all \'scheduled block\' numbers</string>
 
-    <string name="unblock_all_outgoing_block_numbers_title">Un-block all \'always blocked\' numbers</string>
-    <string name="unblock_all_outgoing_block_numbers_summary">Un-blocks outgoing call blocked numbers</string>
-    <string name="clear_all_outgoing_block_schedule_title">Un-block all scheduled block numbers</string>
-    <string name="clear_all_outgoing_block_schedule_summary">Un-block all \\\'scheduled blocked\\\' numbers</string>
+    <string name="unblock_all_outgoing_block_numbers_title">Unblock all \'always block\' numbers</string>
+    <string name="unblock_all_outgoing_block_numbers_summary">Unblocks all \'always block\' numbers</string>
+    <string name="clear_all_outgoing_block_schedule_title">Unblock all \'scheduled block\' numbers</string>
+    <string name="clear_all_outgoing_block_schedule_summary">Unblock all \'scheduled block\' numbers</string>
     <string name="title_activity_preference">Settings</string>
     <string name="settings_string">Settings</string>
     <string name="notification_settings_title">Notification settings</string>
@@ -113,9 +113,15 @@
     <string name="disable_outgoing_block_notification_pref_key">disable_outgoing_block_notification_pref_key</string>
     <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
     <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
+    <string name="enable_vibration_pref_key">enable_vibration_pref_key</string>
     <string name="title_activity_single_contact_log">Single contact log</string>
     <string name="all_incoming_calls_are_blocked">All incoming calls are blocked</string>
     <string name="all_outgoing_calls_are_blocked">All outgoing calls are blocked</string>
     <string name="all_incoming_block_notification_blocked">Incoming block notification disabled</string>
     <string name="all_outgoing_block_notification_blocked">Outgoing block notification disabled</string>
+    <string name="vibration_category_title_string">Vibration setting</string>
+    <string name="vibration_category_summary_string">Vibration setting</string>
+    <string name="vibrate_when_incoming_call_is_blocked_string">Vibrate on blocked incoming call</string>
+    <string name="vibrate_when_incoming_call_is_blocked_string_summary">Enable vibration when an incoming call is blocked</string>
+    <string name="hint_phone_number">Phone number</string>
 </resources>

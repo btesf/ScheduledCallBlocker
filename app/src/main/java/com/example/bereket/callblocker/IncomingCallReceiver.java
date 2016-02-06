@@ -120,6 +120,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             boolean callBlocked = false;
 
             AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
             //Turn ON the mute
             audioManager.setStreamMute(AudioManager.STREAM_RING, true);
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);

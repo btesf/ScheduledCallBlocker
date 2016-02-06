@@ -2,6 +2,7 @@ package com.example.bereket.callblocker;
 
 import android.content.Context;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
@@ -100,4 +101,45 @@ public class TimeHelper {
         return cal;
     }
 
+    public String formattedLogDate(Date date){
+
+        String formattedDate = "";
+        String dateFormatSegment = "";
+
+        if(DateUtils.isToday(date.getTime())){
+
+            formattedDate += "Today";
+        }
+        else {
+            //to check yesterday's date : add one day from the date given and use isToay()
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(date);
+            c1.add(Calendar.DAY_OF_YEAR, +1);
+
+            if(DateUtils.isToday(c1.getTime().getTime())){
+
+                formattedDate += "Yesteday";
+            }
+            else{
+
+                //segment -- Monday, January 30, 2016
+                dateFormatSegment += "EEEE, MMMM d, yyyy";
+            }
+        }
+
+        boolean is24HourFormat = DateFormat.is24HourFormat(mContext);
+
+        if(is24HourFormat){
+            //segment -- 24 hour format hour:minute
+            dateFormatSegment += " k:mm";
+        }
+        else{//am/pm format
+            //segment -- am/pm time format
+            dateFormatSegment += " h:mm a";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormatSegment);
+
+        return formattedDate + sdf.format(date);
+    }
 }

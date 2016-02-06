@@ -36,6 +36,7 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
     private String mParam2;
 
     private LogManager mLogManager;
+    private TimeHelper mTimeHelper;
     private DataBaseHelper.LogCursor mLogCursor;
 
     private OnFragmentInteractionListener mListener;
@@ -73,6 +74,7 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
         }
 
         mLogManager = LogManager.getInstance(getActivity());
+        mTimeHelper = TimeHelper.getInstance(getActivity());
         setHasOptionsMenu(true);
         getLoaderManager().initLoader(LOG_LIST_LOADER, null, this);
         //reset BlockCallCounter variables if the log is displayed
@@ -163,7 +165,7 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
 
             logContactNameTextView.setText(logRecord.getContactName());
             //TODO: format the stardard way. determine if the time format is 24/12 from the system and format the date accordingly
-            logDateTextView.setText(new SimpleDateFormat("dd/MM/yyyy hh:mm a").format(logRecord.getLogDate()));
+            logDateTextView.setText(mTimeHelper.formattedLogDate(logRecord.getLogDate()));
 
             logTypeImage.setImageResource(logRecord.getBlockType() == BlockType.INCOMING ? R.drawable.incoming : R.drawable.outgoing);
         }

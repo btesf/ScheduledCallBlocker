@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 
 public class LoggerAndNotificationService extends IntentService {
@@ -78,11 +79,21 @@ public class LoggerAndNotificationService extends IntentService {
 
     private void handleActionLogByContact(Contact blockedContact, int blockType) {
 
+        if(blockType == BlockType.INCOMING){
+
+            vibrate();
+        }
+
         sendNotification(blockedContact.getDisplayNumber(), blockType);
         mLogManager.log(blockedContact, blockType);
     }
 
     private void handleActionLogByPhoneNumber(String blockedPhoneNumber, int blockType, String countryCodeValue) {
+
+        if(blockType == BlockType.INCOMING){
+
+            vibrate();
+        }
 
         sendNotification(blockedPhoneNumber, blockType);
         mLogManager.log(blockedPhoneNumber, blockType, countryCodeValue);
@@ -112,6 +123,16 @@ public class LoggerAndNotificationService extends IntentService {
                     getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
             notificationManager.notify(BlockType.INCOMING, notification);
+        }
+    }
+
+    private void vibrate(){
+
+        if(mContactManager.enableIncomingBlockVibrationPreferenceEnabled()){
+
+            long pattern[] = { 0, 200, 200, 200};
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(pattern, -1);
         }
     }
 }

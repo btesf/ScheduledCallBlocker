@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,7 @@ public class SingleContactFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_PARAM1 = "param1";
+    public static final String ARG_CONTACT_FROM_PHONEBOOK = "param2";
     public static final int PICK_SCHEDULE_TIME_REQUEST_CODE = 0;
 
     private int WEEK_DAY_BUTTON_POSITION_IN_LAYOUT = 1;
@@ -72,6 +74,8 @@ public class SingleContactFragment extends Fragment {
     //time format helper class
     TimeHelper mTimeHelper;
 
+   // private boolean isBroadcastReceived
+
     private OnFragmentInteractionListener mListener;
 
     {
@@ -79,11 +83,27 @@ public class SingleContactFragment extends Fragment {
         outgoingCallWeekDayButtons = new ArrayList<>();
     }
 
+    /*
+    the purpose of this broadcast receiver is, if somehow, the number is added manually and the search(sync) service (that looks the number in the phone's contact)
+    is not complete before this fragment is loaded, still the contact won't have proper full name and contact id. The synch service will send a broadcast message once it is done.
+    When that message is received, update mContact and views with fresh details from blocked list
+     */
     private BroadcastReceiver mOnUpdateContactFromPhoneBook = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //implementation here
+            //find contact from contact phone number and update it
+            if(mContact != null){
 
+                if(mContactManager != null){
+
+                    mContact = mContactManager.getContactByPhoneNumber(mContact.getPhoneNumber());
+                    //set contact name text
+                    if(mContactNameTextView != null){
+
+                        mContactNameTextView.setText(mContact.getContactName());
+                    }
+                }
+            }
         }
     };
 
@@ -95,10 +115,11 @@ public class SingleContactFragment extends Fragment {
      * @return A new instance of fragment SingleContactFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SingleContactFragment newInstance(Contact param1) {
+    public static SingleContactFragment newInstance(Contact param1, boolean isContactFromPhoneBook) {
         SingleContactFragment fragment = new SingleContactFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, param1);
+        args.putSerializable(ARG_CONTACT_FROM_PHONEBOOK, isContactFromPhoneBook);
         fragment.setArguments(args);
         return fragment;
     }
@@ -110,16 +131,30 @@ public class SingleContactFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            Contact contact = (Contact)getArguments().getSerializable(ARG_PARAM1);
-            if(contact != null){
-                mContact = contact;
-            }
-        }
         //instantiate DB Helper
         mTimeHelper = TimeHelper.getInstance(getActivity());
         mScheduleManager = ScheduleManager.getInstance(getActivity());
         mContactManager = ContactManager.getInstance(getActivity());
+
+        if (getArguments() != null) {
+
+            boolean isContactFromPhonebook = (boolean)getArguments().getBoolean(ARG_CONTACT_FROM_PHONEBOOK);
+            Contact contact = (Contact)getArguments().getSerializable(ARG_PARAM1);
+
+            if(contact != null){
+                //check if the ,contact comes from phone book. If so, don't need to re-query - we have all the necessary information (complete fname, last name...)
+                //otherwise, re-query to get the actual name - this happens when manually added number details are updated after this fragment is called and contact details are now different
+                if(isContactFromPhonebook){
+
+                    mContact = contact;
+                }
+                else{
+                    //if contact is manually added, requery to get an updated contact details if sync service (SaveFromPhoneBookService) change/updated the block list with fresh detail from phonebook
+                    mContact = mContactManager.getContactByPhoneNumber(contact.getPhoneNumber());
+                }
+            }
+        }
+
         setHasOptionsMenu(true);
         //enable the 'UP' ancestoral navigation button, if parent is set in manifest for this activity
         if (NavUtils.getParentActivityName(getActivity()) != null) {

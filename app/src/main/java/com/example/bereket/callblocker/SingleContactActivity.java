@@ -15,8 +15,9 @@ public class SingleContactActivity extends SingleFragmentActivity implements Sin
     protected Fragment createFragment() {
 
         Contact contactExtra = (Contact) getIntent().getSerializableExtra(SingleContactFragment.ARG_PARAM1);
+        boolean isContactFromPhoneBookExtra = (boolean) getIntent().getBooleanExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, true);
 
-        SingleContactFragment contactFragment = SingleContactFragment.newInstance(contactExtra);
+        SingleContactFragment contactFragment = SingleContactFragment.newInstance(contactExtra, isContactFromPhoneBookExtra);
 
         return contactFragment;
     }
