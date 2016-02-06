@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Allow this application to use the privately declared permission - above -->
     <uses-permission android:name="com.example.bereket.callblocker.PRIVATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"

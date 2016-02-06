@@ -10,6 +10,7 @@ import android.media.AudioManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
@@ -22,25 +23,28 @@ import java.util.Calendar;
  */
 public class IncomingCallReceiver extends BroadcastReceiver {
 
+    PhoneCallStateListener customPhoneListener = null;
     @Override
     public void onReceive(Context context, Intent intent) {
-        TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        PhoneCallStateListener customPhoneListener = new PhoneCallStateListener(context);
-        telephony.listen(customPhoneListener, PhoneStateListener.LISTEN_CALL_STATE);
 
+        TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+        if(customPhoneListener == null){
+
+            customPhoneListener = new PhoneCallStateListener(context);
+            telephony.listen(customPhoneListener, PhoneStateListener.LISTEN_CALL_STATE);
+        }
     }
 
     private class PhoneCallStateListener extends PhoneStateListener {
 
         private Context context;
         private ScheduleManager mScheduleManager;
-        private LogManager mLogManager;
         private ContactManager mContactManager;
 
         public PhoneCallStateListener(Context context){
             this.context = context;
             mScheduleManager = ScheduleManager.getInstance(context);
-            mLogManager = LogManager.getInstance(context);
             mContactManager = ContactManager.getInstance(context);
         }
 
