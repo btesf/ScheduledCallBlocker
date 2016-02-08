@@ -23,7 +23,7 @@ import java.util.Calendar;
  */
 public class IncomingCallReceiver extends BroadcastReceiver {
 
-    PhoneCallStateListener customPhoneListener = null;
+    private static PhoneCallStateListener customPhoneListener = null;
     @Override
     public void onReceive(Context context, Intent intent) {
 
