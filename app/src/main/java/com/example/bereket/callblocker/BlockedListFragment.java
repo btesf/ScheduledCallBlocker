@@ -26,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -420,5 +419,15 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
                 startSingleContactActivity(contact, false);
             }
         }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        View  emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_block_list_view, null);
+
+        ((ViewGroup)getListView().getParent()).addView(emptyView);
+        getListView().setEmptyView(emptyView);
     }
 }
