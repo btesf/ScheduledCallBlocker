@@ -227,6 +227,17 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
         getLoaderManager().restartLoader(LOG_LIST_LOADER, null, this);
     }
 
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        View  emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_log_list_view, null);
+
+        ((ViewGroup)getListView().getParent()).addView(emptyView);
+        getListView().setEmptyView(emptyView);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

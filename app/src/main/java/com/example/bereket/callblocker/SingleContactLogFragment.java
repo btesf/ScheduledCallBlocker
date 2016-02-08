@@ -134,12 +134,29 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
         //Create an adapter to point at this cursor
         LogListAdaptor adapter = new LogListAdaptor((DataBaseHelper.LogCursor)logCursor);
         listView.setAdapter(adapter);
+
+        View emptyTextView = getActivity().findViewById(R.id.empty_contact_log_text);
+
+        if(emptyTextView != null) {
+
+            if (adapter.getCount() == 0) emptyTextView.setVisibility(View.VISIBLE);
+            else emptyTextView.setVisibility(View.GONE);
+        }
+
+
     }
 
     @Override
     public void onLoaderReset(Loader<DataBaseHelper.LogCursor> logCursorLoader) {
 
         listView.setAdapter(null);
+
+        View emptyTextView = getActivity().findViewById(R.id.empty_contact_log_text);
+
+        if(emptyTextView != null){ //sometimes empty text view is null
+
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
     }
 
 
