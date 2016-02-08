@@ -132,6 +132,13 @@ public class ContactManager {
                     //TODO remove the line below - it is temporary
                     Toast.makeText(mContext, "Contact is updated", Toast.LENGTH_SHORT).show();
                 }
+                else if((oldContact.getId() < newContact.getId()) && !oldContact.isContactVisible()){ //if contact was there but hidden, make it visible contact - this happens when a contact is added from Phonebook by a logger service
+                    //in this scenario, number is already standardized - b/c it is added during incoming call where network is available.
+                    oldContact.setIsContactVisible(true);
+                    updateContact(oldContact);
+                    //TODO remove the line below - it is temporary
+                    Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                }
                 else{
                     //if the latest id is timestamp, check if there is an older contact (by comparing ids) and update the contact if the older contact id is greater than the new one
                     //i.e - if the new contact comes from contact list, it will be less than the new one - we want to update this time.
@@ -144,9 +151,9 @@ public class ContactManager {
 
                             Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                    else {
+                    } else {
                         //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
+
                         Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -188,6 +195,12 @@ public class ContactManager {
 
                         Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
                     }
+                } else if((contact.getId() < newContact.getId()) && !contact.isContactVisible()){ //if contact was there but hidden, make it visible contact - this happens when a contact is added from Phonebook by a logger service
+                    //in this scenario, number is already standardized - b/c it is added during incoming call where network is available.
+                    contact.setIsContactVisible(true);
+                    updateContact(contact);
+                    //TODO remove the line below - it is temporary
+                    Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
