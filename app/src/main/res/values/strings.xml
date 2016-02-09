@@ -125,5 +125,8 @@
     <string name="vibrate_when_incoming_call_is_blocked_string_summary">Enable vibration when an incoming call is blocked</string>
     <string name="hint_phone_number">Phone number</string>
 
-    <string name="empty_contact_log">no log for this contact</string>
+    <string name="empty_contact_log">No log for this contact</string>
+
+    <string name="empty_log_list_text">NO LOGS AVAILABLE</string>
+    <string name="empty_block_list_text">NO BLOCKED CONTACTS</string>
 </resources>

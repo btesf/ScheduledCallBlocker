@@ -4,7 +4,10 @@
     android:layout_height="fill_parent" android:id="@+id/empty_block_list_view"
     android:layout_gravity="center_vertical" >
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="empty!!!" android:layout_marginLeft="50dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/empty_block_list_text"
+        android:gravity="center_vertical|center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#d3d3d3" />
 </LinearLayout>

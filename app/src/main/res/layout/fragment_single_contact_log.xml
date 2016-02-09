@@ -42,7 +42,10 @@ android:orientation="vertical">
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/empty_contact_log"
-                    android:visibility="gone"/>
+                    android:visibility="gone"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="#d3d3d3"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
             </LinearLayout>
 
