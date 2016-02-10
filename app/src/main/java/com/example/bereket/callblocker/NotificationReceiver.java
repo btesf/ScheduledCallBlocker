@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 
 /**
@@ -23,17 +22,12 @@ public class NotificationReceiver extends BroadcastReceiver {
         mContext = context;
         mContactManager = ContactManager.getInstance(context);
 
-        String phoneNumber = intent.getStringExtra(LoggerAndNotificationService.PHONE_NUMBER);
-        Integer blockType = intent.getIntExtra(LoggerAndNotificationService.BLOCKED_TYPE, -1);
+        String phoneNumber = intent.getStringExtra(LogAndPostBlockService.PHONE_NUMBER);
+        Integer blockType = intent.getIntExtra(LogAndPostBlockService.BLOCKED_TYPE, -1);
 
         if(phoneNumber != null && blockType != -1){
 
             sendNotification(phoneNumber, blockType);
-
-            if(blockType == BlockType.INCOMING){
-
-                vibrate();
-            }
         }
     }
 
@@ -61,16 +55,6 @@ public class NotificationReceiver extends BroadcastReceiver {
                     mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
             notificationManager.notify(BlockType.INCOMING, notification);
-        }
-    }
-
-    private void vibrate(){
-
-        if(mContactManager.enableIncomingBlockVibrationPreferenceEnabled()){
-
-            long pattern[] = { 0, 200, 200, 200};
-            Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(pattern, -1);
         }
     }
 }

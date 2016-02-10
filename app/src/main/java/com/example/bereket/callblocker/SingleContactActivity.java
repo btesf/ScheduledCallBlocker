@@ -2,10 +2,6 @@ package com.example.bereket.callblocker;
 
 import android.app.Fragment;
 import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 
 public class SingleContactActivity extends SingleFragmentActivity implements SingleContactFragment.OnFragmentInteractionListener{

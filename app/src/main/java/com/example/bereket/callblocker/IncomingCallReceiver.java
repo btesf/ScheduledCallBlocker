@@ -1,16 +1,11 @@
 package com.example.bereket.callblocker;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
@@ -64,7 +59,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                     if(mContactManager.globalBlockIncomingBlockPreferenceEnabled()){
 
                         blockCall();
-                        LoggerAndNotificationService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
+                        LogAndPostBlockService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
                     }
                     else{
                         //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
@@ -103,7 +98,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
 
                             if(callBlocked){
 
-                                LoggerAndNotificationService.startActionLoggerAndNotification(context, blockedContact, BlockType.INCOMING);
+                                LogAndPostBlockService.startActionLoggerAndNotification(context, blockedContact, BlockType.INCOMING);
                             }
                         }
                     }

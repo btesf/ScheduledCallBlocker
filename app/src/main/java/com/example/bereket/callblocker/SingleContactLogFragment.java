@@ -20,10 +20,11 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 
-public class SingleContactLogFragment extends Fragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>{
+public class SingleContactLogFragment extends HideNotificationFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>{
 
     public static final String ARG_PARAM1 = "param1";
 
@@ -157,6 +158,11 @@ public class SingleContactLogFragment extends Fragment implements LoaderManager.
 
             emptyTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void doOnBroadcastReceived() {
+        Toast.makeText(getActivity(), "New incoming call is blocked", Toast.LENGTH_SHORT).show();
     }
 
 

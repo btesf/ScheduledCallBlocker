@@ -22,10 +22,11 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 
-public class LogFragment extends ListFragment  implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>  {
+public class LogFragment extends HideNotificationListFragment  implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>  {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -225,6 +226,11 @@ public class LogFragment extends ListFragment  implements LoaderManager.LoaderCa
     public void onResume(){
         super.onResume();
         getLoaderManager().restartLoader(LOG_LIST_LOADER, null, this);
+    }
+
+    @Override
+    public void doOnBroadcastReceived() {
+        Toast.makeText(getActivity(), "New incoming call is blocked", Toast.LENGTH_SHORT).show();
     }
 
 

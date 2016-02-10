@@ -39,7 +39,7 @@ import android.widget.Toast;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BlockedListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor> {
+public class BlockedListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor> {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -182,6 +182,11 @@ public class BlockedListFragment extends ListFragment implements LoaderManager.L
         IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
         getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
+    }
+
+    @Override
+    public void doOnBroadcastReceived() {
+        Toast.makeText(getActivity(), "New incoming call is blocked", Toast.LENGTH_SHORT).show();
     }
 
     @Override

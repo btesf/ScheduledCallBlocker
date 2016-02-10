@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +34,7 @@ import java.util.Map;
  * Use the {@link SingleContactFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SingleContactFragment extends Fragment {
+public class SingleContactFragment extends HideNotificationFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_PARAM1 = "param1";
@@ -553,6 +552,11 @@ public class SingleContactFragment extends Fragment {
         IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
         getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
+    }
+
+    @Override
+    public void doOnBroadcastReceived() {
+        Toast.makeText(getActivity(), "New incoming call is blocked", Toast.LENGTH_SHORT).show();
     }
 
     /**

@@ -1,15 +1,11 @@
 package com.example.bereket.callblocker;
 
 import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Vibrator;
-import android.support.v4.app.NotificationCompat;
 
-public class LoggerAndNotificationService extends IntentService {
+public class LogAndPostBlockService extends IntentService {
 
     private ContactManager mContactManager;
     private LogManager mLogManager;
@@ -28,7 +24,7 @@ public class LoggerAndNotificationService extends IntentService {
 
     public static void startActionLoggerAndNotification(Context context, Contact blockedContact, Integer blockTye) {
 
-        Intent intent = new Intent(context, LoggerAndNotificationService.class);
+        Intent intent = new Intent(context, LogAndPostBlockService.class);
         intent.setAction(ACTION_LOG_CALL_BY_CONTACT);
         intent.putExtra(BlOCKED_CONTACT, blockedContact);
         intent.putExtra(BLOCKED_TYPE, blockTye);
@@ -38,7 +34,7 @@ public class LoggerAndNotificationService extends IntentService {
 
     public static void startActionLoggerAndNotification(Context context, String phoneNumber, Integer blockTye, String countryCode) {
 
-        Intent intent = new Intent(context, LoggerAndNotificationService.class);
+        Intent intent = new Intent(context, LogAndPostBlockService.class);
         intent.setAction(ACTION_LOG_CALL_BY_PHONE_NUMBER);
         intent.putExtra(PHONE_NUMBER, phoneNumber);
         intent.putExtra(BLOCKED_TYPE, blockTye);
@@ -47,7 +43,7 @@ public class LoggerAndNotificationService extends IntentService {
         context.startService(intent);
     }
 
-    public LoggerAndNotificationService() {
+    public LogAndPostBlockService() {
         super("LoggerAndNotificationService");
 
         mContext = getApplication();
@@ -83,12 +79,24 @@ public class LoggerAndNotificationService extends IntentService {
     private void handleActionLogByContact(Contact blockedContact, int blockType) {
 
         sendNotification(blockedContact.getDisplayNumber(), blockType);
+
+        if(blockType == BlockType.INCOMING){
+
+            vibrate();
+        }
+
         mLogManager.log(blockedContact, blockType);
     }
 
     private void handleActionLogByPhoneNumber(String blockedPhoneNumber, int blockType, String countryCodeValue) {
 
         sendNotification(blockedPhoneNumber, blockType);
+
+        if(blockType == BlockType.INCOMING){
+
+            vibrate();
+        }
+
         mLogManager.log(blockedPhoneNumber, blockType, countryCodeValue);
     }
 
@@ -99,6 +107,16 @@ public class LoggerAndNotificationService extends IntentService {
         intent.putExtra(PHONE_NUMBER, phoneNumber);
         intent.putExtra(BLOCKED_TYPE, blockType);
 
-        sendBroadcast(intent, PRIVATE_PERMISSION_KEY);
+        sendOrderedBroadcast(intent, PRIVATE_PERMISSION_KEY);
+    }
+
+    private void vibrate(){
+
+        if(mContactManager.enableIncomingBlockVibrationPreferenceEnabled()){
+
+            long pattern[] = { 0, 200, 200, 200};
+            Vibrator vibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(pattern, -1);
+        }
     }
 }
