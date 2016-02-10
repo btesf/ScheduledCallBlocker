@@ -77,6 +77,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".NotificationReceiver" android:exported="false" >
+            <intent-filter>
+                <action android:name="com.example.bereket.callblocker.SEND_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".LoggerAndNotificationService"
             android:exported="false" >

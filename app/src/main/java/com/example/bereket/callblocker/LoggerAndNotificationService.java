@@ -19,9 +19,12 @@ public class LoggerAndNotificationService extends IntentService {
     private static final String ACTION_LOG_CALL_BY_PHONE_NUMBER = "com.example.bereket.callblocker.action.log.call.by.phone.number";
 
     private static final String BlOCKED_CONTACT = "com.example.bereket.callblocker.extra.blocked.contact";
-    private static final String BLOCKED_TYPE = "com.example.bereket.callblocker.extra.block.type";
-    private static final String PHONE_NUMBER = "com.example.bereket.callblocker.extra.phone.number";
+    public static final String BLOCKED_TYPE = "com.example.bereket.callblocker.extra.block.type";
+    public static final String PHONE_NUMBER = "com.example.bereket.callblocker.extra.phone.number";
     private static final String COUNTRY_CODE = "om.example.bereket.callblocker.extra.country.code";
+
+    private static final String PRIVATE_PERMISSION_KEY = "com.example.bereket.callblocker.PRIVATE";
+    private static final String SEND_NOTIFICATION_ACTION = "com.example.bereket.callblocker.SEND_NOTIFICATION";
 
     public static void startActionLoggerAndNotification(Context context, Contact blockedContact, Integer blockTye) {
 
@@ -79,21 +82,11 @@ public class LoggerAndNotificationService extends IntentService {
 
     private void handleActionLogByContact(Contact blockedContact, int blockType) {
 
-        if(blockType == BlockType.INCOMING){
-
-            vibrate();
-        }
-
         sendNotification(blockedContact.getDisplayNumber(), blockType);
         mLogManager.log(blockedContact, blockType);
     }
 
     private void handleActionLogByPhoneNumber(String blockedPhoneNumber, int blockType, String countryCodeValue) {
-
-        if(blockType == BlockType.INCOMING){
-
-            vibrate();
-        }
 
         sendNotification(blockedPhoneNumber, blockType);
         mLogManager.log(blockedPhoneNumber, blockType, countryCodeValue);
@@ -101,38 +94,11 @@ public class LoggerAndNotificationService extends IntentService {
 
     private void sendNotification(String phoneNumber, int blockType){
 
-        if(!mContactManager.disableIncomingBlockNotificationPreferenceEnabled()){
+        Intent intent = new Intent(SEND_NOTIFICATION_ACTION);
 
-            BlockedCallCounter blockedCallCounter = new BlockedCallCounter(getApplicationContext());
-            int blockCount = blockedCallCounter.incrementAndGetBlockCount(blockType);
-//TODO put string values in xml file
-            Intent i  = new Intent(getApplicationContext(), LogActivity.class);
-            PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, i, 0);
-            Notification notification = new NotificationCompat.Builder(getApplicationContext())
-                    .setTicker("Call blocker")
-                    .setSmallIcon(android.R.drawable.ic_menu_report_image) //TODO: change the drawable here
-                    .setContentTitle( (blockType == BlockType.INCOMING ? "New incoming call blocked" : "New outgoing call blocked"))
-                    .setContentText(blockCount +
-                            (blockType == BlockType.INCOMING ? " incoming " : " outgoing ") + (blockCount == 1 ? "call is " : "calls are ")
-                            + "blocked since you last checked")
-                    .setContentIntent(pi)
-                    .setAutoCancel(true)
-                    .build();
+        intent.putExtra(PHONE_NUMBER, phoneNumber);
+        intent.putExtra(BLOCKED_TYPE, blockType);
 
-            NotificationManager notificationManager = (NotificationManager)
-                    getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.notify(BlockType.INCOMING, notification);
-        }
-    }
-
-    private void vibrate(){
-
-        if(mContactManager.enableIncomingBlockVibrationPreferenceEnabled()){
-
-            long pattern[] = { 0, 200, 200, 200};
-            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(pattern, -1);
-        }
+        sendBroadcast(intent, PRIVATE_PERMISSION_KEY);
     }
 }

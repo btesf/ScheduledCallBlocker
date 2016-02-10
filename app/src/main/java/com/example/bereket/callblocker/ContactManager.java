@@ -431,7 +431,7 @@ public class ContactManager {
 
     public boolean enableIncomingBlockVibrationPreferenceEnabled(){
 
-        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.enable_vibration_pref_key), true);
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.enable_vibration_pref_key), false);
     }
 
     public static boolean numberHasProperFormat(String number){
