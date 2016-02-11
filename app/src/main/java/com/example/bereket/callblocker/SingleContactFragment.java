@@ -1,14 +1,18 @@
 package com.example.bereket.callblocker;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -556,7 +560,8 @@ public class SingleContactFragment extends HideNotificationFragment {
 
     @Override
     public void doOnBroadcastReceived() {
-        Toast.makeText(getActivity(), "New incoming call is blocked", Toast.LENGTH_SHORT).show();
+
+        Utility.showCallInterceptionAlertDialog(getActivity());
     }
 
     /**

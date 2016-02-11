@@ -23,7 +23,7 @@ import android.widget.Toast;
 /**
  * Created by bereket on 11/7/15.
  */
-public class SettingFragment extends PreferenceFragment{
+public class SettingFragment extends HideNotificationPreferenceFragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -251,5 +251,12 @@ public class SettingFragment extends PreferenceFragment{
         }*/
 
         return false;
+    }
+
+    @Override
+    public void doOnBroadcastReceived() {
+
+        //TODO set string from xml/resources
+        Toast.makeText(getActivity(), "New incoming call is blocked.", Toast.LENGTH_SHORT).show();
     }
 }

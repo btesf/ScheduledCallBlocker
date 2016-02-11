@@ -230,7 +230,7 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
 
     @Override
     public void doOnBroadcastReceived() {
-        Toast.makeText(getActivity(), "New incoming call is blocked", Toast.LENGTH_SHORT).show();
+        Utility.showCallInterceptionAlertDialog(getActivity());
     }
 
 

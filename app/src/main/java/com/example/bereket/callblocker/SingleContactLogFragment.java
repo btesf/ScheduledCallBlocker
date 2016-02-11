@@ -162,7 +162,8 @@ public class SingleContactLogFragment extends HideNotificationFragment implement
 
     @Override
     public void doOnBroadcastReceived() {
-        Toast.makeText(getActivity(), "New incoming call is blocked", Toast.LENGTH_SHORT).show();
+
+        Utility.showCallInterceptionAlertDialog(getActivity());
     }
 
 
