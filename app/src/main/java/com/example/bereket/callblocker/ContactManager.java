@@ -51,6 +51,11 @@ public class ContactManager {
         return mDataHelper.queryContacts();
     }
 
+    public DataBaseHelper.ContactCursor queryContacts(String queryString){
+
+        return mDataHelper.queryContacts(queryString);
+    }
+
     public long insertContact(Contact contact){
 
        return mDataHelper.insertContact(contact);

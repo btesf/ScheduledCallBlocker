@@ -3,18 +3,27 @@ package com.example.bereket.callblocker;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.util.Log;
 
 /**
  * Created by bereket on 8/5/15.
  */
 public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor> {
 
+    public static final String QUERY_STRING_KEY = "query.string.key";
     private DataBaseHelper.ContactCursor mCursor;
     private ContactManager contactManager;
+    private String queryString = null;
 
-    public ContactLoader(Context context) {
+    public ContactLoader(Context context, Bundle args) {
         super(context);
         contactManager = ContactManager.getInstance(context);
+
+        if(args != null) {
+
+            queryString = args.getString(QUERY_STRING_KEY);
+        }
     }
 
     @Override
@@ -23,9 +32,8 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
         if(cursor !=  null){
             //Ensure that the content window is filled
             cursor.getCount();
-
-            
         }
+
         return cursor;
     }
 
@@ -43,7 +51,12 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
     }
 
     private DataBaseHelper.ContactCursor loadData(){
-        return contactManager.queryContacts();
+
+        DataBaseHelper.ContactCursor contactCursor;
+
+        contactCursor = (queryString == null) ? contactManager.queryContacts() : contactManager.queryContacts(queryString);
+
+        return contactCursor;
     }
 
     @Override
@@ -81,4 +94,5 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
         }
         mCursor = null;
     }
+
 }

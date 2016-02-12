@@ -3,6 +3,7 @@ package com.example.bereket.callblocker;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,6 +19,7 @@ import android.provider.ContactsContract;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,6 +31,7 @@ import android.widget.AbsListView;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +42,7 @@ import android.widget.Toast;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BlockedListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor> {
+public class BlockedListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor>, SearchView.OnQueryTextListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -240,6 +243,20 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.blocked_list_options, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+
+        if(searchView != null){
+
+            searchView.setSearchableInfo(
+                    searchManager.getSearchableInfo(getActivity().getComponentName()));
+            searchView.setOnQueryTextListener(this);
+        }
+
     }
 
     @Override
@@ -274,7 +291,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
     @Override
     public Loader<DataBaseHelper.ContactCursor> onCreateLoader(int i, Bundle bundle) {
-        return new ContactLoader(getActivity());
+        return new ContactLoader(getActivity(), bundle);
     }
 
     @Override
@@ -287,6 +304,29 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     @Override
     public void onLoaderReset(Loader<DataBaseHelper.ContactCursor> contactCursorLoader) {
         setListAdapter(null);
+    }
+
+    /*
+     Support search from search bar
+      */
+    @Override
+    public boolean onQueryTextSubmit(String searchString) {
+
+        Bundle args = new Bundle();
+        args.putString(ContactLoader.QUERY_STRING_KEY, searchString);
+        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String searchString) {
+
+        Bundle args = new Bundle();
+        args.putString(ContactLoader.QUERY_STRING_KEY, searchString);
+        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
+
+        return false;
     }
 
 

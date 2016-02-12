@@ -303,6 +303,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return new ContactCursor(wrapped);
     }
 
+
+    public ContactCursor queryContacts(String queryString){
+        //Equivalent to "select * from BlockList where IsContactVisible = 1 and (PhoneNumber like '%queryString%' or name like '%queryString%') order by start_date asc"
+        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, IS_CONTACT_VISIBLE + " = ? AND (" +  NAME + " LIKE ? OR " + PHONE_NUMBER + " LIKE  ? )", new String[]{"1", "%" + queryString + "%", "%" + queryString + "%"}, null, null, NAME + " asc");
+        return new ContactCursor(wrapped);
+    }
+
     public void unblockListByType(Integer blockType){
 
         ContentValues values = new ContentValues();
