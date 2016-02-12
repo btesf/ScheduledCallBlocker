@@ -119,5 +119,24 @@
             android:title="@string/vibrate_when_incoming_call_is_blocked_string"
             android:summary="@string/vibrate_when_incoming_call_is_blocked_string_summary"
             android:defaultValue="false" />
+
+        <SwitchPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="app_unlocked_key"
+            android:defaultValue="false"
+            />
+
+        <EditTextPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="app_password_counter_key"
+            android:defaultValue="0"
+            />
+
+        <EditTextPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="app_test_password_key"
+            android:defaultValue="abcdefghijklmnopqrstuvwxyz"
+            />
+
     </PreferenceCategory>
 </PreferenceScreen>
