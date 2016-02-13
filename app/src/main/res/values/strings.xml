@@ -114,6 +114,7 @@
     <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
     <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
     <string name="enable_vibration_pref_key">enable_vibration_pref_key</string>
+    <string name="about_the_app_pref_key">about_the_app_pref_key</string>
     <string name="title_activity_single_contact_log">Single contact log</string>
     <string name="all_incoming_calls_are_blocked">All incoming calls are blocked</string>
     <string name="all_outgoing_calls_are_blocked">All outgoing calls are blocked</string>
@@ -130,5 +131,14 @@
     <string name="empty_log_list_text">NO LOGS AVAILABLE</string>
     <string name="empty_block_list_text">NO BLOCKED CONTACTS</string>
     <string name="search_title">search blocked contact</string>
+    <string name="about_the_app_app_name">Scheduled Call Blocker</string>
+    <string name="app_version_text">Version 1.0</string>
+    <string name="app_maker_label">By Bereket Tesfamichael</string>
+    <string name="app_maker_email">neheworld@gmail.com</string>
+    <string name="about_us_title">About</string>
+    <string name="aboutus_category_title_string">About the app</string>
+    <string name="aboutus_category_summary_string">About the app</string>
+    <string name="about_the_app_preference_title">About Scheduled Call Blocker</string>
+    <string name="about_the_app_preference_summary">About Scheduled Call Blocker</string>
 
 </resources>
