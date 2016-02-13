@@ -124,18 +124,21 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:key="app_unlocked_key"
             android:defaultValue="false"
+            android:visibility="invisible"
             />
 
         <EditTextPreference
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:key="app_password_counter_key"
             android:defaultValue="0"
+            android:visibility="invisible"
             />
 
         <EditTextPreference
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:key="app_test_password_key"
-            android:defaultValue="abcdefghijklmnopqrstuvwxyz"
+            android:defaultValue="nahom.TESFAMICHAEL"
+            android:visibility="invisible"
             />
 
     </PreferenceCategory>

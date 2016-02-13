@@ -78,6 +78,18 @@ public class TestAuthenticator extends DialogFragment {
 
                 int attemptCounter = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("app_password_counter_key", "10"));
 
+                String passwordFromPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("app_test_password_key", "8292398239823983298");
+
+                if(passwordFromPreferences.equals(password)){
+
+                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("app_unlocked_key", true).commit();
+                    dismiss();
+                    return;
+                }
+
+                attemptCounter++;
+                PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putString("app_password_counter_key", String.valueOf(attemptCounter)).commit();
+
                 if(attemptCounter > 2){
 
                     PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("app_unlocked_key", false).commit();
@@ -86,17 +98,6 @@ public class TestAuthenticator extends DialogFragment {
                     getActivity().finish();
                     System.exit(0);
                 }
-
-                String passwordFromPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("app_test_password_key", "8292398239823983298");
-
-                if(passwordFromPreferences.equals(password)){
-
-                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("app_unlocked_key", true).commit();
-                    return;
-                }
-
-                attemptCounter++;
-                PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putString("app_password_counter_key", String.valueOf(attemptCounter)).commit();
 
                 tv.setText("");
 
