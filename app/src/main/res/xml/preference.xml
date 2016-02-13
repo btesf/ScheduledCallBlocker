@@ -119,6 +119,27 @@
             android:title="@string/vibrate_when_incoming_call_is_blocked_string"
             android:summary="@string/vibrate_when_incoming_call_is_blocked_string_summary"
             android:defaultValue="false" />
+     </PreferenceCategory>
+
+    <!-- About the app -->
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="aboutus_setting_category"
+        android:title="@string/aboutus_category_title_string"
+        android:summary="@string/aboutus_category_summary_string">
+
+        <Preference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="about_the_app_pref_key"
+            android:title="@string/about_the_app_preference_title"
+            android:summary="@string/about_the_app_preference_summary"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="app_lock_preference_category"
+        android:enabled="false">
 
         <SwitchPreference
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -142,19 +163,5 @@
             />
 
     </PreferenceCategory>
-
-    <!-- About the app -->
-    <PreferenceCategory
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:key="aboutus_setting_category"
-        android:title="@string/aboutus_category_title_string"
-        android:summary="@string/aboutus_category_summary_string">
-
-        <Preference
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:key="about_the_app_pref_key"
-            android:title="@string/about_the_app_preference_title"
-            android:summary="@string/about_the_app_preference_summary"
-            />
-    </PreferenceCategory>
+    
 </PreferenceScreen>
