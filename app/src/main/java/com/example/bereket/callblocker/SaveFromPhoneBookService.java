@@ -14,17 +14,19 @@ public class SaveFromPhoneBookService extends IntentService {
     private static final String COUNTRY_CODE_VALUE = "com.example.bereket.callblocker.country.code.value";
     private static final String DISPLAY_NUMBER = "com.example.bereket.callblocker.display.number";
     private static final String IS_NUMBER_STANDARDIZED = "com.example.bereket.callblocker.number.standardized";
+    private static final String CONTACT_TYPE = "com.example.bereket.callblocker.contact.type";
 
     public static final String ACTION_REFRESH_BLOCKED_LIST_UI = "com.example.bereket.callblocker.refresh.blocked.list.ui";
     public static final String PRIVATE_PERMISSION = "com.example.bereket.callblocker.PRIVATE";
 
-    public static void startActionSaveFromPhoneBook(Context context, long param1, String countryCodeValue, String displayNumber, boolean isNumberStandardized) {
+    public static void startActionSaveFromPhoneBook(Context context, long param1, String countryCodeValue, String displayNumber, boolean isNumberStandardized, int contactType) {
         Intent intent = new Intent(context, SaveFromPhoneBookService.class);
         intent.setAction(SEARCH_AND_SAVE_FROM_PHONEBOOK);
         intent.putExtra(NEW_CONTACT_ID, param1);
         intent.putExtra(COUNTRY_CODE_VALUE, countryCodeValue);
         intent.putExtra(DISPLAY_NUMBER, displayNumber);
         intent.putExtra(IS_NUMBER_STANDARDIZED, isNumberStandardized); //when copying contact details, isNumberStandardized is not copied. So we need it here
+        intent.putExtra(CONTACT_TYPE, contactType);
 
         context.startService(intent);
     }
@@ -49,6 +51,7 @@ public class SaveFromPhoneBookService extends IntentService {
                 final String countryCode = intent.getStringExtra(COUNTRY_CODE_VALUE);
                 final String displayNumber = intent.getStringExtra(DISPLAY_NUMBER);
                 final boolean isNumberStandardized = intent.getBooleanExtra(IS_NUMBER_STANDARDIZED, false);
+                final int contactType = intent.getIntExtra(CONTACT_TYPE, ContactType.EMPTY_CONTACT);
                 /** implement your definition here **/
 
                 Contact newContact = mContactManager.getEmptyContact();
@@ -63,6 +66,7 @@ public class SaveFromPhoneBookService extends IntentService {
                 newContact.setContactName(phoneBookContact.getContactName());
                 //add isNumberStandardized flag
                 newContact.setIsNumberStandardized(isNumberStandardized);
+                newContact.setContactType(contactType);
 
                 Contact oldContact = new Contact();
                 oldContact.setId(oldContactId);

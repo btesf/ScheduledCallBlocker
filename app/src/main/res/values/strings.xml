@@ -5,7 +5,8 @@
     <string name="add_from_contact">Add from contact</string>
     <string name="add_manually">Add manually</string>
     <string name="phoneNumberIsEmpty">Cannot add contact. Phone number is empty</string>
-    <string name="title_activity_single_contact">Manage contact</string>
+    <string name="title_activity_single_contact">Manage contact </string>
+    <string name="title_whitelist_activity_single_contact">Manage contact</string>
     <string name="call_blocker_activity_name">Blocked calls log</string>
 
     <string name="preference_dialog_clear_type_key">ClearType</string>
@@ -17,6 +18,8 @@
     <string name="dontBlockString">don\'t block</string>
     <string name="alwaysBlockString">always</string>
     <string name="scheduledBlockString">scheduled</string>
+    <string name="addToWhiteList">add to whitelist</string>
+    <string name="remvoveFromWhiteList">remove from whitelist</string>
     <string name="incoming_call_label_string">Incoming call</string>
     <string name="outgoing_call_label_string">Outgoing call</string>
     <string name="weekDay_0">Mon</string>
@@ -53,7 +56,9 @@
     <string name="global_categories">General setting</string>
     <string name="global_call_block_settings">General call blocker settings</string>
     <string name="block_all_settings">Block all settings</string>
+    <string name="whitelist_settings">Whitelist settings</string>
     <string name="block_all_settings_summary">Global block setting affecting all numbers</string>
+    <string name="whitelist_settings_summary">Add block exceptions</string>
     <string name="block_all_incoming_string">Block all incoming calls</string>
     <string name="block_all_outgoing_string">Block all outgoing calls</string>
     <string name="block_all_incoming_string_summary">Blocks all incoming calls</string>
@@ -102,8 +107,14 @@
     <string name="confirm_block_all_incoming_calls">Are you sure you want to block all incoming calls?</string>
     <string name="confirm_block_all_incoming_calls_title">Block all incoming calls</string>
 
+    <string name="confirm_block_all_incoming_calls_except_whitelist">Are you sure you want to block all non-whitelist incoming calls?</string>
+    <string name="confirm_block_all_incoming_calls_except_whitelist_title">Block non-whitelist incoming calls</string>
+
     <string name="confirm_block_all_outgoing_calls">Are you sure you want to block all outgoing calls?</string>
     <string name="confirm_block_all_outgoing_calls_title">Block all outgoing calls</string>
+
+    <string name="confirm_block_all_outgoing_calls_except_whitelist">Are you sure you want to block all non-whitelist outgoing calls?</string>
+    <string name="confirm_block_all_outgoing_calls_except_whitelist_title">Block non-whitelist outgoing calls</string>
 
     <string name="yes_text">Yes</string>
     <string name="no_text">No</string>
@@ -113,11 +124,15 @@
     <string name="disable_outgoing_block_notification_pref_key">disable_outgoing_block_notification_pref_key</string>
     <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
     <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
+    <string name="block_all_incoming_numbers_except_whitelist_pref_key">block_all_incoming_numbers_except_whitelist_pref_key</string>
+    <string name="block_all_outgoing_numbers_except_whitelist_pref_key">block_all_outgoing_numbers_except_whitelist_pref_key</string>
     <string name="enable_vibration_pref_key">enable_vibration_pref_key</string>
     <string name="about_the_app_pref_key">about_the_app_pref_key</string>
     <string name="title_activity_single_contact_log">Single contact log</string>
     <string name="all_incoming_calls_are_blocked">All incoming calls are blocked</string>
     <string name="all_outgoing_calls_are_blocked">All outgoing calls are blocked</string>
+    <string name="all_non_whitelist_incoming_calls_are_blocked">All non-whitelist incoming calls are blocked</string>
+    <string name="all_non_whitelist_outgoing_calls_are_blocked">All non-whitelist outgoing calls are blocked</string>
     <string name="all_incoming_block_notification_blocked">Incoming block notification disabled</string>
     <string name="all_outgoing_block_notification_blocked">Outgoing block notification disabled</string>
     <string name="vibration_category_title_string">Vibration setting</string>
@@ -140,5 +155,14 @@
     <string name="aboutus_category_summary_string">About the app</string>
     <string name="about_the_app_preference_title">About Scheduled Call Blocker</string>
     <string name="about_the_app_preference_summary">About Scheduled Call Blocker</string>
+    <string name="show_white_list">whitelist</string>
+    <string name="show_blocked_list">blocked list</string>
+    <string name="white_list_fragment">Whitelist</string>
+    <string name="block_all_incoming_except_whitelist_string">Block all incoming except whitelist</string>
+    <string name="block_all_outgoing_except_whitelist_string">Block all outgoing except whitelist</string>
+    <string name="block_all_incoming_except_whitelist_string_summary">Block all incoming except whitelist</string>
+    <string name="block_all_outgoing_except_whitelist_string_summary">Block all outgoing except whitelist</string>
+    <string name="white_list_block_setting_category">Whitelist settings</string>
+    <string name="white_list_block_settings_summary">Whitelist/exception list settings</string>
 
 </resources>

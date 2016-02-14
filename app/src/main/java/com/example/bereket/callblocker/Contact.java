@@ -16,7 +16,7 @@ public class Contact implements Serializable {
     private int mIncomingBlockedState;
     private int mIncomingBlockedCount;
     private int mOutgoingBlockedCount;
-    private boolean mContactVisible; //used for new contacts to be logged - those which the user doesn't included them explicitly.
+    private int mContactType; //used for blocked list, hidden log contact or white list contact
 
     public long getId(){
         return mId;
@@ -90,11 +90,11 @@ public class Contact implements Serializable {
         this.mIsNumberStandardized = mIsNumberStandardized;
     }
 
-    public boolean isContactVisible() {
-        return mContactVisible;
+    public int getContactType() {
+        return mContactType;
     }
 
-    public void setIsContactVisible(boolean mContactVisible) {
-        this.mContactVisible = mContactVisible;
+    public void setContactType(int mContactType) {
+        this.mContactType = mContactType;
     }
 }

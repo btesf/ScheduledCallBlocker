@@ -6,12 +6,9 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +30,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static String NO_OF_TIMES_OUTGOING_BLOCKED = "BlockedOutgoingCalls";
     public static String NO_OF_TIMES_INCOMING_BLOCKED = "BlockedIncomingCalls";
     public static String IS_NUMBER_STANDARDIZED = "IsNumberStandardized";
-    public static String IS_CONTACT_VISIBLE = "IsContactVisible";
+    public static String CONTACT_TYPE = "ContactType";
 
     //block type table and columns constants
     private static String BLOCK_STATE_TABLE = "BlockState";
@@ -103,7 +100,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 IS_NUMBER_STANDARDIZED + " boolean, " +
                 NO_OF_TIMES_OUTGOING_BLOCKED + " int default 0, " +
                 NO_OF_TIMES_INCOMING_BLOCKED + " int default 0," +
-                IS_CONTACT_VISIBLE + " boolean default 1," +
+                CONTACT_TYPE + " tinyint default 0," +
                 " FOREIGN KEY (" + OUTGOING_CALL_BLOCKED + ") REFERENCES " + BLOCK_STATE_TABLE + "(" + BLOCK_STATE_ID + "), "  +
                 " FOREIGN KEY (" + INCOMING_CALL_BLOCKED + ") REFERENCES " + BLOCK_STATE_TABLE + "(" + BLOCK_STATE_ID + ")"  +
                 ")";
@@ -132,7 +129,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         //block type reference insert string
         String insertBlockTypeReferences = " INSERT INTO " + BLOCK_TYPE_TABLE + " VALUES (1, 'outgoing'), (2, 'incoming') ";
-        String insertBlockStateReferences = " INSERT INTO " + BLOCK_STATE_TABLE + " VALUES (0, 'unblocked'), (1, 'always blocked'), (2, 'scheduled block') ";
+        String insertBlockStateReferences = " INSERT INTO " + BLOCK_STATE_TABLE + " VALUES (0, 'unblocked'), (1, 'always blocked'), (2, 'scheduled block'), (3, 'whitelist') ";
 
         //block state reference insert string
         sqLiteDatabase.execSQL(createBlockTypeTable);
@@ -204,7 +201,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         contact.setIncomingBlockedCount(0);
         contact.setIncomingBlockedState(BlockState.DONT_BLOCK);
         contact.setIsNumberStandardized(false);
-        contact.setIsContactVisible(ContactVisibilityState.VISIBLE);
 
         return contact;
     }
@@ -235,7 +231,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());// = "BlockedOutgoingCalls";
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());// = "BlockedIncomingCalls";
         cv.put(IS_NUMBER_STANDARDIZED, contact.isIsNumberStandardized());// = "IsNumberStandardized";
-        cv.put(IS_CONTACT_VISIBLE, contact.isContactVisible()); // = "IsContactVisible"
+        cv.put(CONTACT_TYPE, contact.getContactType()); // = "ContactType
 
         return getWritableDatabase().insert(BLOCKED_LIST_TABLE, null, cv);
     }
@@ -246,7 +242,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         cv.put(ID, id);
 
-        Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, ID + " = ? ", new String[]{String.valueOf(id)}, null,null, null);
+        Cursor cursor = getWritableDatabase().query(BLOCKED_LIST_TABLE, null, ID + " = ? ", new String[]{String.valueOf(id)}, null, null, null);
 
         if(cursor != null && cursor.getCount() > 0) {
 
@@ -267,7 +263,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteHiddenContacts(){
 
-        int returnValue = getWritableDatabase().delete(BLOCKED_LIST_TABLE, IS_CONTACT_VISIBLE + " = ? ", new String[]{String.valueOf("0")});
+        int returnValue = getWritableDatabase().delete(BLOCKED_LIST_TABLE, CONTACT_TYPE + " = ? ", new String[]{String.valueOf(ContactType.HIDDEN_CONTACT)});
 
         return returnValue > 0 ? true : false;
     }
@@ -283,7 +279,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cv.put(INCOMING_CALL_BLOCKED, contact.getIncomingBlockedState());
         cv.put(NO_OF_TIMES_INCOMING_BLOCKED, contact.getIncomingBlockedCount());
         cv.put(NO_OF_TIMES_OUTGOING_BLOCKED, contact.getOutgoingBlockedCount());
-        cv.put(IS_CONTACT_VISIBLE, contact.isContactVisible());
+        cv.put(CONTACT_TYPE, contact.getContactType());
 
         int rows = getWritableDatabase().update(BLOCKED_LIST_TABLE, cv, ID + " = ? ", new String[]{String.valueOf(contact.getId())});
 
@@ -298,15 +294,21 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public ContactCursor queryContacts(){
-        //Equivalent to "select * from BlockList where IsContactVisible = 1 order by start_date asc"
-        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, IS_CONTACT_VISIBLE + " = ? ", new String[]{"1"}, null, null, NAME + " asc");
+        //Equivalent to "select * from BlockList"
+        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, null, null, null, null, null);
+        return new ContactCursor(wrapped);
+    }
+
+    public ContactCursor queryContacts(int contactType){
+        //Equivalent to "select * from BlockList where ContactType = contactType order by start_date asc"
+        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, CONTACT_TYPE + " = ? ", new String[]{String.valueOf(contactType)}, null, null, NAME + " asc");
         return new ContactCursor(wrapped);
     }
 
 
-    public ContactCursor queryContacts(String queryString){
-        //Equivalent to "select * from BlockList where IsContactVisible = 1 and (PhoneNumber like '%queryString%' or name like '%queryString%') order by start_date asc"
-        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, IS_CONTACT_VISIBLE + " = ? AND (" +  NAME + " LIKE ? OR " + PHONE_NUMBER + " LIKE  ? )", new String[]{"1", "%" + queryString + "%", "%" + queryString + "%"}, null, null, NAME + " asc");
+    public ContactCursor queryContacts(String queryString, int contactType){
+        //Equivalent to "select * from BlockList where ContactType = contact and (PhoneNumber like '%queryString%' or name like '%queryString%') order by start_date asc"
+        Cursor wrapped = getReadableDatabase().query(BLOCKED_LIST_TABLE, null, CONTACT_TYPE + " = ? AND (" +  NAME + " LIKE ? OR " + PHONE_NUMBER + " LIKE  ? )", new String[]{String.valueOf(contactType), "%" + queryString + "%", "%" + queryString + "%"}, null, null, NAME + " asc");
         return new ContactCursor(wrapped);
     }
 
@@ -319,12 +321,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             case BlockType.INCOMING:
 
                 values.put(INCOMING_CALL_BLOCKED, BlockState.DONT_BLOCK);
-                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, INCOMING_CALL_BLOCKED + " <> ? AND " + INCOMING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.SCHEDULED_BLOCK)})  ;
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, INCOMING_CALL_BLOCKED + " <> ? AND " + INCOMING_CALL_BLOCKED + " <>  ? AND "  + INCOMING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.SCHEDULED_BLOCK), String.valueOf(BlockState.WHITE_LIST)})  ;
                 break;
             case BlockType.OUTGOING:
 
                 values.put(OUTGOING_CALL_BLOCKED, BlockState.DONT_BLOCK);
-                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, OUTGOING_CALL_BLOCKED + " <> ? AND " + OUTGOING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.SCHEDULED_BLOCK)});
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, OUTGOING_CALL_BLOCKED + " <> ? AND " + OUTGOING_CALL_BLOCKED + " <>  ? AND " + INCOMING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.SCHEDULED_BLOCK), String.valueOf(BlockState.WHITE_LIST)});
                 break;
             default:
             //error
@@ -340,14 +342,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             case BlockType.INCOMING:
 
                 values.put(INCOMING_CALL_BLOCKED, BlockState.DONT_BLOCK);
-                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, INCOMING_CALL_BLOCKED + " <> ? AND " + INCOMING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.ALWAYS_BLOCK)});
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, INCOMING_CALL_BLOCKED + " <> ? AND " + INCOMING_CALL_BLOCKED + " <>  ? AND " + INCOMING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.ALWAYS_BLOCK), String.valueOf(BlockState.WHITE_LIST)});
                 getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{String.valueOf(BlockType.INCOMING)});
 
                 break;
             case BlockType.OUTGOING:
 
                 values.put(OUTGOING_CALL_BLOCKED, BlockState.DONT_BLOCK);
-                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, OUTGOING_CALL_BLOCKED + " <> ? AND " + OUTGOING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.ALWAYS_BLOCK)});
+                getWritableDatabase().update(BLOCKED_LIST_TABLE, values, OUTGOING_CALL_BLOCKED + " <> ? AND " + OUTGOING_CALL_BLOCKED + " <>  ? AND " + OUTGOING_CALL_BLOCKED + " <>  ? ", new String[]{String.valueOf(BlockState.DONT_BLOCK), String.valueOf(BlockState.ALWAYS_BLOCK), String.valueOf(BlockState.WHITE_LIST)});
                 getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{String.valueOf(BlockType.OUTGOING)});
 
                 break;
@@ -377,7 +379,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             int incomingBlockedState = getInt(getColumnIndex(INCOMING_CALL_BLOCKED));
             int incomingBlockedCount = getInt(getColumnIndex(NO_OF_TIMES_INCOMING_BLOCKED));
             int outgoingBlockedCount = getInt(getColumnIndex(NO_OF_TIMES_OUTGOING_BLOCKED));
-            boolean isContactVisible = getInt(getColumnIndex(IS_CONTACT_VISIBLE)) == 1 ? true : false;
+            int contactType = getInt(getColumnIndex(CONTACT_TYPE));
 
             contact.setId(contactId);
             contact.setPhoneNumber(phoneNumber);
@@ -388,7 +390,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             contact.setOutGoingBlockedState(outgoingBlockedState);
             contact.setIncomingBlockedCount(incomingBlockedCount);
             contact.setOutgoingBlockedCount(outgoingBlockedCount);
-            contact.setIsContactVisible(isContactVisible);
+            contact.setContactType(contactType);
 
             return contact;
         }

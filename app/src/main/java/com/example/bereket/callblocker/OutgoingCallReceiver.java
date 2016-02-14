@@ -42,7 +42,22 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                         result.setResultData(null);
                         LogAndPostBlockService.startActionLoggerAndNotification(context, phoneNumber, BlockType.OUTGOING, countryCodeValue);
                     }
-                    else{
+                    else if(mContactManager.globalBlockNonWhitelistOutgoingBlockPreferenceEnabled()){
+
+                        //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
+                        if(mContactManager.nonStandardizedPreferenceEnabled()){
+
+                            mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                        }
+
+                        Contact whiteListContact = mContactManager.getContactByStandardizedPhoneNumber(phoneNumber);
+
+                        if(whiteListContact == null || whiteListContact.getOutGoingBlockedState() != BlockState.WHITE_LIST){
+
+                            result.setResultData(null);
+                            LogAndPostBlockService.startActionLoggerAndNotification(context, phoneNumber, BlockType.OUTGOING, countryCodeValue);
+                        }
+                    } else{
                         //standardize any phoneNumbers with non-standard phone number (while the phone was out of service)
                         if(mContactManager.nonStandardizedPreferenceEnabled()){
 

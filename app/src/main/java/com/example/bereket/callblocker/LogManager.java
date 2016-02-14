@@ -21,8 +21,6 @@ public class LogManager {
         mDatabaseHelper = DataBaseHelper.getInstance(context);
     }
 
-
-
     public static LogManager getInstance(Context context){
 
         if(mLogManager == null){
@@ -81,7 +79,7 @@ public class LogManager {
             //non-block list contact - insert hidden contact
             blockedContact = mContactManager.getEmptyContact();
 
-            blockedContact.setIsContactVisible(false); //this will be invisible contact log
+            blockedContact.setContactType(ContactType.HIDDEN_CONTACT); //this will be invisible contact log
             blockedContact.setIsNumberStandardized(true);
 
             Contact phoneBookContact = mContactManager.getContactFromPhoneBook(phoneNumber, countryCodeValue);

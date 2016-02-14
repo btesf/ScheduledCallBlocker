@@ -14,12 +14,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.app.ListFragment;
 import android.provider.ContactsContract;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,7 +38,7 @@ import android.widget.Toast;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BlockedListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor>, SearchView.OnQueryTextListener {
+public class WhiteListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor>, SearchView.OnQueryTextListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -53,10 +49,10 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     private static int CONTACTS_LIST_LOADER = 2;
     private static int ADD_CONTACT_MANUALLY = 3;
     private static int CHANGE_PREFERENCE = 4;
-    private static int WHITE_LIST_ACTIVITY = 5;
+    private static int BLOCKED_LIST_ACTIVITY = 5;
 
     //Activity request codes
-    private final Integer SINGLE_CONTACT_ACTIVITY_RESULT = 0;
+    private final Integer SINGLE_WHITELIST_CONTACT_ACTIVITY_RESULT = 0;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -70,15 +66,15 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle args = new Bundle();
-            args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
+            args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
             //refresh the loadermanager so that the UI gets refreshed
-            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
+            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, WhiteListFragment.this);
         }
     };
 
     // TODO: Rename and change types of parameters
-    public static BlockedListFragment newInstance(String param1, String param2) {
-        BlockedListFragment fragment = new BlockedListFragment();
+    public static WhiteListFragment newInstance(String param1, String param2) {
+        WhiteListFragment fragment = new WhiteListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -90,7 +86,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BlockedListFragment() {
+    public WhiteListFragment() {
     }
 
     @Override
@@ -106,7 +102,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         setHasOptionsMenu(true);
 
         Bundle args = new Bundle();
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
+        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
         getLoaderManager().initLoader(CONTACTS_LIST_LOADER, args, this);
     }
 
@@ -116,11 +112,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         View v = super.onCreateView(inflater, parent, savedInstanceState);
         ListView listView = (ListView) v.findViewById(android.R.id.list);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        actionBar.setLogo(R.mipmap.ic_launcher);
-        actionBar.setDisplayUseLogoEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
 
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
@@ -160,8 +151,8 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                         if (isContactDeleted) {
 
                             Bundle args = new Bundle();
-                            args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
-                            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
+                            args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
+                            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, WhiteListFragment.this);
                         }
 
                         return true;
@@ -192,7 +183,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         super.onResume();
 
         Bundle args = new Bundle();
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
+        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
         getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, this);
         //register a receiver that gets notified when a blocked list contat is updated from phonebook
         IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
@@ -238,8 +229,12 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         }
 
         Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
-        startSingleContactActivity(contact, true);
-        //startActivity(intent);
+
+        Intent intent = new Intent(getActivity(), SingleWhiteListContactActivity.class);
+        //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
+        intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
+        intent.putExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, true);
+        startActivityForResult(intent, SINGLE_WHITELIST_CONTACT_ACTIVITY_RESULT);
     }
 
     //utility method to start single contact activity - it will be used two places
@@ -249,13 +244,13 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
         intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
         intent.putExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, isContactFromPhoneBook);
-        startActivityForResult(intent, SINGLE_CONTACT_ACTIVITY_RESULT);
+        startActivityForResult(intent, SINGLE_WHITELIST_CONTACT_ACTIVITY_RESULT);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.blocked_list_options, menu);
+        inflater.inflate(R.menu.white_list_options, menu);
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
@@ -287,16 +282,15 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                 intent = new Intent(getActivity(), LogActivity.class);
                 startActivityForResult(intent, CONTACTS_LIST_LOADER);
                 return true;
-            case R.id.menu_item_show_white_list:
+            case R.id.menu_item_show_blocked_list:
                 intent = new Intent(getActivity(), WhiteListActivity.class);
-                startActivityForResult(intent, WHITE_LIST_ACTIVITY);
+                startActivityForResult(intent, BLOCKED_LIST_ACTIVITY);
                 return true;
             case R.id.menu_item_settings:
                 intent = new Intent(getActivity(), SettingActivity.class);
                 startActivityForResult(intent, CHANGE_PREFERENCE);
                 return true;
             case android.R.id.home:
-
                 if (NavUtils.getParentActivityName(getActivity()) != null) {
 
                     NavUtils.navigateUpFromSameTask(getActivity());
@@ -315,7 +309,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
             bundle = new Bundle();
         }
 
-        bundle.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
+        bundle.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
         return new ContactLoader(getActivity(), bundle);
     }
 
@@ -339,8 +333,8 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         Bundle args = new Bundle();
         args.putString(ContactLoader.QUERY_STRING_KEY, searchString);
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
-        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
+        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
+        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, WhiteListFragment.this);
 
         return false;
     }
@@ -350,8 +344,8 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         Bundle args = new Bundle();
         args.putString(ContactLoader.QUERY_STRING_KEY, searchString);
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
-        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
+        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
+        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, WhiteListFragment.this);
 
         return false;
     }
@@ -389,26 +383,18 @@ public class BlockedListFragment extends HideNotificationListFragment implements
             //set incoming block state image
             switch(contact.getIncomingBlockedState()){
 
-                case BlockState.ALWAYS_BLOCK:
+                case BlockState.WHITE_LIST:
 
-                    incomingCallBlockStateImage.setImageResource(R.drawable.red_arrow);
-                    break;
-                case BlockState.SCHEDULED_BLOCK:
-
-                    incomingCallBlockStateImage.setImageResource(R.drawable.red);
+                    incomingCallBlockStateImage.setImageResource(R.drawable.green_arrow_left);
                     break;
             }
 
             //set outgoing block state image
             switch(contact.getOutGoingBlockedState()){
 
-                case BlockState.ALWAYS_BLOCK:
+                case BlockState.WHITE_LIST:
 
                     outGoingCallBlockStateImage.setImageResource(R.drawable.green_arrow);
-                    break;
-                case BlockState.SCHEDULED_BLOCK:
-
-                    outGoingCallBlockStateImage.setImageResource(R.drawable.green);
                     break;
             }
         }
@@ -475,9 +461,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
             }
             else{
 
-                mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName, false, ContactType.BLOCKED_CONTACT);
-                Contact contact = mContactManager.getContactById(id);
-                startSingleContactActivity(contact, true);
+                mContactManager.insertNewOrUpdateExistingContact(id, phoneNumber, contactName, false, ContactType.WHITE_LIST_CONTACT);
             }
         }
         else if(requestCode == ADD_CONTACT_MANUALLY){
@@ -486,9 +470,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                 //do something about it
                 String phoneNumber = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
 
-                mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(),  phoneNumber, null, true, ContactType.BLOCKED_CONTACT);
-                Contact contact = mContactManager.getContactByPhoneNumber(phoneNumber);
-                startSingleContactActivity(contact, false);
+                mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(), phoneNumber, null, true, ContactType.WHITE_LIST_CONTACT);
             }
         }
     }

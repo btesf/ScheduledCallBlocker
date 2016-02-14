@@ -33,7 +33,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     private void sendNotification(String phoneNumber, int blockType){
 
-        if(!mContactManager.disableIncomingBlockNotificationPreferenceEnabled()){
+        boolean disabledState = (blockType == BlockType.INCOMING) ? mContactManager.disableIncomingBlockNotificationPreferenceEnabled() : mContactManager.disableOutgoingBlockNotificationPreferenceEnabled();
+
+        if(!disabledState){
 
             BlockedCallCounter blockedCallCounter = new BlockedCallCounter(mContext);
             int blockCount = blockedCallCounter.incrementAndGetBlockCount(blockType);
