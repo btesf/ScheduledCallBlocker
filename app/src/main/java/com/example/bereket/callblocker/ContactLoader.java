@@ -12,9 +12,11 @@ import android.util.Log;
 public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor> {
 
     public static final String QUERY_STRING_KEY = "query.string.key";
+    public static final String CONTACT_TYPE_KEY = "contact.type.key";
     private DataBaseHelper.ContactCursor mCursor;
     private ContactManager contactManager;
     private String queryString = null;
+    private int contactType = ContactType.EMPTY_CONTACT;
 
     public ContactLoader(Context context, Bundle args) {
         super(context);
@@ -23,6 +25,7 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
         if(args != null) {
 
             queryString = args.getString(QUERY_STRING_KEY);
+            contactType = args.getInt(CONTACT_TYPE_KEY);
         }
     }
 
@@ -54,7 +57,7 @@ public class ContactLoader extends AsyncTaskLoader<DataBaseHelper.ContactCursor>
 
         DataBaseHelper.ContactCursor contactCursor;
 
-        contactCursor = (queryString == null) ? contactManager.queryContacts() : contactManager.queryContacts(queryString);
+        contactCursor = (queryString == null) ? contactManager.queryContacts(contactType) : contactManager.queryContacts(queryString, contactType);
 
         return contactCursor;
     }

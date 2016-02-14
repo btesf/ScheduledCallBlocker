@@ -7,7 +7,6 @@ import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
@@ -16,12 +15,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.ListFragment;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.app.DialogFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ActionMode;
@@ -57,7 +53,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     private static int CONTACTS_LIST_LOADER = 2;
     private static int ADD_CONTACT_MANUALLY = 3;
     private static int CHANGE_PREFERENCE = 4;
-    private static int WHITE_LIST_ACTIVITY = 5;
 
     //Activity request codes
     private final Integer SINGLE_CONTACT_ACTIVITY_RESULT = 0;
@@ -73,10 +68,8 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     private BroadcastReceiver mOnUpdateContactFromPhoneBook = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Bundle args = new Bundle();
-            args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
             //refresh the loadermanager so that the UI gets refreshed
-            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
+            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, null, BlockedListFragment.this);
         }
     };
 
@@ -108,12 +101,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         mContactManager = ContactManager.getInstance(getActivity());
         setHasOptionsMenu(true);
-
-        Bundle args = new Bundle();
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
-        getLoaderManager().initLoader(CONTACTS_LIST_LOADER, args, this);
-
-        PreferenceManager.setDefaultValues(getActivity(), R.xml.preference, false);
+        getLoaderManager().initLoader(CONTACTS_LIST_LOADER, null, this);
     }
 
     @Override
@@ -163,12 +151,8 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                             }
                         }
 
-                        if (isContactDeleted) {
-
-                            Bundle args = new Bundle();
-                            args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
-                            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
-                        }
+                        if (isContactDeleted)
+                            getLoaderManager().restartLoader(0, null, BlockedListFragment.this);
 
                         return true;
 
@@ -196,44 +180,11 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     @Override
     public void onResume(){
         super.onResume();
-
-        Bundle args = new Bundle();
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
-        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, this);
+        getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, null, this);
         //register a receiver that gets notified when a blocked list contat is updated from phonebook
         IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
         getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
-
-        boolean appIsUnlocked = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("app_unlocked_key", false);
-        int attemptCounter = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("app_password_counter_key", "10"));
-
-        if(!appIsUnlocked && attemptCounter < 3){
-
-            DialogFragment newFragment = TestAuthenticator.newInstance(1);
-
-            newFragment.setCancelable(false);
-            newFragment.show(getFragmentManager(), "dialog");
-        }
-        else if(!appIsUnlocked && attemptCounter >= 3){
-
-            AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-            alertDialog.setTitle("Application is locked");
-            alertDialog.setMessage("This application is used for test purpose only. Now it is locked and unusable. Click Ok to exit");
-
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            getActivity().finish();
-                            System.exit(0);
-                        }
-                    });
-
-            alertDialog.setCancelable(false);
-            alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.show();
-        }
     }
 
     @Override
@@ -323,16 +274,11 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                 intent = new Intent(getActivity(), LogActivity.class);
                 startActivityForResult(intent, CONTACTS_LIST_LOADER);
                 return true;
-            case R.id.menu_item_show_white_list:
-                intent = new Intent(getActivity(), WhiteListActivity.class);
-                startActivityForResult(intent, WHITE_LIST_ACTIVITY);
-                return true;
             case R.id.menu_item_settings:
                 intent = new Intent(getActivity(), SettingActivity.class);
                 startActivityForResult(intent, CHANGE_PREFERENCE);
                 return true;
             case android.R.id.home:
-
                 if (NavUtils.getParentActivityName(getActivity()) != null) {
 
                     NavUtils.navigateUpFromSameTask(getActivity());
@@ -345,13 +291,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
     @Override
     public Loader<DataBaseHelper.ContactCursor> onCreateLoader(int i, Bundle bundle) {
-
-        if(bundle == null){
-
-            bundle = new Bundle();
-        }
-
-        bundle.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
         return new ContactLoader(getActivity(), bundle);
     }
 
@@ -375,7 +314,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         Bundle args = new Bundle();
         args.putString(ContactLoader.QUERY_STRING_KEY, searchString);
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
         getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
 
         return false;
@@ -386,7 +324,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         Bundle args = new Bundle();
         args.putString(ContactLoader.QUERY_STRING_KEY, searchString);
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
         getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, BlockedListFragment.this);
 
         return false;
@@ -511,7 +448,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
             }
             else{
 
-                mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName, false, ContactType.BLOCKED_CONTACT);
+                mContactManager.insertNewOrUpdateExistingContact(id,  phoneNumber, contactName, false);
                 Contact contact = mContactManager.getContactById(id);
                 startSingleContactActivity(contact, true);
             }
@@ -522,7 +459,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                 //do something about it
                 String phoneNumber = data.getStringExtra(AddNewPhoneFragment.NEW_PHONE_NUMBER_EXTRA_KEY);
 
-                mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(),  phoneNumber, null, true, ContactType.BLOCKED_CONTACT);
+                mContactManager.insertNewOrUpdateExistingContact(mContactManager.getArbitraryContactId(),  phoneNumber, null, true);
                 Contact contact = mContactManager.getContactByPhoneNumber(phoneNumber);
                 startSingleContactActivity(contact, false);
             }

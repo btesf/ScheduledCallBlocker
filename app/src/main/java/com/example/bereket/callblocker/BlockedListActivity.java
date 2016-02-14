@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.os.Build;
 
 
-public class CallBlockerActivity extends SingleFragmentActivity implements BlockedListFragment.OnFragmentInteractionListener{
+public class BlockedListActivity extends SingleFragmentActivity implements BlockedListFragment.OnFragmentInteractionListener{
 
     @Override
     protected android.app.Fragment createFragment() {

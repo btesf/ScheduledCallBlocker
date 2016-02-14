@@ -52,43 +52,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/dontBlockString"
+                    android:text="@string/addToWhiteList"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/dontBlockIncomingRadio"
+                    android:id="@+id/addToWhitelistIncomingRadio"
                     android:longClickable="true"/>
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/alwaysBlockString"
+                    android:text="@string/remvoveFromWhiteList"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/alwaysBlockIncomingRadio"/>
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/scheduledBlockString"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/scheduledIncomingRadio"/>
+                    android:id="@+id/removeFromWhitelistIncomingRadio"/>
             </RadioGroup>
-
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/incomingScheduleTable"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp">
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/clear_all_table_row"/>
-            </TableLayout>
 
         </LinearLayout>
 
@@ -127,46 +103,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
-                    android:text="@string/dontBlockString"
+                    android:text="@string/addToWhiteList"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/dontBlockOutgoingRadio"
+                    android:id="@+id/addToWhitelistOutgoingRadio"
                     android:longClickable="true"/>
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/alwaysBlockString"
+                    android:text="@string/remvoveFromWhiteList"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/alwaysBlockOutgoingRadio" />
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/scheduledBlockString"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/scheduledOutgoingRadio"/>
+                    android:id="@+id/removeFromWhitelistOutgoingRadio" />
 
             </RadioGroup>
 
-
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/outgoingScheduleTable"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp">
-
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/button_row" />
-                <include layout="@layout/clear_all_table_row"/>
-            </TableLayout>
         </LinearLayout>
 
     </LinearLayout>

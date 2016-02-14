@@ -86,6 +86,22 @@ class PhoneCallStateListener extends PhoneStateListener {
                             blockCall();
                             LogAndPostBlockService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
                         }
+                        else if(mContactManager.globalBlockNonWhitelistIncomingBlockPreferenceEnabled()){
+
+                            //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
+                            if(mContactManager.nonStandardizedPreferenceEnabled()){
+
+                                mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                            }
+
+                            Contact whiteListContact = mContactManager.getContactByStandardizedPhoneNumber(incomingNumber);
+
+                            if(whiteListContact == null || whiteListContact.getIncomingBlockedState() != BlockState.WHITE_LIST){
+
+                                blockCall();
+                                LogAndPostBlockService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
+                            }
+                        }
                         else{
                             //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
                             if(mContactManager.nonStandardizedPreferenceEnabled()){

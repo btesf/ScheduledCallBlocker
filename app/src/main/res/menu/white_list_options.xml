@@ -16,9 +16,9 @@
     <item android:id="@+id/menu_item_show_log"
         app:showAsAction="never"
         android:title="@string/show_log"/>
-    <item android:id="@+id/menu_item_show_white_list"
+    <item android:id="@+id/menu_item_show_blocked_list"
         app:showAsAction="never"
-        android:title="@string/show_white_list"/>
+        android:title="@string/show_blocked_list"/>
     <item android:id="@+id/menu_item_settings"
         app:showAsAction="never"
         android:title="@string/settings_string"/>

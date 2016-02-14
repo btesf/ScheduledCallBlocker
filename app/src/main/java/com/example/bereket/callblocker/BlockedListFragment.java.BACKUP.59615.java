@@ -108,12 +108,15 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         mContactManager = ContactManager.getInstance(getActivity());
         setHasOptionsMenu(true);
+<<<<<<< HEAD
+        getLoaderManager().initLoader(CONTACTS_LIST_LOADER, null, this);
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.preference, false);
+=======
 
         Bundle args = new Bundle();
         args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
         getLoaderManager().initLoader(CONTACTS_LIST_LOADER, args, this);
-
-        PreferenceManager.setDefaultValues(getActivity(), R.xml.preference, false);
+>>>>>>> master
     }
 
     @Override

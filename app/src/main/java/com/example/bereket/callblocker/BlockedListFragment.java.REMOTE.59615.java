@@ -7,7 +7,6 @@ import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
@@ -16,12 +15,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.ListFragment;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.app.DialogFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ActionMode;
@@ -112,8 +108,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         Bundle args = new Bundle();
         args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);
         getLoaderManager().initLoader(CONTACTS_LIST_LOADER, args, this);
-
-        PreferenceManager.setDefaultValues(getActivity(), R.xml.preference, false);
     }
 
     @Override
@@ -204,36 +198,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
         getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
-
-        boolean appIsUnlocked = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("app_unlocked_key", false);
-        int attemptCounter = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("app_password_counter_key", "10"));
-
-        if(!appIsUnlocked && attemptCounter < 3){
-
-            DialogFragment newFragment = TestAuthenticator.newInstance(1);
-
-            newFragment.setCancelable(false);
-            newFragment.show(getFragmentManager(), "dialog");
-        }
-        else if(!appIsUnlocked && attemptCounter >= 3){
-
-            AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-            alertDialog.setTitle("Application is locked");
-            alertDialog.setMessage("This application is used for test purpose only. Now it is locked and unusable. Click Ok to exit");
-
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            getActivity().finish();
-                            System.exit(0);
-                        }
-                    });
-
-            alertDialog.setCancelable(false);
-            alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.show();
-        }
     }
 
     @Override

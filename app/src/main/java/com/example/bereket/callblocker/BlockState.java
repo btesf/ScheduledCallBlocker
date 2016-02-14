@@ -7,4 +7,5 @@ public class BlockState {
     public static final int DONT_BLOCK = 0;
     public static final int ALWAYS_BLOCK = 1;
     public static final int SCHEDULED_BLOCK = 2;
+    public static final int WHITE_LIST = 3;
 }
