@@ -283,7 +283,7 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
                 startActivityForResult(intent, CONTACTS_LIST_LOADER);
                 return true;
             case R.id.menu_item_show_blocked_list:
-                intent = new Intent(getActivity(), WhiteListActivity.class);
+                intent = new Intent(getActivity(), BlockedListActivity.class);
                 startActivityForResult(intent, BLOCKED_LIST_ACTIVITY);
                 return true;
             case R.id.menu_item_settings:
@@ -479,7 +479,7 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        View  emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_block_list_view, null);
+        View  emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_white_list_view, null);
 
         ((ViewGroup)getListView().getParent()).addView(emptyView);
         getListView().setEmptyView(emptyView);

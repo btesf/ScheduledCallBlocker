@@ -4,7 +4,7 @@ import android.app.Fragment;
 import android.net.Uri;
 
 
-public class SingleWhiteListContactActivity extends SingleFragmentActivity implements SingleWhiteListContactFragment.OnFragmentInteractionListener{
+public   class SingleWhiteListContactActivity extends SingleFragmentActivity implements SingleWhiteListContactFragment.OnFragmentInteractionListener{
 
 
     @Override
