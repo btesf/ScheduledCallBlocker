@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -87,17 +88,21 @@ public class AddNewPhoneFragment extends HideNotificationFragment {
         saveButton = (Button) v.findViewById(R.id.add_new_phone_button);
         cancelButton = (Button) v.findViewById(R.id.cancel_add_phone_button);
         newPhoneNumberEdit = (EditText) v.findViewById(R.id.edit_box_new_phone_number);
+        final TextInputLayout floatingUsernameLabel = (TextInputLayout) v.findViewById(R.id.phone_text_input_layout);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(newPhoneNumber ==null){
+                if(newPhoneNumber ==null || newPhoneNumber.isEmpty()){
 
-                    Toast.makeText(getActivity(), R.string.nothing_to_save, Toast.LENGTH_SHORT).show();
+                    floatingUsernameLabel.setError(getResources().getString(R.string.nothing_to_save));
+                    floatingUsernameLabel.setErrorEnabled(true);
                 }
-                else if(!mContactManager.numberHasProperFormat(newPhoneNumber.toString())){//if number is not of a proper format, show an error message
-                    Toast.makeText(getActivity(), R.string.wrong_phone_number_format, Toast.LENGTH_SHORT).show();
+                else if(!mContactManager.numberHasProperFormat(newPhoneNumber.toString())) {//if number is not of a proper format, show an error message
+
+                    floatingUsernameLabel.setError(getResources().getString(R.string.wrong_phone_number_format));
+                    floatingUsernameLabel.setErrorEnabled(true);
                 }
                 else {
                     Intent intent = new Intent();
@@ -117,6 +122,7 @@ public class AddNewPhoneFragment extends HideNotificationFragment {
             }
         });
 
+
         newPhoneNumberEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -125,7 +131,10 @@ public class AddNewPhoneFragment extends HideNotificationFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().isEmpty()) {
+
+                if (s != null) {
+
+                    floatingUsernameLabel.setErrorEnabled(false);
                     newPhoneNumber = s.toString();
                 }
             }
