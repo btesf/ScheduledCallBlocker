@@ -145,6 +145,7 @@
 
     <string name="empty_log_list_text">NO LOGS AVAILABLE</string>
     <string name="empty_block_list_text">NO BLOCKED CONTACTS</string>
+    <string name="empty_white_list_text">NO WHITELISTED CONTACTS</string>
     <string name="search_title">search blocked contact</string>
     <string name="about_the_app_app_name">Scheduled Call Blocker</string>
     <string name="app_version_text">Version 1.0</string>
