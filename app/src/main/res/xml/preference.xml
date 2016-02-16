@@ -7,9 +7,9 @@
 
     <PreferenceCategory
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:key="block_all_settings_category"
-        android:title="@string/block_all_settings"
-        android:summary="@string/block_all_settings_summary">
+        android:key="incoming_call_settings_category"
+        android:title="@string/incoming_block_category_title_string"
+        android:summary="@string/incoming_block_category_summary_string">
 
         <SwitchPreference
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,39 +19,9 @@
 
         <SwitchPreference
             xmlns:android="http://schemas.android.com/apk/res/android"
-            android:key="block_all_outgoing_numbers_pref_key"
-            android:title="@string/block_all_outgoing_string"
-            android:summary="@string/block_all_outgoing_string_summary">
-        </SwitchPreference>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:key="whitelist_settings_category"
-        android:title="@string/white_list_block_setting_category"
-        android:summary="@string/white_list_block_settings_summary">
-
-        <SwitchPreference
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:key="block_all_incoming_numbers_except_whitelist_pref_key"
+            android:key="incoming_whitelist_pref_key"
             android:title="@string/block_all_incoming_except_whitelist_string"
             android:summary="@string/block_all_incoming_except_whitelist_string_summary" />
-
-        <SwitchPreference
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:key="block_all_outgoing_numbers_except_whitelist_pref_key"
-            android:title="@string/block_all_outgoing_except_whitelist_string"
-            android:summary="@string/block_all_outgoing_except_whitelist_string_summary">
-        </SwitchPreference>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:key="incoming_call_settings_category"
-        android:title="@string/incoming_block_category_title_string"
-        android:summary="@string/incoming_block_category_summary_string">
 
         <com.example.bereket.callblocker.ClearSettingPreference
             android:title="@string/unblock_all_incoming_block_numbers_title"
@@ -78,6 +48,20 @@
         android:key="outgoing_call_settings_category"
         android:title="@string/outgoing_block_category_title_string"
         android:summary="@string/outgoing_block_category_summary_string">
+
+        <SwitchPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="block_all_outgoing_numbers_pref_key"
+            android:title="@string/block_all_outgoing_string"
+            android:summary="@string/block_all_outgoing_string_summary">
+        </SwitchPreference>
+
+        <SwitchPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="outgoing_whitelist_pref_key"
+            android:title="@string/block_all_outgoing_except_whitelist_string"
+            android:summary="@string/block_all_outgoing_except_whitelist_string_summary">
+        </SwitchPreference>
 
         <com.example.bereket.callblocker.ClearSettingPreference
             android:title="@string/unblock_all_outgoing_block_numbers_title"

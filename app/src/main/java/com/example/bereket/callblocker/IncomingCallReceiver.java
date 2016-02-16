@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.os.Vibrator;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
@@ -83,20 +82,22 @@ class PhoneCallStateListener extends PhoneStateListener {
                         //check if a global block setting is set - if so block instantly
                         if(mContactManager.globalBlockIncomingBlockPreferenceEnabled()){
 
-                            blockCall();
-                            LogAndPostBlockService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
-                        }
-                        else if(mContactManager.globalBlockNonWhitelistIncomingBlockPreferenceEnabled()){
+                            if(mContactManager.whitelistIncomingAllowPreferenceEnabled()){
 
-                            //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
-                            if(mContactManager.nonStandardizedPreferenceEnabled()){
+                                //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
+                                if(mContactManager.nonStandardizedPreferenceEnabled()){
 
-                                mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                                    mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                                }
+
+                                Contact whiteListContact = mContactManager.getContactByStandardizedPhoneNumber(incomingNumber);
+
+                                if(whiteListContact != null && whiteListContact.getIncomingBlockedState() == BlockState.WHITE_LIST){
+
+                                    break;
+                                }
                             }
-
-                            Contact whiteListContact = mContactManager.getContactByStandardizedPhoneNumber(incomingNumber);
-
-                            if(whiteListContact == null || whiteListContact.getIncomingBlockedState() != BlockState.WHITE_LIST){
+                            else{
 
                                 blockCall();
                                 LogAndPostBlockService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
