@@ -1,23 +1,16 @@
 package com.example.bereket.callblocker;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -26,6 +19,16 @@ import android.widget.Toast;
 public class SettingFragment extends HideNotificationPreferenceFragment{
 
     private static final int ABOUT_THE_APP_DIALOG_REQUEST_CODE = 1;
+
+    private Preference incomigCallCheckBoxPreference;
+    private Preference outgoigCallCheckBoxPreference;
+    private Preference blockAllIncomingCallSwitchPreference;
+    private Preference blockAllOutgoingCallSwitchPreference;
+    private Preference blockAllIncomingCallExceptWhitelistSwitchPreference;
+    private Preference blockAllOutgoingCallExceptWhitelistSwitchPreference;
+    private Preference enableVibrationOnInterceptionPreference;
+    private Preference aboutUsPreference;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,14 +38,26 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
 
         Resources resources = getResources();
         //get the incoming block disable/enable checkbox key
-        Preference incomigCallCheckBoxPreference = findPreference(resources.getString(R.string.disable_incoming_block_notification_pref_key));
-        Preference outgoigCallCheckBoxPreference = findPreference(resources.getString(R.string.disable_outgoing_block_notification_pref_key));
-        Preference blockAllIncomingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_incoming_numbers_pref_key));
-        Preference blockAllOutgoingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_outgoing_numbers_pref_key));
-        Preference blockAllIncomingCallExceptWhitelistSwitchPreference = findPreference(resources.getString(R.string.block_all_incoming_numbers_except_whitelist_pref_key));
-        Preference blockAllOutgoingCallExceptWhitelistSwitchPreference = findPreference(resources.getString(R.string.block_all_outgoing_numbers_except_whitelist_pref_key));
-        Preference enableVibrationOnInterceptionPreference = findPreference(resources.getString(R.string.enable_vibration_pref_key));
-        Preference aboutUsPreference = findPreference(resources.getString(R.string.about_the_app_pref_key));
+        incomigCallCheckBoxPreference = findPreference(resources.getString(R.string.disable_incoming_block_notification_pref_key));
+        outgoigCallCheckBoxPreference = findPreference(resources.getString(R.string.disable_outgoing_block_notification_pref_key));
+        blockAllIncomingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_incoming_numbers_pref_key));
+        blockAllOutgoingCallSwitchPreference = findPreference(resources.getString(R.string.block_all_outgoing_numbers_pref_key));
+        blockAllIncomingCallExceptWhitelistSwitchPreference = findPreference(resources.getString(R.string.incoming_whitelist_pref_key));
+        blockAllOutgoingCallExceptWhitelistSwitchPreference = findPreference(resources.getString(R.string.outgoing_whitelist_pref_key));
+        enableVibrationOnInterceptionPreference = findPreference(resources.getString(R.string.enable_vibration_pref_key));
+        aboutUsPreference = findPreference(resources.getString(R.string.about_the_app_pref_key));
+
+        if(!((SwitchPreference)blockAllIncomingCallSwitchPreference).isChecked()){
+
+            blockAllIncomingCallExceptWhitelistSwitchPreference.setEnabled(false);
+        }
+        else blockAllIncomingCallExceptWhitelistSwitchPreference.setEnabled(true);
+
+        if(!((SwitchPreference)blockAllOutgoingCallSwitchPreference).isChecked()){
+
+            blockAllOutgoingCallExceptWhitelistSwitchPreference.setEnabled(false);
+        }
+        else blockAllOutgoingCallExceptWhitelistSwitchPreference.setEnabled(true);
 
      /* preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -68,6 +83,8 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     ((SwitchPreference) preference).setChecked(true);
+                                    //enable whitelist switch preference
+                                    setWhitelistPreference(BlockType.INCOMING, true);
                                     Toast.makeText(getActivity(), R.string.all_incoming_calls_are_blocked, Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -89,54 +106,18 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
                             });
 
                             builder.show();
+
+                        } else{
+
+                            //disalbe whitelist switch preference
+                            setWhitelistPreference(BlockType.INCOMING, false);
                         }
 
                         return true;
                     }
                 });
 
-        blockAllOutgoingCallSwitchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(final Preference preference, Object o) {
-                //if enable is selected show an confirmation dialog and get confirmation from the user
-                if (((Boolean) o).equals(Boolean.TRUE)) {
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle(R.string.confirm_block_all_outgoing_calls_title);
-                    builder.setMessage(R.string.confirm_block_all_outgoing_calls);
-                    builder.setCancelable(true);
-                    builder.setPositiveButton(R.string.yes_text, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            ((SwitchPreference) preference).setChecked(true);
-                            Toast.makeText(getActivity(), R.string.all_outgoing_calls_are_blocked, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    builder.setNegativeButton(R.string.no_text, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            ((SwitchPreference) preference).setChecked(false);
-                        }
-                    });
-
-                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-
-                            ((SwitchPreference) preference).setChecked(false);
-                        }
-                    });
-
-                    builder.show();
-                }
-
-                return true;
-            }
-        });
-
+        /*
         blockAllIncomingCallExceptWhitelistSwitchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(final Preference preference, Object o) {
@@ -178,8 +159,56 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
                 return true;
             }
         });
+*/
+        blockAllOutgoingCallSwitchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(final Preference preference, Object o) {
+                //if enable is selected show an confirmation dialog and get confirmation from the user
+                if (((Boolean) o).equals(Boolean.TRUE)) {
 
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle(R.string.confirm_block_all_outgoing_calls_title);
+                    builder.setMessage(R.string.confirm_block_all_outgoing_calls);
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(R.string.yes_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
+                            ((SwitchPreference) preference).setChecked(true);
+                            //enable whitelist switch preference
+                            setWhitelistPreference(BlockType.OUTGOING, true);
+                            Toast.makeText(getActivity(), R.string.all_outgoing_calls_are_blocked, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    builder.setNegativeButton(R.string.no_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            ((SwitchPreference) preference).setChecked(false);
+                        }
+                    });
+
+                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+
+                            ((SwitchPreference) preference).setChecked(false);
+                        }
+                    });
+
+                    builder.show();
+                } else{
+
+                    //disalbe whitelist switch preference
+                    setWhitelistPreference(BlockType.OUTGOING, false);
+                }
+
+                return true;
+            }
+        });
+
+/*
         blockAllOutgoingCallExceptWhitelistSwitchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(final Preference preference, Object o) {
@@ -221,7 +250,7 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
                 return true;
             }
         });
-
+*/
         incomigCallCheckBoxPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(final Preference preference, Object o) {
@@ -352,6 +381,28 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
         }*/
 
         return false;
+    }
+
+    private void setWhitelistPreference(int blockType, boolean isEnabled){
+
+        Preference switchPreference = null;
+
+        switch(blockType){
+
+            case BlockType.INCOMING:
+
+                switchPreference = blockAllIncomingCallExceptWhitelistSwitchPreference;
+                break;
+            case BlockType.OUTGOING:
+
+                switchPreference = blockAllOutgoingCallExceptWhitelistSwitchPreference;
+                break;
+        }
+
+        if(switchPreference != null){
+
+            switchPreference.setEnabled(isEnabled);
+        }
     }
 
     @Override

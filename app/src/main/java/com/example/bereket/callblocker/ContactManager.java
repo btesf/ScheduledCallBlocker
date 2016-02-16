@@ -480,14 +480,14 @@ public class ContactManager {
         return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.block_all_outgoing_numbers_pref_key), false);
     }
 
-    public boolean globalBlockNonWhitelistIncomingBlockPreferenceEnabled(){
+    public boolean whitelistIncomingAllowPreferenceEnabled(){
 
-        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.block_all_incoming_numbers_except_whitelist_pref_key), false);
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.incoming_whitelist_pref_key), false);
     }
 
-    public boolean globalBlockNonWhitelistOutgoingBlockPreferenceEnabled(){
+    public boolean whitelistOutgoingAllowPreferenceEnabled(){
 
-        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.block_all_outgoing_numbers_except_whitelist_pref_key), false);
+        return PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext()).getBoolean(mContext.getResources().getString(R.string.outgoing_whitelist_pref_key), false);
     }
 
     public boolean disableIncomingBlockNotificationPreferenceEnabled(){

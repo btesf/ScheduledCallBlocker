@@ -39,10 +39,30 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
 
                     if(mContactManager.globalBlockOutgoingBlockPreferenceEnabled()){
 
-                        result.setResultData(null);
-                        LogAndPostBlockService.startActionLoggerAndNotification(context, phoneNumber, BlockType.OUTGOING, countryCodeValue);
+                        if(mContactManager.whitelistOutgoingAllowPreferenceEnabled()){
+
+                            //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
+                            if(mContactManager.nonStandardizedPreferenceEnabled()){
+
+                                mContactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                            }
+
+                            Contact whiteListContact = mContactManager.getContactByStandardizedPhoneNumber(phoneNumber);
+
+                            if(whiteListContact != null && whiteListContact.getIncomingBlockedState() == BlockState.WHITE_LIST){
+
+                                result.finish();
+
+                                return;
+                            }
+                        }
+                        else{
+
+                            result.setResultData(null);
+                            LogAndPostBlockService.startActionLoggerAndNotification(context, phoneNumber, BlockType.OUTGOING, countryCodeValue);
+                        }
                     }
-                    else if(mContactManager.globalBlockNonWhitelistOutgoingBlockPreferenceEnabled()){
+                    else if(mContactManager.whitelistOutgoingAllowPreferenceEnabled()){
 
                         //standardize any phoneNumbers with non-standard phone number (registered while the phone was out of service)
                         if(mContactManager.nonStandardizedPreferenceEnabled()){

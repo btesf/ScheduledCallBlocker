@@ -55,9 +55,7 @@
     <string name="nothing_to_save">Cannot save empty string</string>
     <string name="global_categories">General setting</string>
     <string name="global_call_block_settings">General call blocker settings</string>
-    <string name="block_all_settings">Block all settings</string>
     <string name="whitelist_settings">Whitelist settings</string>
-    <string name="block_all_settings_summary">Global block setting affecting all numbers</string>
     <string name="whitelist_settings_summary">Add block exceptions</string>
     <string name="block_all_incoming_string">Block all incoming calls</string>
     <string name="block_all_outgoing_string">Block all outgoing calls</string>
@@ -124,8 +122,8 @@
     <string name="disable_outgoing_block_notification_pref_key">disable_outgoing_block_notification_pref_key</string>
     <string name="block_all_incoming_numbers_pref_key">block_all_incoming_numbers_pref_key</string>
     <string name="block_all_outgoing_numbers_pref_key">block_all_outgoing_numbers_pref_key</string>
-    <string name="block_all_incoming_numbers_except_whitelist_pref_key">block_all_incoming_numbers_except_whitelist_pref_key</string>
-    <string name="block_all_outgoing_numbers_except_whitelist_pref_key">block_all_outgoing_numbers_except_whitelist_pref_key</string>
+    <string name="incoming_whitelist_pref_key">incoming_whitelist_pref_key</string>
+    <string name="outgoing_whitelist_pref_key">outgoing_whitelist_pref_key</string>
     <string name="enable_vibration_pref_key">enable_vibration_pref_key</string>
     <string name="about_the_app_pref_key">about_the_app_pref_key</string>
     <string name="title_activity_single_contact_log">Single contact log</string>
@@ -159,11 +157,9 @@
     <string name="show_white_list">whitelist</string>
     <string name="show_blocked_list">blocked list</string>
     <string name="white_list_fragment">Whitelist</string>
-    <string name="block_all_incoming_except_whitelist_string">Block all incoming except whitelist</string>
-    <string name="block_all_outgoing_except_whitelist_string">Block all outgoing except whitelist</string>
-    <string name="block_all_incoming_except_whitelist_string_summary">Block all incoming except whitelist</string>
-    <string name="block_all_outgoing_except_whitelist_string_summary">Block all outgoing except whitelist</string>
-    <string name="white_list_block_setting_category">Whitelist settings</string>
-    <string name="white_list_block_settings_summary">Whitelist/exception list settings</string>
+    <string name="block_all_incoming_except_whitelist_string">Allow whitelisted numbers</string>
+    <string name="block_all_outgoing_except_whitelist_string">Allow whitelisted numbers</string>
+    <string name="block_all_incoming_except_whitelist_string_summary">receive calls from whitelisted numbers</string>
+    <string name="block_all_outgoing_except_whitelist_string_summary">make calls to whitelisted numbers</string>
 
 </resources>
