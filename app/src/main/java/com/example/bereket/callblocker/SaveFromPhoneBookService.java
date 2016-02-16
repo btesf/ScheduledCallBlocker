@@ -68,8 +68,8 @@ public class SaveFromPhoneBookService extends IntentService {
                 newContact.setIsNumberStandardized(isNumberStandardized);
                 newContact.setContactType(contactType);
 
-                Contact oldContact = new Contact();
-                oldContact.setId(oldContactId);
+                Contact oldContact = mContactManager.getContactById(oldContactId);
+                mContactManager.copyContactDetails(oldContact, newContact);
 
                 mContactManager.updateOldContactWithNewContactWithId(oldContact, newContact);
                 //send a broadcast so that the blocked list UI can refresh it's list once the old contact is replaced with the contact from phone book

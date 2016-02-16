@@ -55,6 +55,11 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
 
                                 return;
                             }
+                            else{
+
+                                result.setResultData(null);
+                                LogAndPostBlockService.startActionLoggerAndNotification(context, phoneNumber, BlockType.OUTGOING, countryCodeValue);
+                            }
                         }
                         else{
 

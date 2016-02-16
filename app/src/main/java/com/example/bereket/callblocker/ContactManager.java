@@ -71,9 +71,9 @@ public class ContactManager {
 
         newContact.setIncomingBlockedCount(oldContact.getIncomingBlockedCount());
         newContact.setOutgoingBlockedCount(oldContact.getOutgoingBlockedCount());
-        //if contact type is different, then the blocked states should be cleared - b/c it is changing category
-        newContact.setIncomingBlockedState((oldContact.getContactType() != newContact.getContactType()) ? BlockState.DONT_BLOCK : oldContact.getIncomingBlockedState());
-        newContact.setOutGoingBlockedState((oldContact.getContactType() != newContact.getContactType()) ? BlockState.DONT_BLOCK : oldContact.getOutGoingBlockedState());
+        //if contact type is different, then the blocked states should be the new one's default state
+        newContact.setIncomingBlockedState((oldContact.getContactType() != newContact.getContactType()) ? newContact.getIncomingBlockedState() : oldContact.getIncomingBlockedState());
+        newContact.setOutGoingBlockedState((oldContact.getContactType() != newContact.getContactType()) ? newContact.getOutGoingBlockedState() : oldContact.getOutGoingBlockedState());
         //don't copy visibility state (in case of hidden contacts saved for log purpose) - because copying precedes update. We want the contact to be visible after a user added it explicitly
     }
 
@@ -163,13 +163,15 @@ public class ContactManager {
 
                        if(oldContact.getContactType() != contactType) {
                            //set default block setting for old user
-                           setDefaultBlockStateByContactType(newContact, contactType);
+                           setDefaultBlockStateByContactType(oldContact, contactType);
+                           updateContact(oldContact);
                            //TODO bring the string from string resource
                            Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : " white list"), Toast.LENGTH_SHORT).show();
                        }
                        else{
 
                            Toast.makeText(mContext, "Contact is updated", Toast.LENGTH_SHORT).show();
+                           updateContact(newContact);
                        }
                    } else{
 

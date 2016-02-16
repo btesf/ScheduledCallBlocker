@@ -96,6 +96,11 @@ class PhoneCallStateListener extends PhoneStateListener {
 
                                     break;
                                 }
+                                else{
+
+                                    blockCall();
+                                    LogAndPostBlockService.startActionLoggerAndNotification(context, incomingNumber, BlockType.INCOMING, countryCodeValue);
+                                }
                             }
                             else{
 
