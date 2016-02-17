@@ -180,21 +180,19 @@ public class ContactManager {
                        updateContact(newContact);
                     }
                 }
-                else if((oldContact.getId() < newContact.getId()) &&  oldContact.getContactType() == ContactType.HIDDEN_CONTACT){ //if contact was there but hidden, make it visible contact - this happens when a contact is added from Phonebook by a logger service
-                    //in this scenario, number is already standardized - b/c it is added during incoming call where network is available.
+                else if((oldContact.getId() < newContact.getId()) && (oldContact.getContactType() != newContact.getContactType())){
+                    //during adding hidden contact or category change (e.g. blocklist -> whitelist or viceversa)
                     oldContact.setContactType(newContact.getContactType());
-                    setDefaultBlockStateByContactType(oldContact, newContact.getContactType());
+                    setDefaultBlockStateByContactType(oldContact, newContact.getContactType());//this method is called on the oldContact
                     updateContact(oldContact);
-                    //TODO remove the line below - it is temporary
-                    Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
-                }
-                else if((oldContact.getId() < newContact.getId()) && (oldContact.getContactType() != newContact.getContactType())){ //if manually add from different category is performed (where the contact may exist in another category), a category change must be done.
-                    //set default block setting for old user - we don't to lose other oldContact properties
-                    setDefaultBlockStateByContactType(oldContact, contactType);
-                    oldContact.setContactType(newContact.getContactType());
-                    updateContact(oldContact);
-                    //TODO bring the string from string resource
-                    Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+
+                    if(oldContact.getContactType() == ContactType.HIDDEN_CONTACT){
+                        //TODO bring the string from string resource
+                        Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                    } else{//category change
+                        //TODO bring the string from string resource
+                        Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else if(oldContact.getId() > newContact.getId()){
                 //if the latest id is timestamp, check if there is an older contact (by comparing ids) and update the contact if the older contact id is greater than the new one
@@ -266,8 +264,8 @@ public class ContactManager {
                         Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
                     }
 
-                } else if((contact.getId() < newContact.getId()) && contact.getContactType() == ContactType.HIDDEN_CONTACT){ //if contact was there but hidden, make it visible contact - this happens when a contact is added from Phonebook by a logger service
-                    //in this scenario, number is already standardized - b/c it is added during incoming call where network is available.
+                } else if((contact.getId() < newContact.getId()) && (contact.getContactType() != newContact.getContactType())){//&& contact.getContactType() == ContactType.HIDDEN_CONTACT){ //if contact was there but hidden, make it visible contact - this happens when a contact is added from Phonebook by a logger service
+
                     contact.setContactType(newContact.getContactType());
                     setDefaultBlockStateByContactType(contact, newContact.getContactType());
                     updateContact(contact);
@@ -278,12 +276,20 @@ public class ContactManager {
                     //set default block setting for old user - we don't to lose other oldContact properties
                     setDefaultBlockStateByContactType(contact, newContact.getContactType());
                     contact.setContactType(newContact.getContactType());
-                    //sometimes, if the original contact itself was not standardized, now by when it is fetched through numberExistsInTemporaryList it will be standardized
-                    //with temporary country code - as a result, a wrong number will be saved. In that regard, we will reset it with display number
-                    contact.setPhoneNumber(displayNumber);
+                    //sometimes, if the original contact itself was not standardized, and fetched from numberExistsInTemporaryList it will be standardized
+                    //with temporary country code - as a result, a wrong number will be saved. To prevernt that check if oldContact is standardized and if not reset it with display number
+                    if(!contact.isIsNumberStandardized()) contact.setPhoneNumber(displayNumber);
+                    
                     updateContact(contact);
-                    //TODO bring the string from string resource
-                    Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+
+                    if(contact.getContactType() == ContactType.HIDDEN_CONTACT){
+                        //TODO remove the line below - it is temporary
+                        Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        //TODO bring the string from string resource
+                        Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else {
                     //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
@@ -447,7 +453,7 @@ public class ContactManager {
 
                 Contact contact = contactCursor.getContact();
 
-                if(!contact.isIsNumberStandardized()){
+                if(!contact.isIsNumberStandardized()) {
 
                     contact.setPhoneNumber(standardizePhoneNumber(contact.getPhoneNumber(), countryCode));
                 }
