@@ -10,7 +10,7 @@ public class SaveFromPhoneBookService extends IntentService {
     private ContactManager mContactManager;
 
     private static final String SEARCH_AND_SAVE_FROM_PHONEBOOK = "com.example.bereket.callblocker.action.search.and.save.from.phonebook";
-    private static final String NEW_CONTACT_ID = "com.example.bereket.callblocker.new.inserted.id";
+    private static final String CONTACT = "com.example.bereket.callblocker.contact";
     private static final String COUNTRY_CODE_VALUE = "com.example.bereket.callblocker.country.code.value";
     private static final String DISPLAY_NUMBER = "com.example.bereket.callblocker.display.number";
     private static final String IS_NUMBER_STANDARDIZED = "com.example.bereket.callblocker.number.standardized";
@@ -19,10 +19,10 @@ public class SaveFromPhoneBookService extends IntentService {
     public static final String ACTION_REFRESH_BLOCKED_LIST_UI = "com.example.bereket.callblocker.refresh.blocked.list.ui";
     public static final String PRIVATE_PERMISSION = "com.example.bereket.callblocker.PRIVATE";
 
-    public static void startActionSaveFromPhoneBook(Context context, long param1, String countryCodeValue, String displayNumber, boolean isNumberStandardized, int contactType) {
+    public static void startActionSaveFromPhoneBook(Context context, Contact param1, String countryCodeValue, String displayNumber, boolean isNumberStandardized, int contactType) {
         Intent intent = new Intent(context, SaveFromPhoneBookService.class);
         intent.setAction(SEARCH_AND_SAVE_FROM_PHONEBOOK);
-        intent.putExtra(NEW_CONTACT_ID, param1);
+        intent.putExtra(CONTACT, param1);
         intent.putExtra(COUNTRY_CODE_VALUE, countryCodeValue);
         intent.putExtra(DISPLAY_NUMBER, displayNumber);
         intent.putExtra(IS_NUMBER_STANDARDIZED, isNumberStandardized); //when copying contact details, isNumberStandardized is not copied. So we need it here
@@ -47,7 +47,7 @@ public class SaveFromPhoneBookService extends IntentService {
 
             if (SEARCH_AND_SAVE_FROM_PHONEBOOK.equals(action)) {
 
-                final long oldContactId = intent.getLongExtra(NEW_CONTACT_ID, -1);
+                final Contact oldContact = (Contact)intent.getSerializableExtra(CONTACT);
                 final String countryCode = intent.getStringExtra(COUNTRY_CODE_VALUE);
                 final String displayNumber = intent.getStringExtra(DISPLAY_NUMBER);
                 final boolean isNumberStandardized = intent.getBooleanExtra(IS_NUMBER_STANDARDIZED, false);
@@ -68,8 +68,7 @@ public class SaveFromPhoneBookService extends IntentService {
                 newContact.setIsNumberStandardized(isNumberStandardized);
                 newContact.setContactType(contactType);
 
-                Contact oldContact = new Contact();
-                oldContact.setId(oldContactId);
+                mContactManager.copyContactDetails(oldContact, newContact);
 
                 mContactManager.updateOldContactWithNewContactWithId(oldContact, newContact);
                 //send a broadcast so that the blocked list UI can refresh it's list once the old contact is replaced with the contact from phone book
