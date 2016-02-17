@@ -250,7 +250,7 @@ public class ContactManager {
                     if(contact.getContactType() != ContactType.HIDDEN_CONTACT){
 
                         if(contact.getContactType() != contactType) {
-                            
+
                             updateOldContactWithNewContactWithId(contact, newContact);//no problem here, because newContact will have all the necessary details
                             //TODO bring the string from string resource
                             Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
@@ -278,6 +278,9 @@ public class ContactManager {
                     //set default block setting for old user - we don't to lose other oldContact properties
                     setDefaultBlockStateByContactType(contact, newContact.getContactType());
                     contact.setContactType(newContact.getContactType());
+                    //sometimes, if the original contact itself was not standardized, now by when it is fetched through numberExistsInTemporaryList it will be standardized
+                    //with temporary country code - as a result, a wrong number will be saved. In that regard, we will reset it with display number
+                    contact.setPhoneNumber(displayNumber);
                     updateContact(contact);
                     //TODO bring the string from string resource
                     Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
@@ -447,7 +450,6 @@ public class ContactManager {
                 if(!contact.isIsNumberStandardized()){
 
                     contact.setPhoneNumber(standardizePhoneNumber(contact.getPhoneNumber(), countryCode));
-                    contact.setIsNumberStandardized(true);
                 }
 
                 contacts.add(contact);
