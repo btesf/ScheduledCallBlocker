@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 /**
@@ -40,7 +41,10 @@ public class NotificationReceiver extends BroadcastReceiver {
             BlockedCallCounter blockedCallCounter = new BlockedCallCounter(mContext);
             int blockCount = blockedCallCounter.incrementAndGetBlockCount(blockType);
             //TODO put string values in xml file
-            Intent i  = new Intent(mContext, LogActivity.class);
+            Intent i  = new Intent(mContext, MainAppActivity.class);
+            Bundle bundle = new Bundle();
+            i.putExtra(Constants.FRAGMENT_ID, Constants.LOG_LIST_FRAGMENT);
+
             PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);
             Notification notification = new NotificationCompat.Builder(mContext)
                     .setTicker("Call blocker")

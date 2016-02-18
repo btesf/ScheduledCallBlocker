@@ -35,7 +35,11 @@ public class MainAppActivity extends AppCompatActivity
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+
+        int fragmentId = getIntent().getIntExtra(Constants.FRAGMENT_ID, Constants.BLOCKED_LIST_FRAGMENT);
+
         setupViewPager(viewPager);
+        viewPager.setCurrentItem(fragmentId);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
