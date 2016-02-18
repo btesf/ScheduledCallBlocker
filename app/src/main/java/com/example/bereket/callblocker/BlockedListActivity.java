@@ -12,16 +12,7 @@ import android.view.ViewGroup;
 import android.os.Build;
 
 
-public class BlockedListActivity extends SingleFragmentActivity implements BlockedListFragment.OnFragmentInteractionListener{
-
-    @Override
-    protected android.app.Fragment createFragment() {
-
-        String arg1 = "";
-        String arg2 = "";
-
-        return BlockedListFragment.newInstance(arg1, arg2);
-    }
+public class BlockedListActivity implements BlockedListFragment.OnFragmentInteractionListener{
 
     @Override
     public void onFragmentInteraction(String id) {

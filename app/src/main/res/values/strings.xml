@@ -156,7 +156,11 @@
     <string name="about_the_app_preference_summary">About Scheduled Call Blocker</string>
     <string name="show_white_list">whitelist</string>
     <string name="show_blocked_list">blocked list</string>
-    <string name="white_list_fragment">Whitelist</string>
+    <string name="white_list_fragment">whitelist</string>
+    <string name="block_list_fragment">block list</string>
+    <string name="block_list_tab_name">BLOCK LIST</string>
+    <string name="log_list_tab_name">LOG</string>
+    <string name="white_list_tab_name">WHITELIST</string>
     <string name="block_all_incoming_except_whitelist_string">Allow whitelisted numbers</string>
     <string name="block_all_outgoing_except_whitelist_string">Allow whitelisted numbers</string>
     <string name="block_all_incoming_except_whitelist_string_summary">receive calls from whitelisted numbers</string>

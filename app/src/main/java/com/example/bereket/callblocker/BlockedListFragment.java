@@ -2,26 +2,22 @@ package com.example.bereket.callblocker;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.ListFragment;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ActionMode;
@@ -123,10 +119,10 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         ListView listView = (ListView) v.findViewById(android.R.id.list);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+     /*   ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         actionBar.setLogo(R.mipmap.ic_launcher);
         actionBar.setDisplayUseLogoEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);*/
 
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
