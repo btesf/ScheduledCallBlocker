@@ -1,10 +1,10 @@
 package com.example.bereket.callblocker;
 
-import android.app.Fragment;
 import android.net.Uri;
+import android.support.v4.app.Fragment;
 
 
-public   class SingleWhiteListContactActivity extends SingleFragmentActivity implements SingleWhiteListContactFragment.OnFragmentInteractionListener{
+public  class SingleWhiteListContactActivity extends SingleFragmentActivity implements SingleWhiteListContactFragment.OnFragmentInteractionListener{
 
 
     @Override

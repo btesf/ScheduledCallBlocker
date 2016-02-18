@@ -1,8 +1,8 @@
 package com.example.bereket.callblocker;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.net.Uri;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;

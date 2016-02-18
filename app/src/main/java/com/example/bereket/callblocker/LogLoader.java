@@ -1,8 +1,8 @@
 package com.example.bereket.callblocker;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.content.AsyncTaskLoader;
 
 /**
  * Created by bereket on 10/8/15.
