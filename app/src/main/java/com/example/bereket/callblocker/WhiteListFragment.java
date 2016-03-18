@@ -38,7 +38,8 @@ import android.widget.Toast;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class WhiteListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor>, SearchView.OnQueryTextListener {
+public class WhiteListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor>, SearchView.OnQueryTextListener,
+    UpdatableFragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -101,9 +102,7 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
         mContactManager = ContactManager.getInstance(getActivity());
         setHasOptionsMenu(true);
 
-        Bundle args = new Bundle();
-        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
-        getLoaderManager().initLoader(CONTACTS_LIST_LOADER, args, this);
+        //init loader manager is moved to onActivityCreated b/c in tabbed view, it is creating a problem when put here
     }
 
     @Override
@@ -186,9 +185,9 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
         args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
         getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, args, this);
         //register a receiver that gets notified when a blocked list contat is updated from phonebook
-        IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
+        IntentFilter filter = new IntentFilter(Constants.ACTION_REFRESH_BLOCKED_LIST_UI);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
-        getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
+        getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, Constants.PRIVATE_PERMISSION, null);
     }
 
     @Override
@@ -483,5 +482,20 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
 
         ((ViewGroup)getListView().getParent()).addView(emptyView);
         getListView().setEmptyView(emptyView);
+
+
+        Bundle args = new Bundle();
+        args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.WHITE_LIST_CONTACT);
+        getLoaderManager().initLoader(CONTACTS_LIST_LOADER, args, this);
+    }
+
+    @Override
+    public void updateContent() {
+
+        Activity activity = getActivity();
+        if (isAdded() && activity != null) {
+
+            getLoaderManager().restartLoader(CONTACTS_LIST_LOADER, null, this);
+        }
     }
 }

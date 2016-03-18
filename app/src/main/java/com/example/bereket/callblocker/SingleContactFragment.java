@@ -552,9 +552,9 @@ public class SingleContactFragment extends HideNotificationFragment {
         super.onResume();
 
         //register a receiver that gets notified when a blocked list contat is updated from phonebook
-        IntentFilter filter = new IntentFilter(SaveFromPhoneBookService.ACTION_REFRESH_BLOCKED_LIST_UI);
+        IntentFilter filter = new IntentFilter(Constants.ACTION_REFRESH_BLOCKED_LIST_UI);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
-        getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, SaveFromPhoneBookService.PRIVATE_PERMISSION, null);
+        getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, Constants.PRIVATE_PERMISSION, null);
     }
 
     @Override

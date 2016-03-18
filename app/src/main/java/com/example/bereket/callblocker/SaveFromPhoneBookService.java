@@ -16,8 +16,6 @@ public class SaveFromPhoneBookService extends IntentService {
     private static final String IS_NUMBER_STANDARDIZED = "com.example.bereket.callblocker.number.standardized";
     private static final String CONTACT_TYPE = "com.example.bereket.callblocker.contact.type";
 
-    public static final String ACTION_REFRESH_BLOCKED_LIST_UI = "com.example.bereket.callblocker.refresh.blocked.list.ui";
-    public static final String PRIVATE_PERMISSION = "com.example.bereket.callblocker.PRIVATE";
 
     public static void startActionSaveFromPhoneBook(Context context, Contact param1, String countryCodeValue, String displayNumber, boolean isNumberStandardized, int contactType) {
         Intent intent = new Intent(context, SaveFromPhoneBookService.class);
@@ -72,7 +70,7 @@ public class SaveFromPhoneBookService extends IntentService {
 
                 mContactManager.updateOldContactWithNewContactWithId(oldContact, newContact);
                 //send a broadcast so that the blocked list UI can refresh it's list once the old contact is replaced with the contact from phone book
-                sendBroadcast(new Intent(ACTION_REFRESH_BLOCKED_LIST_UI), PRIVATE_PERMISSION); //here a private permission is added so that the broadcast can be interoggated if it holds the right permission when sent
+                sendBroadcast(new Intent(Constants.ACTION_REFRESH_BLOCKED_LIST_UI), Constants.PRIVATE_PERMISSION); //here a private permission is added so that the broadcast can be interoggated if it holds the right permission when sent
             }
         }
     }

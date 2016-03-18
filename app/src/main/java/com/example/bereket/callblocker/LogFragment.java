@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.media.Image;
 import android.net.Uri;
@@ -26,7 +27,7 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 
-public class LogFragment extends HideNotificationListFragment  implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>  {
+public class LogFragment extends HideNotificationListFragment  implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>, UpdatableFragment  {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -77,7 +78,6 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
         mLogManager = LogManager.getInstance(getActivity());
         mTimeHelper = TimeHelper.getInstance(getActivity());
         setHasOptionsMenu(true);
-        getLoaderManager().initLoader(LOG_LIST_LOADER, null, this);
         //reset BlockCallCounter variables if the log is displayed
 
         BlockedCallCounter blockedCallCounter = new BlockedCallCounter(getActivity());
@@ -91,6 +91,8 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
         }
+
+        //init loader manager is moved to onActivityCreated b/c in tabbed view, it is creating a problem when put here
     }
 
     @Override
@@ -136,6 +138,16 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
     @Override
     public void onLoaderReset(Loader<DataBaseHelper.LogCursor> logCursorLoader) {
         setListAdapter(null);
+    }
+
+    @Override
+    public void updateContent() {
+
+        Activity activity = getActivity();
+        if (isAdded() && activity != null) {
+
+            getLoaderManager().restartLoader(LOG_LIST_LOADER, null, this);
+        }
     }
 
 
@@ -242,6 +254,8 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
 
         ((ViewGroup)getListView().getParent()).addView(emptyView);
         getListView().setEmptyView(emptyView);
+
+        getLoaderManager().initLoader(LOG_LIST_LOADER, null, this);
     }
 
     /**
