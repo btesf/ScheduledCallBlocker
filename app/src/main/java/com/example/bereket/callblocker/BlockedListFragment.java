@@ -288,14 +288,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                 intent = new Intent(getActivity(), AddNewPhoneActivity.class);
                 startActivityForResult(intent, ADD_CONTACT_MANUALLY);
                 return true;
-            case R.id.menu_item_show_log:
-                intent = new Intent(getActivity(), LogActivity.class);
-                startActivityForResult(intent, CONTACTS_LIST_LOADER);
-                return true;
-            case R.id.menu_item_show_white_list:
-                intent = new Intent(getActivity(), WhiteListActivity.class);
-                startActivityForResult(intent, WHITE_LIST_ACTIVITY);
-                return true;
             case R.id.menu_item_settings:
                 intent = new Intent(getActivity(), SettingActivity.class);
                 startActivityForResult(intent, CHANGE_PREFERENCE);

@@ -13,12 +13,6 @@
     <item android:id="@+id/menu_item_manually_add_contact"
         app:showAsAction="never"
         android:title="@string/add_manually"/>
-    <item android:id="@+id/menu_item_show_log"
-        app:showAsAction="never"
-        android:title="@string/show_log"/>
-    <item android:id="@+id/menu_item_show_blocked_list"
-        app:showAsAction="never"
-        android:title="@string/show_blocked_list"/>
     <item android:id="@+id/menu_item_settings"
         app:showAsAction="never"
         android:title="@string/settings_string"/>

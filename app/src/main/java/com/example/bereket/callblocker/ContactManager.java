@@ -181,12 +181,14 @@ public class ContactManager {
                     }
                 }
                 else if((oldContact.getId() < newContact.getId()) && (oldContact.getContactType() != newContact.getContactType())){
+
+                    int oldContactType = oldContact.getContactType();
                     //during adding hidden contact or category change (e.g. blocklist -> whitelist or viceversa)
                     oldContact.setContactType(newContact.getContactType());
                     setDefaultBlockStateByContactType(oldContact, newContact.getContactType());//this method is called on the oldContact
                     updateContact(oldContact);
 
-                    if(oldContact.getContactType() == ContactType.HIDDEN_CONTACT){
+                    if(oldContactType == ContactType.HIDDEN_CONTACT){
                         //TODO bring the string from string resource
                         Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
                     } else{//category change
@@ -197,13 +199,13 @@ public class ContactManager {
                 else if(oldContact.getId() > newContact.getId()){
                 //if the latest id is timestamp, check if there is an older contact (by comparing ids) and update the contact if the older contact id is greater than the new one
                 //i.e - if the new contact comes from contact list, it will be less than the new one - we want to update this time.
-
+                    int oldContactType = oldContact.getContactType();
                     //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                     updateOldContactWithNewContactWithId(oldContact, newContact);
                     //TODO remove the toast line and conditions below - it is temporary
                     //if the contact is saved on log (while global block setting is set), we don't want to show an update toast  - because the user doesn't know the contact was already saved
 
-                    if(oldContact.getContactType() != ContactType.HIDDEN_CONTACT) {
+                    if(oldContactType != ContactType.HIDDEN_CONTACT) {
                         Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
                     }
 
@@ -275,14 +277,17 @@ public class ContactManager {
                 else if((contact.getId() < newContact.getId()) && (contact.getContactType() != newContact.getContactType())){ //if manually add from different category is performed (where the contact may exist in another category), a category change must be done.
                     //set default block setting for old user - we don't to lose other oldContact properties
                     setDefaultBlockStateByContactType(contact, newContact.getContactType());
+
+                    int oldContactType = contact.getContactType();
+
                     contact.setContactType(newContact.getContactType());
                     //sometimes, if the original contact itself was not standardized, and fetched from numberExistsInTemporaryList it will be standardized
                     //with temporary country code - as a result, a wrong number will be saved. To prevernt that check if oldContact is standardized and if not reset it with display number
                     if(!contact.isIsNumberStandardized()) contact.setPhoneNumber(displayNumber);
-                    
+
                     updateContact(contact);
 
-                    if(contact.getContactType() == ContactType.HIDDEN_CONTACT){
+                    if(oldContactType == ContactType.HIDDEN_CONTACT){
                         //TODO remove the line below - it is temporary
                         Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
                     }

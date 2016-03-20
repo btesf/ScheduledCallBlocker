@@ -19,6 +19,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +49,21 @@ public class MainAppActivity extends AppCompatActivity
 
         final int fragmentId = getIntent().getIntExtra(Constants.FRAGMENT_ID, Constants.BLOCKED_LIST_FRAGMENT);
 
-        setupViewPager(viewPager);
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        adapter.addFragment(new BlockedListFragment(), getResources().getString(R.string.block_list_tab_name));
+        adapter.addFragment(new LogFragment(), getResources().getString(R.string.log_list_tab_name));
+        adapter.addFragment(new WhiteListFragment(), getResources().getString(R.string.white_list_tab_name));
+
+        viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(fragmentId);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        viewPager.clearOnPageChangeListeners();
+        viewPager.addOnPageChangeListener(new WorkaroundTabLayoutOnPageChangeListener(tabLayout));
+
         /*
         When tabbed activity is set, all the tabs are populated for the first time and all the lifecycle methods are called once.
         As a result, when a contact is deleted from a list, we can't rely on the fragment's lifecycle methods (onPause, onResume) to restart loader.
@@ -66,16 +77,17 @@ public class MainAppActivity extends AppCompatActivity
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 
-                if(adapter != null){
+                if (adapter != null) {
 
-                    int position = viewPager.getCurrentItem();
+                    //int position = viewPager.getCurrentItem();
+                    int position = tab.getPosition();
 
                     viewPager = (ViewPager) findViewById(R.id.viewpager);
                     viewPager.setCurrentItem(position);
 
-                    Fragment tabbedFragment =  adapter.getRegisteredFragment(viewPager.getCurrentItem());
+                    Fragment tabbedFragment = adapter.getRegisteredFragment(viewPager.getCurrentItem());
 
-                    if(tabbedFragment instanceof UpdatableFragment){
+                    if (tabbedFragment instanceof UpdatableFragment) {
 
                         ((UpdatableFragment) tabbedFragment).updateContent();
                     }
@@ -85,11 +97,6 @@ public class MainAppActivity extends AppCompatActivity
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
 
-/*                Fragment tabbedFragment =  adapter.getItem(viewPager.getCurrentItem());
-                if(tabbedFragment instanceof LogFragment){
-
-                    ((LogFragment) tabbedFragment).updateContent();
-                }*/
             }
 
             @Override
@@ -97,18 +104,6 @@ public class MainAppActivity extends AppCompatActivity
 
             }
         });
-    }
-
-    /**
-     * @param viewPager
-     */
-    private void setupViewPager(ViewPager viewPager) {
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
-/*        adapter.addFragment(new BlockedListFragment(), getResources().getString(R.string.block_list_tab_name));
-        adapter.addFragment(new LogFragment(), getResources().getString(R.string.log_list_tab_name));
-        adapter.addFragment(new WhiteListFragment(), getResources().getString(R.string.white_list_tab_name));*/
-        viewPager.setAdapter(adapter);
-
     }
 
     @Override
@@ -121,25 +116,26 @@ public class MainAppActivity extends AppCompatActivity
 
     }
 
+    /*
+    Fragent pager adapter keeps the fragments in memory. Which means, it keeps the fragments in the FragmentManager once they are created, and
+     it won't recreate them anymore. This creates problem when the activity is destroyed and re-created. In such case there will be a new instance
+     of the Activity but not the fragments. Since we don't have the references of the older
+     fragments anymore we can't call the implemented interface method updateContent() and refresh the views of fragments.
+     That's why I hold the fragment instances used by the fragmentmanager when instantiateItem method is called..
+     */
     class ViewPagerAdapter extends FragmentPagerAdapter {
         //private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
-        SparseArray<Fragment> mFragmentList = new SparseArray<Fragment>(); //I want this, because the fragment manager always keeps its original fragments in memory
-
+        private SparseArray<Fragment> mFragmentList = new SparseArray<Fragment>(); //I want this, because the fragment manager always keeps its original fragments in memory
         private List<Fragment> fragments = new ArrayList<Fragment>();
-
-        {
-            fragments.add(new BlockedListFragment());
-            fragments.add(new LogFragment());
-            fragments.add(new WhiteListFragment());
-
-            mFragmentTitleList.add(getResources().getString(R.string.block_list_tab_name));
-            mFragmentTitleList.add(getResources().getString(R.string.log_list_tab_name));
-            mFragmentTitleList.add(getResources().getString(R.string.white_list_tab_name));
-        }
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            fragments.add(fragment);
+            mFragmentTitleList.add(title);
         }
 
         @Override
@@ -152,12 +148,6 @@ public class MainAppActivity extends AppCompatActivity
         public int getCount() {
             return fragments.size();
         }
-
-/*        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }*/
-
 
 
         @Override
@@ -180,6 +170,31 @@ public class MainAppActivity extends AppCompatActivity
 
         public Fragment getRegisteredFragment(int position) {
             return mFragmentList.get(position);
+        }
+    }
+
+    /**
+     * this workAround listener is a fix/workaround for discovered marshalmellow (23.xxx) design library tab listener issue
+     * breaking the tab selection prior to that version
+     */
+    public class WorkaroundTabLayoutOnPageChangeListener extends TabLayout.TabLayoutOnPageChangeListener {
+        private final WeakReference<TabLayout> mTabLayoutRef;
+
+        public WorkaroundTabLayoutOnPageChangeListener(TabLayout tabLayout) {
+            super(tabLayout);
+            this.mTabLayoutRef = new WeakReference<>(tabLayout);
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            super.onPageSelected(position);
+            final TabLayout tabLayout = mTabLayoutRef.get();
+            if (tabLayout != null) {
+                final TabLayout.Tab tab = tabLayout.getTabAt(position);
+                if (tab != null) {
+                    tab.select();
+                }
+            }
         }
     }
 }
