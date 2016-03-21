@@ -1,0 +1,17 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+
+<!-- the code below includes a ListView widget with id @android:id/list  - in which id the ListViewFragment expects to address the listView-->
+<include layout="@android:layout/list_content"/>
+
+<TextView android:id="@id/android:empty"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:text="@string/empty_log_list_text"
+    android:gravity="center_vertical|center_horizontal"
+    android:textAppearance="?android:attr/textAppearanceLarge"
+    android:textColor="#d3d3d3" />
+
+</RelativeLayout>

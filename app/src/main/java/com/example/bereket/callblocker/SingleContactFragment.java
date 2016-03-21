@@ -340,7 +340,6 @@ public class SingleContactFragment extends HideNotificationFragment {
                     Map<Integer, Schedule> scheduleMap = null;
                     List<Button> buttonList = null;
                     int weekDay = schedule.getWeekDay();
-                    boolean mapChangedFlag = false;
 
                     if(schedule.getBlockType() == BlockType.INCOMING){
 

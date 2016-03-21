@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
@@ -31,6 +32,8 @@ import android.widget.LinearLayout;
 import java.util.List;
 
 public class SettingActivity extends AppCompatActivity{
+
+    private int returnView;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         /*
@@ -38,6 +41,27 @@ public class SettingActivity extends AppCompatActivity{
         From that API on these methods are no longer supported and are transferred to PreferenceFragment
          */
         super.onCreate(savedInstanceState);
+        //return view is the tab(fragment) where the settings action is fired. Keep it and when 'home'/back button it will be returned
+        //so that the right tab is selected in MainActivity
+        returnView = getIntent().getIntExtra(Constants.FRAGMENT_ID, Constants.BLOCKED_LIST_FRAGMENT);
+
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingFragment()).commit();
+    }
+
+    /**
+     * This method is included to override the back to parent button behaviour. Since I am returning to a specific tab(fragement)
+     * in the activity, I want to add an extra in the MainActivity to send me to a specific tab.
+     * @return
+     */
+    @Override
+    public Intent getParentActivityIntent() { // getParentActivityIntent() if you are not using the Support Library
+        final Bundle bundle = new Bundle();
+
+        final Intent intent = new Intent(this, MainAppActivity.class);
+        //putback the returnView(tab position)
+        bundle.putInt(Constants.FRAGMENT_ID, returnView);
+        intent.putExtras(bundle);
+
+        return intent;
     }
 }

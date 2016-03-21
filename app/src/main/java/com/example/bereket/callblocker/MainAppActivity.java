@@ -64,6 +64,10 @@ public class MainAppActivity extends AppCompatActivity
         viewPager.clearOnPageChangeListeners();
         viewPager.addOnPageChangeListener(new WorkaroundTabLayoutOnPageChangeListener(tabLayout));
 
+        //in the tabbed view, action bar has a shadow under it that draws a black line between it and the tabs below.
+        //to remove the shadow for this activity only (since the actionBar is common/application theme property), setting the elevation to 0 does the trick
+        ActionBar bar = getSupportActionBar();
+        bar.setElevation(0);
         /*
         When tabbed activity is set, all the tabs are populated for the first time and all the lifecycle methods are called once.
         As a result, when a contact is deleted from a list, we can't rely on the fragment's lifecycle methods (onPause, onResume) to restart loader.

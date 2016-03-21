@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.app.ListFragment;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
@@ -32,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -53,15 +55,13 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    private static int REQUEST_NEW_CONTACT = 1;
     private static int CONTACTS_LIST_LOADER = 2;
-    private static int ADD_CONTACT_MANUALLY = 3;
     private static int CHANGE_PREFERENCE = 4;
     private static int WHITE_LIST_ACTIVITY = 5;
 
     //Activity request codes
     private final Integer SINGLE_CONTACT_ACTIVITY_RESULT = 0;
+    private final Integer ADD_NEW_CONTACT_REQUEST_CODE = 1;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -118,7 +118,9 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
 
-        View v = super.onCreateView(inflater, parent, savedInstanceState);
+        //View v = super.onCreateView(inflater, parent, savedInstanceState);
+        //ListView listView = (ListView) v.findViewById(android.R.id.list);
+        View v = inflater.inflate(R.layout.blocklist_list_view, parent, false);
         ListView listView = (ListView) v.findViewById(android.R.id.list);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
@@ -126,6 +128,18 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         actionBar.setLogo(R.mipmap.ic_launcher);
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);*/
+
+        FloatingActionButton addNewButton = (FloatingActionButton) v.findViewById(R.id.add_new_contact_floating_button);
+
+        addNewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AddNewContactDialogFragment addNewContactDialogFragment = AddNewContactDialogFragment.newInstance(ContactType.BLOCKED_CONTACT);
+                addNewContactDialogFragment.setTargetFragment(BlockedListFragment.this,ADD_NEW_CONTACT_REQUEST_CODE);
+                addNewContactDialogFragment.show(getFragmentManager(), "bere.bere.bere");
+            }
+        });
 
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
@@ -265,31 +279,50 @@ public class BlockedListFragment extends HideNotificationListFragment implements
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
                 (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
+        final MenuItem menuSearch = menu.findItem(R.id.search);
+        final SearchView searchView =
+                (SearchView) menuSearch.getActionView();
 
         if(searchView != null){
 
             searchView.setSearchableInfo(
                     searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setOnQueryTextListener(this);
-        }
 
+            /** below is a trick to close/collapse/hide the searchbox whenever 'x' button is clicked
+             * This is how it works:
+             * when onActionViewCollapsed() is called in searchView, it does all the termination of tasks associated with closing this search box
+             * calling collapseActionView() on the menuItem also collapses and hides the searchbox altogether.
+             * These two methods are called when the 'x' button ('x' imageView to be specific) is clicked.
+             * To find the 'x' image, search the button id by the image name (search_close_btn) and use the id to get the close button from the searchView.
+             *
+             * Then override the onClickListener
+             */
+            int searchCloseButtonId = searchView.getContext().getResources()
+                    .getIdentifier("android:id/search_close_btn", null, null);
+
+            ImageView closeButton = (ImageView)searchView.findViewById(searchCloseButtonId);
+
+            closeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Clear query
+                    searchView.setQuery("", false);
+                    //Collapse the action view
+                    searchView.onActionViewCollapsed();
+                    //Collapse the search widget
+                    menuSearch.collapseActionView();
+                }
+            });
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_item_add_from_contact:
-                Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                startActivityForResult(intent, REQUEST_NEW_CONTACT);
-                return true;
-            case R.id.menu_item_manually_add_contact:
-                intent = new Intent(getActivity(), AddNewPhoneActivity.class);
-                startActivityForResult(intent, ADD_CONTACT_MANUALLY);
-                return true;
             case R.id.menu_item_settings:
-                intent = new Intent(getActivity(), SettingActivity.class);
+                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                intent.putExtra(Constants.FRAGMENT_ID, Constants.BLOCKED_LIST_FRAGMENT);
                 startActivityForResult(intent, CHANGE_PREFERENCE);
                 return true;
             case android.R.id.home:
@@ -410,11 +443,11 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
                 case BlockState.ALWAYS_BLOCK:
 
-                    outGoingCallBlockStateImage.setImageResource(R.drawable.green_arrow);
+                    outGoingCallBlockStateImage.setImageResource(R.drawable.red_arrow_outgoing);
                     break;
                 case BlockState.SCHEDULED_BLOCK:
 
-                    outGoingCallBlockStateImage.setImageResource(R.drawable.green);
+                    outGoingCallBlockStateImage.setImageResource(R.drawable.red_scheduled_outgoing);
                     break;
             }
         }
@@ -440,7 +473,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         if (resultCode != Activity.RESULT_OK) return;
 
-        if (requestCode == REQUEST_NEW_CONTACT) {
+        if (requestCode == Constants.REQUEST_NEW_CONTACT) {
 
             Uri contactUri = data.getData();
             ContentResolver cr = getActivity().getContentResolver();
@@ -486,7 +519,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
                 startSingleContactActivity(contact, true);
             }
         }
-        else if(requestCode == ADD_CONTACT_MANUALLY){
+        else if(requestCode == Constants.ADD_CONTACT_MANUALLY){
 
             if(data != null){
                 //do something about it
@@ -502,11 +535,6 @@ public class BlockedListFragment extends HideNotificationListFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        View  emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_block_list_view, null);
-
-        ((ViewGroup)getListView().getParent()).addView(emptyView);
-        getListView().setEmptyView(emptyView);
 
         Bundle args = new Bundle();
         args.putInt(ContactLoader.CONTACT_TYPE_KEY, ContactType.BLOCKED_CONTACT);

@@ -44,6 +44,7 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
     private OnFragmentInteractionListener mListener;
 
     private static int LOG_LIST_LOADER = 1;
+    private static int CHANGE_PREFERENCE = 2;
 
     /**
      * Use this factory method to create a new instance of
@@ -99,8 +100,7 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.log_list_view, container, false);
         ListView listView = (ListView) v.findViewById(android.R.id.list);
 
         return v;
@@ -199,6 +199,12 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
                 getLoaderManager().restartLoader(0, null, LogFragment.this);
 
                 return true;
+            case R.id.menu_item_settings:
+                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                intent.putExtra(Constants.FRAGMENT_ID, Constants.LOG_LIST_FRAGMENT);
+                startActivityForResult(intent, CHANGE_PREFERENCE);
+
+                return true;
             case android.R.id.home:
                 if (NavUtils.getParentActivityName(getActivity()) != null) {
 
@@ -249,11 +255,6 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        View  emptyView = getActivity().getLayoutInflater().inflate(R.layout.empty_log_list_view, null);
-
-        ((ViewGroup)getListView().getParent()).addView(emptyView);
-        getListView().setEmptyView(emptyView);
 
         getLoaderManager().initLoader(LOG_LIST_LOADER, null, this);
     }

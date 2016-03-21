@@ -12,4 +12,7 @@ public class Constants {
 
     public static final String ACTION_REFRESH_BLOCKED_LIST_UI = "com.example.bereket.callblocker.refresh.blocked.list.ui";
     public static final String PRIVATE_PERMISSION = "com.example.bereket.callblocker.PRIVATE";
+
+    public static final int REQUEST_NEW_CONTACT = 1;
+    public static final int ADD_CONTACT_MANUALLY = 3;
 }
