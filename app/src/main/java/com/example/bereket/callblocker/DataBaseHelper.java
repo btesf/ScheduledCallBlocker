@@ -410,6 +410,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return new LogCursor(wrapped);
     }
 
+    public boolean contactHasLog(long contactId){
+
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT A.*, B." + NAME + " AS ContactName, B." + DISPLAY_NUMBER + " AS ContactNumber FROM " + CALL_LOG_TABLE +
+                " A, " + BLOCKED_LIST_TABLE + " B WHERE A." + CALL_LOG_CONTACT_ID + " = B." + ID + " AND A." + CALL_LOG_CONTACT_ID + " = ? ORDER BY " + CALL_LOG_TIME + " DESC ", new String[]{String.valueOf(contactId)}); //   query(BLOCKED_LIST_TABLE, null, null, null, null, null, NAME  + " asc");
+
+        if(cursor != null && cursor.getCount() > 0) return true;
+        else return false;
+    }
+
     public boolean insertLog(long contactId, int blockType){
 
         ContentValues cv = new ContentValues();
@@ -507,6 +516,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public boolean deleteAllSchedulesForContact(long contactId, Integer blockType){
 
         return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? and " + BLOCK_SCHEDULE_BLOCK_TYPE + " = ? ", new String[]{String.valueOf(contactId), String.valueOf(blockType)}) != 0 ? true : false;
+    }
+
+    public boolean deleteAllSchedulesForContact(long contactId){
+
+        return getWritableDatabase().delete(BLOCK_SCHEDULE_TABLE, BLOCK_SCHEDULE_CONTACT_ID + " = ? ", new String[]{String.valueOf(contactId)}) != 0 ? true : false;
     }
 
     public Map<Integer,Schedule> queryContactSchedule(long contactId, int blockType){

@@ -40,13 +40,13 @@
         android:gravity="center_horizontal"
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
-        <Button
+        <Button android:theme="@style/BrandButtonStyle"
             android:id="@+id/add_new_phone_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:text="@string/save_new_number"/>
-        <Button
+        <Button android:theme="@style/BrandButtonStyle"
             android:id="@+id/cancel_add_phone_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

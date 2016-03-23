@@ -212,7 +212,7 @@ public class ContactManager {
                 } else { //newcontactId is greater than old contact id
                     //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
 
-                    Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Number already exists in list.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -298,7 +298,7 @@ public class ContactManager {
                 }
                 else {
                     //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
-                    Toast.makeText(mContext, "Number already exist in list.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Number already exists in list.", Toast.LENGTH_SHORT).show();
                 }
             }
             else{
@@ -348,7 +348,23 @@ public class ContactManager {
 
     public boolean deleteContact(Contact contact){
 
-        return mDataHelper.deleteContact(contact);
+        /*if a contact is deleted all related records in other tables will be deleted too
+        but if a contact has a log, we want to keep the contact so that to preserve the logs
+        in this case, deleting all the schedule entries (if any) is enough - only changing the contact
+        type to HIDDEN
+        */
+
+        if(mDataHelper.contactHasLog(contact.getId())){
+
+            mDataHelper.deleteAllSchedulesForContact(contact.getId());
+            contact.setContactType(ContactType.HIDDEN_CONTACT);
+
+            return updateContact(contact);
+        }
+        else {
+
+            return mDataHelper.deleteContact(contact);
+        }
     }
 
     public Contact getContactById(long id){
