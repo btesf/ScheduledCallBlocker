@@ -9,6 +9,7 @@
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:divider">@color/divider</item>
+        <item name="android:alertDialogTheme">@style/CallBlockerDialogStyle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -23,6 +24,14 @@
     <style name="BrandButtonStyle" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">#2196F3</item>
         <item name="android:textColorPrimary">#ffffff</item>
+    </style>
+
+    <style name="CallBlockerDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:colorAccent">@color/primary</item> <!--will affect your text colors of negative or positive buttons -->
+        <item name="android:textColor">@color/accent</item> <!-- will affect your title text color of dialog. -->
+        <item name="android:textColorPrimary">@color/primary_text</item> <!-- will affect your message color of dialog. -->
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
     </style>
 
 </resources>

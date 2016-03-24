@@ -14,7 +14,8 @@
         android:text="@string/about_the_app_app_name"
         android:id="@+id/about_the_app_label"
         android:layout_marginBottom="10dp"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textColor="@color/primary_text"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -22,7 +23,8 @@
         android:id="@+id/app_version_label"
         android:text="@string/app_version_text"
         android:layout_marginTop="3dp"
-        android:layout_marginBottom="3dp" />
+        android:layout_marginBottom="3dp"
+        android:textColor="@color/primary_text"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,12 +32,14 @@
         android:id="@+id/app_maker_label"
         android:text="@string/app_maker_label"
         android:layout_marginTop="3dp"
-        android:layout_marginBottom="3dp" />
+        android:layout_marginBottom="3dp"
+        android:textColor="@color/primary_text"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/app_maker_email"
-        android:text="@string/app_maker_email"/>
+        android:text="@string/app_maker_email"
+        android:textColor="@color/primary_text"/>
 
 </LinearLayout>

@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -28,6 +29,7 @@ public class AboutUsFragment extends DialogFragment {
         //custom -  prepare centered title
         TextView customTitle = new TextView(getActivity());
         customTitle.setText(R.string.about_us_title);
+        customTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
         customTitle.setTextAppearance(getActivity(), R.style.TextAppearance_AppCompat_Title);
         customTitle.setPadding(10, 10, 10, 10); //I don't really know why I need padding for such a small title
         customTitle.setGravity(Gravity.CENTER);

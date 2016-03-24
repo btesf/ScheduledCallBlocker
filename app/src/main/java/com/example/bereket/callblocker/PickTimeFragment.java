@@ -59,7 +59,7 @@ public class PickTimeFragment extends DialogFragment {
         // Inflate the layout for this fragment
         View v = getActivity().getLayoutInflater().inflate(R.layout.fragment_pick_time, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()/*, R.style.CallBlockerDialogStyle*/);
         builder.setView(v);
         builder.setTitle(R.string.pick_time);
         builder.setPositiveButton(R.string.button_save_text, new DialogInterface.OnClickListener() {
