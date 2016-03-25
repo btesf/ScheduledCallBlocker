@@ -46,6 +46,7 @@
                 android:id="@+id/textView" />
 
             <RadioGroup
+                android:id="@+id/incoming_radio_button_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <RadioButton

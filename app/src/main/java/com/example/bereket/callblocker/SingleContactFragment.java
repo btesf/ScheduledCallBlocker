@@ -1,29 +1,24 @@
 package com.example.bereket.callblocker;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +44,18 @@ public class SingleContactFragment extends HideNotificationFragment {
     private int WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT = 0;
     private int CLEAR_ALL_SCHEDULES_BUTTON_POSITION_IN_LAYOUT = 0;
 
-    private final String SAVED_INSTANCE_BUNDLE_KEY = "saved.instance.bundle.key";
+    /*
+    The following two boolean variables hold state information in savedInstanceState bundle for a specific purpose.
+    i.e. to check if a 'scheduled' radio button is clicked but doesn't have data. In that case, I don't save the data but I want to retain the view
+    during screen rotation. These two values will be saved on onSavedInstanceState() and reassigned to the mContact when fragment is recreated (onCreate)
+
+    I check and determine the values on onPause
+    */
+    private boolean incomingScheduleRadioClickedWithoutSchedule;
+    private boolean outgoingScheduleRadioClickedWithoutSchedule;
+
+    private final String SAVED_INSTANCE_INCOMING_SCHEDULE_RADIO = "saved.instance.incoming.radio.schedule";
+    private final String SAVED_INSTANCE_OUTGOING_SCHEDULE_RADIO = "saved.instance.outgoing.radio.schedule";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -165,6 +171,20 @@ public class SingleContactFragment extends HideNotificationFragment {
                     //if contact is manually added, requery to get an updated contact details if sync service (SaveFromPhoneBookService) change/updated the block list with fresh detail from phonebook
                     mContact = mContactManager.getContactByPhoneNumber(contact.getPhoneNumber());
                 }
+
+                if(savedInstanceState != null){
+
+                    incomingScheduleRadioClickedWithoutSchedule = savedInstanceState.getBoolean(SAVED_INSTANCE_INCOMING_SCHEDULE_RADIO, false);
+                    outgoingScheduleRadioClickedWithoutSchedule = savedInstanceState.getBoolean(SAVED_INSTANCE_OUTGOING_SCHEDULE_RADIO, false);
+
+                    if(incomingScheduleRadioClickedWithoutSchedule){
+                        mContact.setIncomingBlockedState(BlockState.SCHEDULED_BLOCK);
+                    }
+
+                    if(outgoingScheduleRadioClickedWithoutSchedule){
+                        mContact.setOutGoingBlockedState(BlockState.SCHEDULED_BLOCK);
+                    }
+                }
             }
         }
 
@@ -249,6 +269,10 @@ public class SingleContactFragment extends HideNotificationFragment {
         //set the view according to the model data
         updateUI(BlockType.INCOMING);
         updateUI(BlockType.OUTGOING);
+
+        RadioGroup rg = (RadioGroup)view.findViewById(R.id.incoming_radio_button_group);
+
+        int id = rg.getCheckedRadioButtonId();
 
         return view;
     }
@@ -515,6 +539,9 @@ public class SingleContactFragment extends HideNotificationFragment {
 
         //unregister the broadcast listener that is released from SaveFromPhoneBookService
         getActivity().unregisterReceiver(mOnUpdateContactFromPhoneBook);
+        //orientation state radio buttons default values
+        outgoingScheduleRadioClickedWithoutSchedule = false;
+        incomingScheduleRadioClickedWithoutSchedule = false;
 
         Map<Integer, Schedule> scheduleMap = null;
 
@@ -526,6 +553,8 @@ public class SingleContactFragment extends HideNotificationFragment {
 
                 mContact.setIncomingBlockedState(BlockState.DONT_BLOCK);
                 mContactManager.updateContact(mContact);
+                //if schedule radio is clicked but without data, we want to show the same view during orientation change (screen rotation)
+                incomingScheduleRadioClickedWithoutSchedule = true;
             }
         }
 
@@ -536,6 +565,8 @@ public class SingleContactFragment extends HideNotificationFragment {
 
                 mContact.setOutGoingBlockedState(BlockState.DONT_BLOCK);
                 mContactManager.updateContact(mContact);
+                //if schedule radio is clicked but without data, we want to show the same view during orientation change (screen rotation)
+                outgoingScheduleRadioClickedWithoutSchedule = true;
             }
         }
     }
@@ -576,7 +607,8 @@ public class SingleContactFragment extends HideNotificationFragment {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
 
-        savedInstanceState.putSerializable(SAVED_INSTANCE_BUNDLE_KEY, mContact);
+        savedInstanceState.putBoolean(SAVED_INSTANCE_INCOMING_SCHEDULE_RADIO, incomingScheduleRadioClickedWithoutSchedule);
+        savedInstanceState.putBoolean(SAVED_INSTANCE_OUTGOING_SCHEDULE_RADIO, outgoingScheduleRadioClickedWithoutSchedule);
         super.onSaveInstanceState(savedInstanceState);
 
     }
