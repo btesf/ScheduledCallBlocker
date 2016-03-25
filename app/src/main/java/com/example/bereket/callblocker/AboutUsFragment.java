@@ -29,8 +29,8 @@ public class AboutUsFragment extends DialogFragment {
         //custom -  prepare centered title
         TextView customTitle = new TextView(getActivity());
         customTitle.setText(R.string.about_us_title);
-        customTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
         customTitle.setTextAppearance(getActivity(), R.style.TextAppearance_AppCompat_Title);
+        customTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.accent));
         customTitle.setPadding(10, 10, 10, 10); //I don't really know why I need padding for such a small title
         customTitle.setGravity(Gravity.CENTER);
         //set custom title
@@ -43,12 +43,8 @@ public class AboutUsFragment extends DialogFragment {
                 if (getTargetFragment() == null)
                     return;
 
-/*                Intent intent = new Intent();
-                intent.putExtra(SCHEDULE, mSchedule);
-                getTargetFragment().onActivityResult(SingleContactFragment.PICK_SCHEDULE_TIME_REQUEST_CODE, Activity.RESULT_OK, intent);*/
-            }
+             }
         });
-
 
         return builder.create();
     }

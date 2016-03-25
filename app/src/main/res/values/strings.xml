@@ -51,7 +51,7 @@
     <string name="newPhoneNumberString">Phone number</string>
     <string name="save_new_number">Save</string>
     <string name="cancel_new_number">Cancel</string>
-    <string name="title_activity_add_new_phone">Add new phone</string>
+    <string name="title_activity_add_new_phone">Add new number</string>
     <string name="wrong_phone_number_format">Invalid phone number format</string>
     <string name="nothing_to_save">Cannot save empty string</string>
     <string name="global_categories">General setting</string>

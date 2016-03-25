@@ -68,6 +68,14 @@ public class MainAppActivity extends AppCompatActivity
         //to remove the shadow for this activity only (since the actionBar is common/application theme property), setting the elevation to 0 does the trick
         ActionBar bar = getSupportActionBar();
         bar.setElevation(0);
+        //sometimes, when a log fragment is called opened from notification, newly added log items are not shown (view is not refreshed)
+        Fragment tabbedFragment = adapter.getRegisteredFragment(fragmentId);
+
+        if(tabbedFragment != null && tabbedFragment instanceof LogFragment){
+
+            ((LogFragment) tabbedFragment).updateContent();
+        }
+
         /*
         When tabbed activity is set, all the tabs are populated for the first time and all the lifecycle methods are called once.
         As a result, when a contact is deleted from a list, we can't rely on the fragment's lifecycle methods (onPause, onResume) to restart loader.
@@ -89,7 +97,7 @@ public class MainAppActivity extends AppCompatActivity
                     viewPager = (ViewPager) findViewById(R.id.viewpager);
                     viewPager.setCurrentItem(position);
 
-                    Fragment tabbedFragment = adapter.getRegisteredFragment(viewPager.getCurrentItem());
+                    Fragment tabbedFragment = adapter.getRegisteredFragment(position);
 
                     if (tabbedFragment instanceof UpdatableFragment) {
 

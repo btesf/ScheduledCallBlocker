@@ -3,6 +3,8 @@ package com.example.bereket.callblocker;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
 
 public class SaveFromPhoneBookService extends IntentService {
 
@@ -71,7 +73,31 @@ public class SaveFromPhoneBookService extends IntentService {
                 mContactManager.updateOldContactWithNewContactWithId(oldContact, newContact);
                 //send a broadcast so that the blocked list UI can refresh it's list once the old contact is replaced with the contact from phone book
                 sendBroadcast(new Intent(Constants.ACTION_REFRESH_BLOCKED_LIST_UI), Constants.PRIVATE_PERMISSION); //here a private permission is added so that the broadcast can be interoggated if it holds the right permission when sent
+                //send another delayed broadcast to give time for SingleContactFragment to register its receiver. Sometimes,the broadcast is sent before the
+                //broadcast receiver is registered in the fragment
+                sendDelayedBroadcast();
             }
+        }
+    }
+
+    private void sendDelayedBroadcast(){
+
+        new SendDelayedBroadcast().execute();
+    }
+    //this AsyncTask sends a broadcast half a second later
+    private class SendDelayedBroadcast extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                //do nothing - not critical
+            }
+
+            sendBroadcast(new Intent(Constants.ACTION_REFRESH_SINGLE_CONTACT_FRAGMENT_UI), Constants.PRIVATE_PERMISSION); //here a private permission is added so that the broadcast can be interoggated if it holds the right permission when sent
+            return null;
         }
     }
 }

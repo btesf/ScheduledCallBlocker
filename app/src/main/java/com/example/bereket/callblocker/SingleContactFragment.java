@@ -13,6 +13,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +48,8 @@ public class SingleContactFragment extends HideNotificationFragment {
     private int WEEK_DAY_BUTTON_POSITION_IN_LAYOUT = 1;
     private int WEEK_DAY_TEXTVIEW_POSITION_IN_LAYOUT = 0;
     private int CLEAR_ALL_SCHEDULES_BUTTON_POSITION_IN_LAYOUT = 0;
+
+    private final String SAVED_INSTANCE_BUNDLE_KEY = "saved.instance.bundle.key";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -138,6 +141,14 @@ public class SingleContactFragment extends HideNotificationFragment {
         mScheduleManager = ScheduleManager.getInstance(getActivity());
         mContactManager = ContactManager.getInstance(getActivity());
 
+       /* if(savedInstanceState != null){
+
+            if(savedInstanceState.getSerializable(SAVED_INSTANCE_BUNDLE_KEY) != null){
+
+                mContact = (Contact) savedInstanceState.getSerializable(SAVED_INSTANCE_BUNDLE_KEY);
+            }
+        }
+        else*/
         if (getArguments() != null) {
 
             boolean isContactFromPhonebook = (boolean)getArguments().getBoolean(ARG_CONTACT_FROM_PHONEBOOK);
@@ -551,7 +562,7 @@ public class SingleContactFragment extends HideNotificationFragment {
         super.onResume();
 
         //register a receiver that gets notified when a blocked list contat is updated from phonebook
-        IntentFilter filter = new IntentFilter(Constants.ACTION_REFRESH_BLOCKED_LIST_UI);
+        IntentFilter filter = new IntentFilter(Constants.ACTION_REFRESH_SINGLE_CONTACT_FRAGMENT_UI);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
         getActivity().registerReceiver(mOnUpdateContactFromPhoneBook, filter, Constants.PRIVATE_PERMISSION, null);
     }
@@ -562,6 +573,13 @@ public class SingleContactFragment extends HideNotificationFragment {
         Utility.showCallInterceptionAlertDialog(getActivity());
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putSerializable(SAVED_INSTANCE_BUNDLE_KEY, mContact);
+        super.onSaveInstanceState(savedInstanceState);
+
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
