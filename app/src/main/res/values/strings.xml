@@ -168,5 +168,6 @@
     <string name="block_all_outgoing_except_whitelist_string_summary">make calls to whitelisted numbers</string>
     <string name="new_call_intercepted_message">New call is blocked</string>
     <string name="incoming_call_intercepted_title">Incoming call intercepted</string>
-
+    <string name="see_log_text">SEE LOG</string>
+    <string name="cancel_see_log_text">CANCEL</string>
 </resources>
