@@ -103,12 +103,26 @@ public class MainAppActivity extends AppCompatActivity
 
                         ((UpdatableFragment) tabbedFragment).updateContent();
                     }
+
+                    if(tabbedFragment instanceof HideNotificationListFragment){
+                        //register call interception notification broadcast listener. LogFragment has slightely different handling (it shows toast and update the view)
+                        //since the listener is created and removed in lifecycle methods, tabbed fragments' lifecycle methods won't be called in tabbed activity
+                        ((HideNotificationListFragment) tabbedFragment).registerReceiver();
+                    }
                 }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
 
+                int position = tab.getPosition();
+                HideNotificationListFragment hideNotificationListFragment = (HideNotificationListFragment) adapter.getRegisteredFragment(position);
+                //unregister call interception notification broadcast listener. LogFragment has slightely different handling (it shows toast and update the view)
+                //since the listener is created and removed in lifecycle methods, tabbed fragments' lifecycle methods won't be called in tabbed activity
+                if(hideNotificationListFragment != null) {
+
+                    hideNotificationListFragment.unregisterReceiver();
+                }
             }
 
             @Override

@@ -248,7 +248,10 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
 
     @Override
     public void doOnBroadcastReceived() {
-        Utility.showCallInterceptionAlertDialog(getActivity());
+        //since this is a log fragment, just update the list and show a toast that a call has been intercepted
+        //Utility.showCallInterceptionAlertDialog(getActivity());
+        getLoaderManager().restartLoader(LOG_LIST_LOADER, null, this);
+        Toast.makeText(getActivity(), R.string.new_call_intercepted_message, Toast.LENGTH_SHORT).show();
     }
 
 

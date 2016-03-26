@@ -42,7 +42,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             int blockCount = blockedCallCounter.incrementAndGetBlockCount(blockType);
             //TODO put string values in xml file
             Intent i  = new Intent(mContext, MainAppActivity.class);
-            Bundle bundle = new Bundle();
+
             i.putExtra(Constants.FRAGMENT_ID, Constants.LOG_LIST_FRAGMENT);
 
             PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);

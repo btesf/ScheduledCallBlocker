@@ -22,13 +22,16 @@ public class Utility {
         //TODO replace texts with those coming fom xml
         alertDialog = new AlertDialog.Builder(context).create();
         alertDialog.setTitle("Incoming call intercepted");
-        alertDialog.setMessage("New call is blocked. ");
+        alertDialog.setMessage("New call is blocked");
 
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SEE LOG",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(context, LogActivity.class);
-                        context.startActivity(intent);
+
+                        Intent i  = new Intent(context, MainAppActivity.class);
+
+                        i.putExtra(Constants.FRAGMENT_ID, Constants.LOG_LIST_FRAGMENT);
+                        context.startActivity(i);
                     }
                 });
 

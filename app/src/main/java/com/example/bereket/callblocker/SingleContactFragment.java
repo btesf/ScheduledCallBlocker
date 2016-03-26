@@ -270,10 +270,6 @@ public class SingleContactFragment extends HideNotificationFragment {
         updateUI(BlockType.INCOMING);
         updateUI(BlockType.OUTGOING);
 
-        RadioGroup rg = (RadioGroup)view.findViewById(R.id.incoming_radio_button_group);
-
-        int id = rg.getCheckedRadioButtonId();
-
         return view;
     }
 

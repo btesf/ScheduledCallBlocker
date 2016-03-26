@@ -28,7 +28,8 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:ems="10"
-                android:hint="@string/hint_phone_number" />
+                android:hint="@string/hint_phone_number"
+                android:singleLine="true"/>
 
         </android.support.design.widget.TextInputLayout>
 

@@ -5,8 +5,8 @@
     <string name="add_from_contact">Add from contact</string>
     <string name="add_manually">Add manually</string>
     <string name="phoneNumberIsEmpty">Cannot add contact. Phone number is empty</string>
-    <string name="title_activity_single_contact">Manage contact </string>
-    <string name="title_whitelist_activity_single_contact">Manage contact</string>
+    <string name="title_activity_single_contact">Manage blacklist contact </string>
+    <string name="title_whitelist_activity_single_contact">Manage whitelist contact</string>
     <string name="call_blocker_activity_name">Blocked calls log</string>
 
     <string name="preference_dialog_clear_type_key">ClearType</string>
@@ -166,5 +166,7 @@
     <string name="block_all_outgoing_except_whitelist_string">Allow whitelisted numbers</string>
     <string name="block_all_incoming_except_whitelist_string_summary">receive calls from whitelisted numbers</string>
     <string name="block_all_outgoing_except_whitelist_string_summary">make calls to whitelisted numbers</string>
+    <string name="new_call_intercepted_message">New call is blocked</string>
+    <string name="incoming_call_intercepted_title">Incoming call intercepted</string>
 
 </resources>
