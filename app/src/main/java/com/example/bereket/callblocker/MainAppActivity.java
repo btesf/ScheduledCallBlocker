@@ -1,10 +1,13 @@
 package com.example.bereket.callblocker;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -130,6 +134,37 @@ public class MainAppActivity extends AppCompatActivity
 
             }
         });
+        PreferenceManager.setDefaultValues(this, R.xml.preference, false);
+
+        boolean appIsUnlocked = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("app_unlocked_key", false);
+        int attemptCounter = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("app_password_counter_key", "10"));
+
+        if(!appIsUnlocked && attemptCounter < 3){
+
+            DialogFragment newFragment = TestAuthenticator.newInstance(1);
+
+            newFragment.setCancelable(false);
+            newFragment.show(getSupportFragmentManager(), "dialog");
+        }
+        else if(!appIsUnlocked && attemptCounter >= 3){
+
+            AlertDialog alertDialog = new AlertDialog.Builder(MainAppActivity.this).create();
+            alertDialog.setTitle("Application is locked");
+            alertDialog.setMessage("This application is used for test purpose only. Now it is locked and unusable. Click Ok to exit");
+
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            MainAppActivity.this.finish();
+                            System.exit(0);
+                        }
+                    });
+
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+        }
     }
 
     @Override
