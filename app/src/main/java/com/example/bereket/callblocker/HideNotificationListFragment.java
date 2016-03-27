@@ -59,7 +59,8 @@ abstract public class HideNotificationListFragment extends ListFragment {
     }
 
     public void registerReceiver(){
-
+        //unregister the receiver before registering - incase multiple receiver is mistakenly registered in the tabbed change listeners - in mainActivity
+        unregisterReceiver();
         //register a receiver that gets notified when block action happened and broadcast for notification is sent
         IntentFilter filter = new IntentFilter(SEND_NOTIFICATION_ACTION);
         //only receive broadcasts which are sent through the valid private permission - we don't want to receive a broadcast just matching an intent - we want the permission too
