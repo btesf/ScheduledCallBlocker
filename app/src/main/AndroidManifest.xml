@@ -76,7 +76,8 @@
         </activity>
         <activity
             android:name=".SettingActivity"
-            android:label="@string/title_activity_preference" >
+            android:label="@string/title_activity_preference"
+            android:configChanges="orientation">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainAppActivity"/>
         </activity>

@@ -170,4 +170,12 @@
     <string name="incoming_call_intercepted_title">Incoming call intercepted</string>
     <string name="see_log_text">SEE LOG</string>
     <string name="cancel_see_log_text">CANCEL</string>
+
+    <string name="contact_added_successfully">Contact added successfully</string>
+    <string name="contact_is_updated">Contact is updated</string>
+    <string name="number_already_exists_in_list">Number already exists in list</string>
+    <string name="number_is_moved_to">Number is moved to  </string>
+    <string name="blocked_list">blocked list</string>
+    <string name="white_list">whitelist</string>
+    <string name="old_number_is_replaced_by_new_one">Old number is replaced by new one</string>
 </resources>

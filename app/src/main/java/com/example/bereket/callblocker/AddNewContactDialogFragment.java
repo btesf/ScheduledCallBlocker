@@ -21,7 +21,6 @@ import java.util.Date;
 public class AddNewContactDialogFragment extends DialogFragment {
 
     public static String CONTACT_TYPE = "com.example.bereket.callblocker.contactType";
-    private int mContactType;
 
     public static AddNewContactDialogFragment newInstance(int contactType) {
         AddNewContactDialogFragment fragment = new AddNewContactDialogFragment();
@@ -34,10 +33,6 @@ public class AddNewContactDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) { //TODO what about if argument is null?
-
-            mContactType = getArguments().getInt(CONTACT_TYPE, ContactType.EMPTY_CONTACT);
-        }
     }
 
     @Override
