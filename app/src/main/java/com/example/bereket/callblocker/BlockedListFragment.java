@@ -247,7 +247,7 @@ public class BlockedListFragment extends HideNotificationListFragment implements
 
         Intent intent = new Intent(getActivity(), SingleContactActivity.class);
         //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
-        intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
+        intent.putExtra(SingleContactFragment.CONTACT, contact);
         intent.putExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, isContactFromPhoneBook);
         startActivityForResult(intent, SINGLE_CONTACT_ACTIVITY_RESULT);
     }

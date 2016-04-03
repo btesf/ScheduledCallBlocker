@@ -33,6 +33,11 @@ import java.util.List;
 
 public class SettingActivity extends AppCompatActivity{
 
+    public interface ConfirmationDialogInteractionListener {
+        public void onConfirmationDialogInteractionListener(int preferenceType, boolean isPositive);
+    }
+
+    private ConfirmationDialogInteractionListener confirmationDialogInteractionListener;
     private int returnView;
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -44,8 +49,9 @@ public class SettingActivity extends AppCompatActivity{
         //return view is the tab(fragment) where the settings action is fired. Keep it and when 'home'/back button it will be returned
         //so that the right tab is selected in MainActivity
         returnView = getIntent().getIntExtra(Constants.FRAGMENT_ID, Constants.BLOCKED_LIST_FRAGMENT);
-
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingFragment()).commit();
+        SettingFragment settingFragment = new SettingFragment();
+        confirmationDialogInteractionListener = settingFragment;
+        getFragmentManager().beginTransaction().replace(android.R.id.content, settingFragment).commit();
     }
 
     /**
@@ -63,5 +69,10 @@ public class SettingActivity extends AppCompatActivity{
         intent.putExtras(bundle);
 
         return intent;
+    }
+
+    public void preferenceCallBack(int preferenceType, boolean isPositive){
+
+        confirmationDialogInteractionListener.onConfirmationDialogInteractionListener(preferenceType, isPositive);
     }
 }

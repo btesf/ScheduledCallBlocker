@@ -14,34 +14,47 @@ import android.util.Log;
  * Created by bereket on 8/23/15.
  */
 public class NetworkConnectionReceiver extends BroadcastReceiver {
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        TelephonyManager tm = (TelephonyManager)context.getSystemService(context.TELEPHONY_SERVICE);
+        final Context mContext = context;
+        final PendingResult result = goAsync();
 
-        switch(tm.getSimState()){
+        Thread thread = new Thread() {
 
-            case TelephonyManager.SIM_STATE_READY:
+            public void run() {
 
-                ContactManager contactManager = null;
+                TelephonyManager tm = (TelephonyManager)mContext.getSystemService(mContext.TELEPHONY_SERVICE);
 
-                try {
-                    contactManager = ContactManager.getInstance(context);
-                    String countryCodeValue = contactManager.getCountryCodeFromNetwork();
-//TODO: you should call a service from here - because on Receive won't run for more than few seconds - if not milliseconds. This is not an appropriate place to do such DB intensive work
-                    contactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                switch(tm.getSimState()){
+
+                    case TelephonyManager.SIM_STATE_READY:
+
+                        ContactManager contactManager = null;
+
+                        try {
+                            contactManager = ContactManager.getInstance(mContext);
+                            String countryCodeValue = contactManager.getCountryCodeFromNetwork();
+                            contactManager.standardizeNonStandardContactPhones(countryCodeValue);
+                        }
+                        catch(Exception e){
+                            Log.d("bere.bere.bere", e.getMessage());
+                        }
+
+                        if(contactManager != null){
+                            //if all numbers are standardized, set the preference to false
+                            contactManager.setNonStandardizedPreference(false);
+                        }
+
+                        break;
+                    default:
                 }
-                catch(Exception e){
-                    Log.d("bere.bere.bere", e.getMessage());
-                }
 
-                if(contactManager != null){
-                    //if all numbers are standardized, set the preference to false
-                    contactManager.setNonStandardizedPreference(false);
-                }
+                result.finish();
+            }
+        };
 
-                break;
-            default:
-        }
+        thread.start();
     }
 }

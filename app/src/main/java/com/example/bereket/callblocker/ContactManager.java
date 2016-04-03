@@ -145,7 +145,7 @@ public class ContactManager {
 
                 newContact.setId(mDataHelper.insertContact(newContact));
 
-                Toast.makeText(mContext, R.string.contact_added_successfully, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
 
                 if(isManual) {
                     //call a background service to replace the number from phone book if exists
@@ -165,16 +165,16 @@ public class ContactManager {
                            setDefaultBlockStateByContactType(oldContact, contactType);
                            oldContact.setContactType(newContact.getContactType());
                            updateContact(oldContact);
-                           Toast.makeText(mContext, R.string.number_is_moved_to + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+                           Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                        }
                        else{
 
-                           Toast.makeText(mContext, R.string.contact_is_updated, Toast.LENGTH_SHORT).show();
+                           Toast.makeText(mContext, mContext.getString(R.string.contact_is_updated), Toast.LENGTH_SHORT).show();
                            updateContact(newContact);
                        }
                    } else{
 
-                       Toast.makeText(mContext, R.string.contact_added_successfully, Toast.LENGTH_SHORT).show();
+                       Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                        updateContact(newContact);
                     }
                 }
@@ -187,9 +187,9 @@ public class ContactManager {
                     updateContact(oldContact);
 
                     if(oldContactType == ContactType.HIDDEN_CONTACT){
-                        Toast.makeText(mContext, R.string.contact_added_successfully, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                     } else{//category change
-                        Toast.makeText(mContext, R.string.number_is_moved_to + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getResources().getString(R.string.blocked_list) : mContext.getResources().getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                     }
                 }
                 else if(oldContact.getId() > newContact.getId()){
@@ -200,12 +200,12 @@ public class ContactManager {
                     updateOldContactWithNewContactWithId(oldContact, newContact);
                     //if the contact is saved on log (while global block setting is set), we don't want to show an update toast  - because the user doesn't know the contact was already saved
                     if(oldContactType != ContactType.HIDDEN_CONTACT) {
-                        Toast.makeText(mContext, R.string.old_number_is_replaced_by_new_one, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.old_number_is_replaced_by_new_one), Toast.LENGTH_SHORT).show();
                     }
 
                 } else { //newcontactId is greater than old contact id
 
-                    Toast.makeText(mContext, R.string.number_already_exists_in_list, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.number_already_exists_in_list), Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -244,17 +244,17 @@ public class ContactManager {
                         if(contact.getContactType() != contactType) {
 
                             updateOldContactWithNewContactWithId(contact, newContact);//no problem here, because newContact will have all the necessary details
-                            Toast.makeText(mContext, R.string.number_is_moved_to + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getResources().getString(R.string.blocked_list) : mContext.getResources().getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                         }
                         else{
                             //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                             updateOldContactWithNewContactWithId(contact, newContact);
-                            Toast.makeText(mContext, R.string.contact_is_updated, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, mContext.getString(R.string.contact_is_updated), Toast.LENGTH_SHORT).show();
                         }
                     } else{
                         //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                         updateOldContactWithNewContactWithId(contact, newContact);
-                        Toast.makeText(mContext, R.string.contact_added_successfully, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                     }
 
                 } else if((contact.getId() < newContact.getId()) && (contact.getContactType() != newContact.getContactType())){//&& contact.getContactType() == ContactType.HIDDEN_CONTACT){ //if contact was there but hidden, make it visible contact - this happens when a contact is added from Phonebook by a logger service
@@ -262,7 +262,7 @@ public class ContactManager {
                     contact.setContactType(newContact.getContactType());
                     setDefaultBlockStateByContactType(contact, newContact.getContactType());
                     updateContact(contact);
-                    Toast.makeText(mContext, R.string.contact_added_successfully, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                 }
                 else if((contact.getId() < newContact.getId()) && (contact.getContactType() != newContact.getContactType())){ //if manually add from different category is performed (where the contact may exist in another category), a category change must be done.
                     //set default block setting for old user - we don't to lose other oldContact properties
@@ -279,22 +279,22 @@ public class ContactManager {
 
                     if(oldContactType == ContactType.HIDDEN_CONTACT){
 
-                        Toast.makeText(mContext, R.string.contact_added_successfully, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                     }
                     else{
 
-                        Toast.makeText(mContext, R.string.number_is_moved_to + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getResources().getString(R.string.blocked_list) : mContext.getResources().getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                     }
                 }
                 else {
 
-                   Toast.makeText(mContext, R.string.number_already_exists_in_list, Toast.LENGTH_SHORT).show();
+                   Toast.makeText(mContext, mContext.getString(R.string.number_already_exists_in_list), Toast.LENGTH_SHORT).show();
                 }
             }
             else{
 
                 newContact.setId(mDataHelper.insertContact(newContact));
-                Toast.makeText(mContext, R.string.contact_added_successfully, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
 
                 if (isManual) {
                     //call a background service to replace the number from phone book if exists

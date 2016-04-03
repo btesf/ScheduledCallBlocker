@@ -19,7 +19,7 @@ import android.widget.Toast;
 /**
  * Created by bereket on 11/7/15.
  */
-public class SettingFragment extends HideNotificationPreferenceFragment{
+public class SettingFragment extends HideNotificationPreferenceFragment implements SettingActivity.ConfirmationDialogInteractionListener{
 
     private static final int ABOUT_THE_APP_DIALOG_REQUEST_CODE = 1;
 
@@ -215,8 +215,7 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
     @Override
     public void doOnBroadcastReceived() {
 
-        //TODO set string from xml/resources
-        Toast.makeText(getActivity(), "New incoming call is blocked.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), getActivity().getString(R.string.new_incoming_call_blocked), Toast.LENGTH_SHORT).show();
     }
 
     private SettingAlertDialogFragment newSettingAlertDialogFragmentInstance(final int preferenceType, final int title, final int message) {
@@ -234,7 +233,8 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
     }
 
     //callback method called inside the DialogFragment.
-    private void preferenceCallBack(int preferenceType, boolean isPositive){
+    @Override
+    public void onConfirmationDialogInteractionListener(int preferenceType, boolean isPositive){
 
         switch(preferenceType){
 
@@ -309,38 +309,24 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
      *
      * The static member avoids this issue.
      */
-    public class SettingAlertDialogFragment extends DialogFragment {
+    public static class SettingAlertDialogFragment extends DialogFragment {
 
         private int preferenceType;
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-            int title;
-            int message;
-
-            if(savedInstanceState != null) {
-
-                title = savedInstanceState.getInt("title");
-                message = savedInstanceState.getInt("message");
-                preferenceType = savedInstanceState.getInt("preferenceType");
-            }
-            else{
-
-                title = getArguments().getInt("title");
-                message = getArguments().getInt("message");
-                preferenceType = getArguments().getInt("preferenceType");
-            }
+            preferenceType = getArguments().getInt("preferenceType");
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(title);
-            builder.setMessage(message);
+            builder.setTitle(getArguments().getInt("title"));
+            builder.setMessage(getArguments().getInt("message"));
             builder.setCancelable(true);
             builder.setPositiveButton(R.string.yes_text, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
-                    preferenceCallBack(preferenceType, true);
+                    ((SettingActivity)getActivity()).preferenceCallBack(preferenceType, true);
                 }
             });
 
@@ -348,7 +334,7 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
-                    preferenceCallBack(preferenceType, false);
+                    ((SettingActivity)getActivity()).preferenceCallBack(preferenceType, false);
                 }
             });
 
@@ -358,18 +344,17 @@ public class SettingFragment extends HideNotificationPreferenceFragment{
         @Override
         public void onCancel(DialogInterface dialog) {
 
-            preferenceCallBack(preferenceType, false);
-
             if(isAdded()) {
+
+                ((SettingActivity)getActivity()).preferenceCallBack(preferenceType, false);
                 //remove this fragment instance from backstack. Otherwise on screen rotation, all the created fragments will be recreated
                 getActivity().getFragmentManager().beginTransaction().remove(this).commit();
             }
         }
 
+        //onDismiss(...) is always called whenever the dialog is destroyed (whether 'Ok' is clicked or not)
         @Override
         public void onDismiss(DialogInterface dialog) {
-
-            preferenceCallBack(preferenceType, false);
 
             if(isAdded()) {
                 //remove this fragment instance from backstack. Otherwise on screen rotation, all the created fragments will be recreated
