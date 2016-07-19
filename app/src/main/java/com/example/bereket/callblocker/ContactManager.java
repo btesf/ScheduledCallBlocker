@@ -145,8 +145,7 @@ public class ContactManager {
 
                 newContact.setId(mDataHelper.insertContact(newContact));
 
-                //TODO: update this toast below
-                Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
 
                 if(isManual) {
                     //call a background service to replace the number from phone book if exists
@@ -166,17 +165,16 @@ public class ContactManager {
                            setDefaultBlockStateByContactType(oldContact, contactType);
                            oldContact.setContactType(newContact.getContactType());
                            updateContact(oldContact);
-                           //TODO bring the string from string resource
-                           Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+                           Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                        }
                        else{
 
-                           Toast.makeText(mContext, "Contact is updated", Toast.LENGTH_SHORT).show();
+                           Toast.makeText(mContext, mContext.getString(R.string.contact_is_updated), Toast.LENGTH_SHORT).show();
                            updateContact(newContact);
                        }
                    } else{
 
-                       Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                       Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                        updateContact(newContact);
                     }
                 }
@@ -189,11 +187,9 @@ public class ContactManager {
                     updateContact(oldContact);
 
                     if(oldContactType == ContactType.HIDDEN_CONTACT){
-                        //TODO bring the string from string resource
-                        Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                     } else{//category change
-                        //TODO bring the string from string resource
-                        Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                     }
                 }
                 else if(oldContact.getId() > newContact.getId()){
@@ -202,17 +198,14 @@ public class ContactManager {
                     int oldContactType = oldContact.getContactType();
                     //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                     updateOldContactWithNewContactWithId(oldContact, newContact);
-                    //TODO remove the toast line and conditions below - it is temporary
                     //if the contact is saved on log (while global block setting is set), we don't want to show an update toast  - because the user doesn't know the contact was already saved
-
                     if(oldContactType != ContactType.HIDDEN_CONTACT) {
-                        Toast.makeText(mContext, "Old number is replaced by new one", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.old_number_is_replaced_by_new_one), Toast.LENGTH_SHORT).show();
                     }
 
                 } else { //newcontactId is greater than old contact id
-                    //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
 
-                    Toast.makeText(mContext, "Number already exists in list.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.number_already_exists_in_list), Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -245,25 +238,23 @@ public class ContactManager {
                 if((newContact.getId() <= contact.getId())){
 
                     copyContactDetails(contact, newContact);
-                    //TODO remove the toast line and conditions below - it is temporary
                     //if the contact is saved on log (while global block setting is set), it is hidden contact, so we don't want to show an update toast - because the user doesn't know the contact was already saved
                     if(contact.getContactType() != ContactType.HIDDEN_CONTACT){
 
                         if(contact.getContactType() != contactType) {
 
                             updateOldContactWithNewContactWithId(contact, newContact);//no problem here, because newContact will have all the necessary details
-                            //TODO bring the string from string resource
-                            Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                         }
                         else{
                             //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                             updateOldContactWithNewContactWithId(contact, newContact);
-                            Toast.makeText(mContext, "Contact is updated", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, mContext.getString(R.string.contact_is_updated), Toast.LENGTH_SHORT).show();
                         }
                     } else{
                         //change the id of the old contact so that all referencing tables' ids could also be updated (schedule, log tables)
                         updateOldContactWithNewContactWithId(contact, newContact);
-                        Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                     }
 
                 } else if((contact.getId() < newContact.getId()) && (contact.getContactType() != newContact.getContactType())){//&& contact.getContactType() == ContactType.HIDDEN_CONTACT){ //if contact was there but hidden, make it visible contact - this happens when a contact is added from Phonebook by a logger service
@@ -271,8 +262,7 @@ public class ContactManager {
                     contact.setContactType(newContact.getContactType());
                     setDefaultBlockStateByContactType(contact, newContact.getContactType());
                     updateContact(contact);
-                    //TODO remove the line below - it is temporary
-                    Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                 }
                 else if((contact.getId() < newContact.getId()) && (contact.getContactType() != newContact.getContactType())){ //if manually add from different category is performed (where the contact may exist in another category), a category change must be done.
                     //set default block setting for old user - we don't to lose other oldContact properties
@@ -288,24 +278,23 @@ public class ContactManager {
                     updateContact(contact);
 
                     if(oldContactType == ContactType.HIDDEN_CONTACT){
-                        //TODO remove the line below - it is temporary
-                        Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                     }
                     else{
-                        //TODO bring the string from string resource
-                        Toast.makeText(mContext, "Number is moved to  " + (contactType == ContactType.BLOCKED_CONTACT ? "blocked list" : "white list"), Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(mContext, mContext.getString(R.string.number_is_moved_to) + (contactType == ContactType.BLOCKED_CONTACT ? mContext.getString(R.string.blocked_list) : mContext.getString(R.string.white_list)), Toast.LENGTH_SHORT).show();
                     }
                 }
                 else {
-                    //TODO: is this a good idea to simply show a toast and stop or is it better to show a dialog to ignore/replace the new number
-                    Toast.makeText(mContext, "Number already exists in list.", Toast.LENGTH_SHORT).show();
+
+                   Toast.makeText(mContext, mContext.getString(R.string.number_already_exists_in_list), Toast.LENGTH_SHORT).show();
                 }
             }
             else{
 
                 newContact.setId(mDataHelper.insertContact(newContact));
-                //TODO: update this toast below
-                Toast.makeText(mContext, "Contact added successfully", Toast.LENGTH_SHORT).show(); //TODO is there a better message here?
+                Toast.makeText(mContext, mContext.getString(R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
 
                 if (isManual) {
                     //call a background service to replace the number from phone book if exists
@@ -393,8 +382,7 @@ public class ContactManager {
         String countryCodeValue = tm.getNetworkCountryIso();
 
         if(countryCodeValue == null || countryCodeValue.isEmpty()){
-            //get it from preference
-            //TODO get it from preference setting
+            //do nothing for the time being. Null countryCodeValue is evaluated by the calling/client methods
         }
         else{
             //save country code value in preference for later use

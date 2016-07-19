@@ -42,11 +42,6 @@ import android.widget.Toast;
 public class WhiteListFragment extends HideNotificationListFragment implements LoaderManager.LoaderCallbacks<DataBaseHelper.ContactCursor>, SearchView.OnQueryTextListener,
     UpdatableFragment{
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
     private static int REQUEST_NEW_CONTACT = 1;
     private static int CONTACTS_LIST_LOADER = 2;
     private static int ADD_CONTACT_MANUALLY = 3;
@@ -55,10 +50,6 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
     //Activity request codes
     private final Integer SINGLE_WHITELIST_CONTACT_ACTIVITY_RESULT = 0;
     private final Integer ADD_NEW_CONTACT_REQUEST_CODE = 1;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
     private ContactManager mContactManager;
@@ -74,12 +65,9 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
         }
     };
 
-    // TODO: Rename and change types of parameters
-    public static WhiteListFragment newInstance(String param1, String param2) {
+    public static WhiteListFragment newInstance() {
         WhiteListFragment fragment = new WhiteListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,11 +82,6 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
         mContactManager = ContactManager.getInstance(getActivity());
         setHasOptionsMenu(true);
@@ -243,11 +226,7 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
 
         Contact contact = ((DataBaseHelper.ContactCursor)((getListAdapter()).getItem(position))).getContact();
 
-        Intent intent = new Intent(getActivity(), SingleWhiteListContactActivity.class);
-        //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
-        intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
-        intent.putExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, true);
-        startActivityForResult(intent, SINGLE_WHITELIST_CONTACT_ACTIVITY_RESULT);
+        startSingleContactActivity(contact, true);
     }
 
     //utility method to start single contact activity - it will be used two places
@@ -255,7 +234,7 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
 
         Intent intent = new Intent(getActivity(), SingleContactActivity.class);
         //Intent intent = new Intent(getActivity(), CrimePagerActivity.class);
-        intent.putExtra(SingleContactFragment.ARG_PARAM1, contact);
+        intent.putExtra(SingleContactFragment.CONTACT, contact);
         intent.putExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, isContactFromPhoneBook);
         startActivityForResult(intent, SINGLE_WHITELIST_CONTACT_ACTIVITY_RESULT);
     }
@@ -437,7 +416,6 @@ public class WhiteListFragment extends HideNotificationListFragment implements L
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
 

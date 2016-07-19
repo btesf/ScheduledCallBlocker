@@ -28,14 +28,6 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 
 public class LogFragment extends HideNotificationListFragment  implements LoaderManager.LoaderCallbacks<DataBaseHelper.LogCursor>, UpdatableFragment  {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private LogManager mLogManager;
     private TimeHelper mTimeHelper;
@@ -49,17 +41,11 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment LogFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static LogFragment newInstance(String param1, String param2) {
+    public static LogFragment newInstance() {
         LogFragment fragment = new LogFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,10 +57,6 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
         mLogManager = LogManager.getInstance(getActivity());
         mTimeHelper = TimeHelper.getInstance(getActivity());
@@ -162,7 +144,7 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
         public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View v = inflater.inflate(R.layout.fragment_log, viewGroup, false);
-            return v; //TODO: inflate a view and return here -- inflater.inflate(R.layout.single_contact_view, viewGroup, false);
+            return v;
         }
 
         @Override
@@ -170,14 +152,12 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
             LogRecord logRecord = mLogCursor.getLog();
 
             //set up the start date text view
-            //TODO: bind a data with view here
             TextView logContactNameTextView = (TextView) view.findViewById(R.id.log_contact_phone);
             TextView logDateTextView = (TextView) view.findViewById(R.id.log_contact_date);
 
             ImageView logTypeImage = (ImageView) view.findViewById(R.id.block_type_icon);
 
             logContactNameTextView.setText(logRecord.getContactName());
-            //TODO: format the stardard way. determine if the time format is 24/12 from the system and format the date accordingly
             logDateTextView.setText(mTimeHelper.formattedLogDate(logRecord.getLogDate()));
 
             logTypeImage.setImageResource(logRecord.getBlockType() == BlockType.INCOMING ? R.drawable.incoming : R.drawable.outgoing);
@@ -215,8 +195,7 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
                 return super.onOptionsItemSelected(item);
         }
     }
-//and the most important thing in this world
-    // TODO: Rename method, update argument and hook method into UI event
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -273,7 +252,6 @@ public class LogFragment extends HideNotificationListFragment  implements Loader
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 

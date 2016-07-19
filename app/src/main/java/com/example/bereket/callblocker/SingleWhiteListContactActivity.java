@@ -12,7 +12,7 @@ public  class SingleWhiteListContactActivity extends SingleFragmentActivity impl
     @Override
     protected Fragment createFragment() {
 
-        Contact contactExtra = (Contact) getIntent().getSerializableExtra(SingleContactFragment.ARG_PARAM1);
+        Contact contactExtra = (Contact) getIntent().getSerializableExtra(SingleContactFragment.CONTACT);
         boolean isContactFromPhoneBookExtra = (boolean) getIntent().getBooleanExtra(SingleContactFragment.ARG_CONTACT_FROM_PHONEBOOK, true);
 
         SingleWhiteListContactFragment contactFragment = SingleWhiteListContactFragment.newInstance(contactExtra, isContactFromPhoneBookExtra);

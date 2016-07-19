@@ -19,7 +19,7 @@ public class AddNewPhoneActivity extends SingleFragmentActivity implements AddNe
         String arg1 = "";
         String arg2 = "";
 
-        AddNewPhoneFragment addNewPhoneFragment = AddNewPhoneFragment.newInstance(arg1, arg2);
+        AddNewPhoneFragment addNewPhoneFragment = AddNewPhoneFragment.newInstance();
 
         return addNewPhoneFragment;
     }

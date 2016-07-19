@@ -40,22 +40,21 @@ public class NotificationReceiver extends BroadcastReceiver {
 
             BlockedCallCounter blockedCallCounter = new BlockedCallCounter(mContext);
             int blockCount = blockedCallCounter.incrementAndGetBlockCount(blockType);
-            //TODO put string values in xml file
             Intent i  = new Intent(mContext, MainAppActivity.class);
 
             i.putExtra(Constants.FRAGMENT_ID, Constants.LOG_LIST_FRAGMENT);
 
             PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);
             Notification notification = new NotificationCompat.Builder(mContext)
-                    .setTicker("Call blocker")
+                    .setTicker(mContext.getResources().getString(R.string.scheduled_call_blocker_notification_ticker))
                     .setSmallIcon(android.R.drawable.ic_menu_report_image) //TODO: change the drawable here
-                    .setContentTitle( (blockType == BlockType.INCOMING ? "New incoming call blocked" : "New outgoing call blocked"))
+                    .setContentTitle((blockType == BlockType.INCOMING ? mContext.getString(R.string.new_incoming_call_blocked) : mContext.getString(R.string.new_outgoing_call_blocked)))
                     .setContentText(blockCount +
-                            (blockType == BlockType.INCOMING ? " incoming " : " outgoing ") + (blockCount == 1 ? "call is " : "calls are ")
-                            + "blocked since you last checked")
+                            (blockType == BlockType.INCOMING ? mContext.getString(R.string.notification_segment_incoming) : mContext.getString(R.string.notification_segment_outgoing)) + (blockCount == 1 ? mContext.getString(R.string.notification_call_is) : mContext.getString(R.string.notification_calls_are))
+                            + mContext.getString(R.string.blocked_since_you_last_checked))
                     .setContentIntent(pi)
                     .setAutoCancel(true)
-                    .build();
+                            .build();
 
             NotificationManager notificationManager = (NotificationManager)
                     mContext.getSystemService(Context.NOTIFICATION_SERVICE);

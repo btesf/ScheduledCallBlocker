@@ -10,8 +10,6 @@
     <string name="call_blocker_activity_name">Blocked calls log</string>
 
     <string name="preference_dialog_clear_type_key">ClearType</string>
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="outgoing_call_blocked_string">Block outgoing call</string>
     <string name="incoming_call_blocked_string">Block incoming call</string>
     <string name="delte_contact">delte</string>
@@ -170,4 +168,20 @@
     <string name="incoming_call_intercepted_title">Incoming call intercepted</string>
     <string name="see_log_text">SEE LOG</string>
     <string name="cancel_see_log_text">CANCEL</string>
+
+    <string name="contact_added_successfully">Contact added successfully</string>
+    <string name="contact_is_updated">Contact is updated</string>
+    <string name="number_already_exists_in_list">Number already exists in list</string>
+    <string name="number_is_moved_to">Number is moved to\u0020</string>
+    <string name="blocked_list">blocked list</string>
+    <string name="white_list">whitelist</string>
+    <string name="old_number_is_replaced_by_new_one">Old number is replaced by new one</string>
+    <string name="new_incoming_call_blocked">New incoming call is blocked</string>
+    <string name="new_outgoing_call_blocked">New outgoing call is blocked</string>
+    <string name="notification_segment_incoming">\u0020 incoming\u0020</string>
+    <string name="notification_segment_outgoing">\u0020 outgoing\u0020</string>
+    <string name="notification_call_is">call is\u0020</string>
+    <string name="notification_calls_are">calls are\u0020</string>
+    <string name="blocked_since_you_last_checked">blocked since you last checked</string>
+    <string name="scheduled_call_blocker_notification_ticker">Schedule call blocker</string>
 </resources>

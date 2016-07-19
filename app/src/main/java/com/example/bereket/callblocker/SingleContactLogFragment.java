@@ -213,7 +213,6 @@ public class SingleContactLogFragment extends HideNotificationFragment implement
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 

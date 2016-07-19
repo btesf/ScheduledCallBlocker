@@ -43,10 +43,15 @@ public class PickTimeFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) { //TODO what about if argument is null?
+        if (getArguments() != null) {
             Schedule schedule = (Schedule)getArguments().getSerializable(SCHEDULE);
             if(schedule != null){
+
                 mSchedule = schedule;
+            } else{ //this case is for safety and to avoid NPE. The value returned by this activity won't be used in the calling Activity result - b/c contactId is null here
+
+                mSchedule = new Schedule();
+                mSchedule.setContactId(0);
             }
         }
 

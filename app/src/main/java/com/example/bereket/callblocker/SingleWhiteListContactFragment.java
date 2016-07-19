@@ -28,15 +28,9 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class SingleWhiteListContactFragment extends HideNotificationFragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static final String ARG_PARAM1 = "param1";
-    public static final String ARG_CONTACT_FROM_PHONEBOOK = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    public static final String ARG_CONTACT = "contactParam";
+    public static final String ARG_CONTACT_FROM_PHONEBOOK = "contactFromPhonbookParam";
     private Contact mContact;
     //UI Elements
     private TextView mPhoneNumberTextView;
@@ -82,14 +76,13 @@ public class SingleWhiteListContactFragment extends HideNotificationFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
+     * @param contact Parameter 1.
      * @return A new instance of fragment SingleContactFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static SingleWhiteListContactFragment newInstance(Contact param1, boolean isContactFromPhoneBook) {
+    public static SingleWhiteListContactFragment newInstance(Contact contact, boolean isContactFromPhoneBook) {
         SingleWhiteListContactFragment fragment = new SingleWhiteListContactFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_PARAM1, param1);
+        args.putSerializable(ARG_CONTACT, contact);
         args.putSerializable(ARG_CONTACT_FROM_PHONEBOOK, isContactFromPhoneBook);
         fragment.setArguments(args);
         return fragment;
@@ -108,7 +101,7 @@ public class SingleWhiteListContactFragment extends HideNotificationFragment {
         if (getArguments() != null) {
 
             boolean isContactFromPhonebook = (boolean)getArguments().getBoolean(ARG_CONTACT_FROM_PHONEBOOK);
-            Contact contact = (Contact)getArguments().getSerializable(ARG_PARAM1);
+            Contact contact = (Contact)getArguments().getSerializable(ARG_CONTACT);
 
             if(contact != null){
                 //check if the ,contact comes from phone book. If so, don't need to re-query - we have all the necessary information (complete fname, last name...)
@@ -308,7 +301,6 @@ public class SingleWhiteListContactFragment extends HideNotificationFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 }
